@@ -1,0 +1,14 @@
+:root {
+    --navajowhite2:  	#eecfa1;
+    --navajowhite3:  	#cdb38b;
+}
+
+canvas {
+    padding: 0;
+    margin: 5px;
+    position: relative;
+}
+
+canvas.active {
+    outline: var(--navajowhite2) 3px solid;
+}
