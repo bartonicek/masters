@@ -12,3 +12,24 @@ canvas {
 canvas.active {
     outline: var(--navajowhite2) 3px solid;
 }
+
+#help-button {
+    background-color: navajowhite;
+    color: steelblue;
+    position: absolute;
+    padding: 20px;
+    right: 0;
+    bottom: 0;
+    font-size: 20px;
+}
+
+#help-menu {
+    transform: translateX(-100%);
+    display: flex;
+    flex-direction: column;
+    transition: transform 220ms;
+}
+
+#help-menu.show {
+    transform: translateX(0);
+}

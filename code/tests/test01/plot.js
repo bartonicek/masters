@@ -1,10 +1,11 @@
 export class Plot {
 
-    constructor(height, width, col) {
+    constructor(height, width, col = 'antiquewhite') {
         this.dims = {height, width}
         this.coords = {xmin : 0, ymin : 0, xmax : 100, ymax : 100}
         this.gpars = {panel_bg : col}
         this.geoms = []
+        //this.initialize()
     }
 
     initialize() {
