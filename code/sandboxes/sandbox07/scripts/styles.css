@@ -1,0 +1,14 @@
+
+.plotBox {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    padding: 0px;
+    margin: 5px;
+}
+
+.plotBox canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

@@ -1,0 +1,9 @@
+{
+    "scripts": {
+        "test" : "ava"
+    },
+    "ava": {
+        "files": ["./tests/*"]
+    },
+    "type": "module" 
+}
