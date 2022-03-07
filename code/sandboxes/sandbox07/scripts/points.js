@@ -15,11 +15,14 @@ export class Points {
         return this.scales.y.dataToPlot(this.dataY)
     }
 
-    draw(x, y, col, context) {
+    draw(x, y, col, context, transp) {
 
         context.save()
-        context.fillStyle = col
         
+        context.fillStyle = col
+
+        if (transp === true) context.clearRect(0, 0, 400, 400)
+
         x.forEach((e, i) => {
             context.beginPath()
             context.arc(e, y[i], this.radius, 0, Math.PI * 2)
@@ -33,7 +36,7 @@ export class Points {
 
         const x = this.plotX
         const y = this.plotY
-
+        
         this.draw(x, y, 'firebrick', base.context)
 
     }
@@ -43,7 +46,7 @@ export class Points {
         const x = this.plotX.filter((e, i) => selected[i])
         const y = this.plotY.filter((e, i) => selected[i])
 
-        this.draw(x, y, 'steelblue', highlight.context)
+        this.draw(x, y, 'steelblue', highlight.context, true)
 
     }
 }

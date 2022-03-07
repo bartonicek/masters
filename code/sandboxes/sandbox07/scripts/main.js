@@ -1,7 +1,7 @@
 import { Plot } from "./plot.js";
 import { Scene } from "./scene.js";
 
-const n = 20
+const n = 100
 const height = Array.from(Array(n))
                .map(e => Math.round(Math.random() * 20))
 const weight = Array.from(Array(n)).map(e => Math.random() * 20)

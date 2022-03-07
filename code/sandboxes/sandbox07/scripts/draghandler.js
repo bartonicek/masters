@@ -75,7 +75,7 @@ export class DragHandler {
 
         mouseEvents.forEach((e, i) => {
             this.plotBox.addEventListener(e, event => {
-                this[dragActions[i]](event)
+                window.requestAnimationFrame(this[dragActions[i]](event))
             })            
         });
         
