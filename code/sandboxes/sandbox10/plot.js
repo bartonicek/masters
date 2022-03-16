@@ -14,8 +14,10 @@ export class Plot extends PlotContainer {
         this.y = y
         this.marker = marker
         
-        this.scales = {x : new XYScale(0, 10, this.width, 1, {lower : 0.1, upper : 0.1}),
-                       y : new XYScale(0, 10, this.height, -1, {lower : 0.1, upper : 0.1})}
+        this.scales = {x : new XYScale(Math.min(...this.x), Math.max(...this.x),
+                                        this.width, 1, {lower : 0.1, upper : 0.1}),
+                       y : new XYScale(Math.min(...this.y), Math.max(...this.y), 
+                                        this.height, -1, {lower : 0.1, upper : 0.1})}
         this.objects = {
                         points1 : new Points(this.x, this.y, this.scales),
                         axis1 : new Axis(this.scales),

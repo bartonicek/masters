@@ -1,10 +1,12 @@
 import { Plot } from './plot.js'
 
-const n = 20
-const x = Array.from(Array(n)).map(e => Math.random() * 10)
-const y = Array.from(Array(n)).map(e => Math.random() * 10)
-const z = Array.from(Array(n)).map(e => Math.random() * 10)
-const w = Array.from(Array(n)).map(e => Math.random() * 10)
+const getData = async(path) => {
+    const response = await fetch(path)
+    return response.json()
+}
+
+const data1 = await getData('mtcars.json')
+const n = 32
 
 class Marker {
 
@@ -23,16 +25,14 @@ class Marker {
         Object.keys(plots).forEach(e => {
             plots[e].drawHighlight(plots[e].plotHighlight, selected)
         })
-
+    
     }
 
 }
 
 const marker1 = new Marker(n)
-const plot1 = new Plot(x, y, marker1)
-const plot2 = new Plot(z, w, marker1)
 
+const plot1 = new Plot(data1.wt, data1.mpg, marker1)
+const plot2 = new Plot(data1.cyl, data1.hp, marker1)
 const plots = {plot1, plot2}
-
-
 
