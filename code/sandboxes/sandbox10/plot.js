@@ -1,5 +1,6 @@
 import { Axis } from "./axis.js";
 import { ClickHandler } from "./clickhandler.js";
+import { DragBox } from "./dragbox.js";
 import { DragHandler } from "./draghandler.js";
 import { PlotContainer } from "./plotcontainer.js";
 import { Points } from "./points.js";
@@ -57,7 +58,14 @@ export class Plot extends PlotContainer {
     });
   }
 
+  drawUser(user) {
+    Object.keys(this.objects).forEach((e) => {
+      this.objects[e]?.drawUser?.call(this.objects[e], user);
+    });
+  }
+
   initialize() {
     this.drawBase(this.plotBase);
+    this.objects.dragBox1 = new DragBox(this.plotContainer, this.dragHandler);
   }
 }

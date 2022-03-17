@@ -43,13 +43,13 @@ export class Points {
     const x = this.plotX;
     const y = this.plotY;
 
-    this.draw(x, y, "firebrick", base);
+    this.draw(x, y, "seagreen", base);
   }
 
   drawHighlight(highlight, selected) {
     const x = this.plotX.filter((e, i) => selected[i]);
     const y = this.plotY.filter((e, i) => selected[i]);
 
-    this.draw(x, y, "steelblue", highlight, true);
+    this.draw(x, y, "firebrick", highlight, true);
   }
 }
