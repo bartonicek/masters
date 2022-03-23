@@ -1,30 +1,23 @@
 export class ClickHandler {
-    
-    constructor(plotContainer, marker) {
+  constructor(plotContainer, marker) {
+    this.plotContainer = plotContainer;
+    this.marker = marker;
 
-        this.plotContainer = plotContainer
-        this.marker = marker
+    this.initialize();
+  }
 
-        this.initialize()
+  unselect() {
+    this.marker.receive([]);
+  }
 
-    }
+  initialize() {
+    const actions = ["dblclick"];
+    const consequences = ["unselect"];
 
-    unselect() {
-
-        this.marker.receive([])
-
-    }
-
-    initialize() {
-
-        const actions = ['dblclick']
-        const consequences = ['unselect']
-
-        actions.forEach((action, index) => {
-            this.plotContainer.addEventListener(action, event => {
-                this[consequences[index]](event)
-            })
-        })
-
-    }
+    actions.forEach((action, index) => {
+      this.plotContainer.addEventListener(action, (event) => {
+        this[consequences[index]](event);
+      });
+    });
+  }
 }
