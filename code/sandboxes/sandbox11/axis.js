@@ -1,3 +1,6 @@
+import { LinePrimitive } from "./primitives/lineprim.js";
+import { TextPrimitive } from "./primitives/textprim.js";
+
 export class Axis {
   constructor(scales) {
     this.scales = scales;
@@ -6,19 +9,11 @@ export class Axis {
   }
 
   draw(context) {
-    const { x: xScale, y: yScale } = this.scales;
+    const { plotMin: x0, plotMax: x1 } = this.scales.x;
+    const { plotMin: y0, plotMax: y1 } = this.scales.y;
 
-    const x0 = xScale.plotMin;
-    const x1 = xScale.plotMax;
-    const y0 = yScale.plotMin;
-    const y1 = yScale.plotMax;
-
-    context.save();
-    context.beginPath();
-    context.moveTo(x0, y0);
-    context.lineTo(x1, y0);
-    context.moveTo(x0, y0);
-    context.lineTo(x0, y1);
+    LinePrimitive.draw(context, [x0, x1], [y0, y0]);
+    LinePrimitive.draw(context, [x0, x0], [y0, y1]);
 
     this.xText.plotBreaks.forEach((e, i) =>
       context.fillText(this.xText.dataLabels[i], e, y0 + 20)
@@ -27,8 +22,6 @@ export class Axis {
     this.yText.plotBreaks.forEach((e, i) => {
       context.fillText(this.yText.dataLabels[i], x0 - 30, e);
     });
-
-    context.stroke();
     context.restore();
   }
 

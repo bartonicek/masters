@@ -1,6 +1,6 @@
 export class Marker {
   constructor(n) {
-    this.selected = Array.from(Array(n)).map((e) => false);
+    this.selected = new Uint8Array(Array(n));
     this.callbacks = [];
   }
 
