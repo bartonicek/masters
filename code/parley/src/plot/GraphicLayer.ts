@@ -24,39 +24,45 @@ export class GraphicLayer {
   }
 
   drawBarsV(
-    x: Array<number>,
-    y: Array<number>,
+    x: number[],
+    y: number[],
     y0: number,
-    redraw = false,
     col = "steelblue",
-    width = this.width / (2 * x.length)
+    width = this.width / (3 * x.length)
   ) {
     const context = this.context;
     context.save();
     context.fillStyle = col;
-    if (redraw) context.clearRect(0, 0, this.width, this.height);
     x.forEach((e, i) => {
-      context.fillRect(e, y0 - y[i], width, y[i]);
+      context.fillRect(e - width / 2, y[i], width, y0 - y[i]);
     });
     context.restore();
   }
 
-  drawPoints(
-    x: Array<number>,
-    y: Array<number>,
-    redraw = false,
-    col = "steelblue",
-    radius = 5
-  ) {
+  drawPoints = (x: number[], y: number[], col = "steelblue", radius = 5) => {
     const context = this.context;
     context.save();
     context.fillStyle = col;
-    if (redraw) context.clearRect(0, 0, this.width, this.height);
     x.forEach((e, i) => {
       context.beginPath();
       context.arc(e, y[i], radius, 0, Math.PI * 2);
       context.fill();
     });
     context.restore();
-  }
+  };
+
+  drawLine = (x: number[], y: number[], col = "black") => {
+    const context = this.context;
+    context.save();
+    context.beginPath();
+    context.strokeStyle = col;
+    context.moveTo(x[0], y[0]);
+    x.shift();
+    y.shift();
+    x.forEach((e, i) => {
+      context.lineTo(e, y[i]);
+    });
+    context.stroke();
+    context.restore();
+  };
 }

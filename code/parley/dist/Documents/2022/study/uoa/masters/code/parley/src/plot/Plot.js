@@ -1,25 +1,31 @@
 import { GraphicStack } from "./GraphicStack.js";
-import { Points } from "../geoms/Points.js";
+import * as reps from "../representations/representations.js";
+import * as scales from "../scales/scales.js";
 export class Plot extends GraphicStack {
     data;
     mapping;
     marker;
-    stats;
-    geoms;
-    constructor(data, mapping, 
-    //objects: string[],
-    marker) {
+    scales;
+    entities;
+    constructor(data, mapping, marker) {
         super();
         this.data = data;
         this.mapping = mapping;
         this.marker = marker;
-        this.geoms = { points1: new Points(this.data, this.mapping) };
+        this.data = data;
+        this.mapping = mapping;
+        this.marker = marker;
+        this.entities = { points1: new reps.Points() };
+        this.scales = {
+            x: new scales.XYScaleContinuous(this.width),
+            y: new scales.XYScaleContinuous(this.height),
+        };
+        this.initialize();
     }
-    collectX = () => {
-        let set = new Set();
-        Object.keys(this.geoms).forEach((e) => {
-            this.geoms[e].statX.forEach((f) => set.add(f));
-        });
-        return Array.from(set);
+    iterateObject = (object, fun, ...args) => {
+        Object.keys(object).forEach((e) => object[e][fun](...args));
+    };
+    initialize = () => {
+        this.iterateObject(this.entities, "registerScales", this.scales);
     };
 }

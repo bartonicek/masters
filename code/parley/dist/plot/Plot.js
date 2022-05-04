@@ -1,16 +1,15 @@
 import { GraphicStack } from "./GraphicStack.js";
-import { Points } from "../geoms/Points.js";
-import { XYScaleContinuous } from "../scales/xyscalecontinuous.js";
+import * as reps from "../representations/representations.js";
+import * as scales from "../scales/scales.js";
+import * as stats from "../statistics/statistics.js";
 export class Plot extends GraphicStack {
     data;
     mapping;
     marker;
-    stats;
     scales;
-    geoms;
-    constructor(data, mapping, 
-    //objects: string[],
-    marker) {
+    representations;
+    statistics;
+    constructor(data, mapping, marker) {
         super();
         this.data = data;
         this.mapping = mapping;
@@ -18,30 +17,44 @@ export class Plot extends GraphicStack {
         this.data = data;
         this.mapping = mapping;
         this.marker = marker;
-        this.geoms = { points1: new Points(this.data, this.mapping) };
+        this.representations = {
+            points2: new reps.Bars(),
+            points1: new reps.Points(),
+            axisbox1: new reps.AxisBox(),
+        };
         this.scales = {
-            x: new XYScaleContinuous(this.uniqueStatX, this.width),
-            y: new XYScaleContinuous(this.uniqueStatY, this.height),
+            x: new scales.XYScaleContinuous(this.width),
+            y: new scales.XYScaleContinuous(this.height, -1),
+        };
+        this.statistics = {
+            identity1: new stats.Identity(this.data, this.mapping),
+            summary1: new stats.Summary(this.data, this.mapping, ["mean"]),
         };
         this.initialize();
     }
-    get uniqueStatX() {
-        let set = new Set();
-        Object.keys(this.geoms).forEach((geom) => {
-            set = new Set([...set, ...new Set(this.geoms[geom].statX)]);
-        });
-        return Array.from(set);
+    extractChildren = (object, what) => {
+        return Object.keys(object).map((e) => object?.[e]?.[what]);
+    };
+    callChildren = (object, fun, ...args) => {
+        Object.keys(object).forEach((e) => object?.[e]?.[fun](...args));
+    };
+    get xVals() {
+        const values = [].concat(...this.extractChildren(this.statistics, "x"));
+        return Array.from(new Set(values));
     }
-    get uniqueStatY() {
-        let set = new Set();
-        Object.keys(this.geoms).forEach((geom) => {
-            set = new Set([...set, ...new Set(this.geoms[geom].statX)]);
-        });
-        return Array.from(set);
+    get yVals() {
+        const values = [].concat(...this.extractChildren(this.statistics, "y"));
+        return Array.from(new Set(values));
     }
+    drawBase = () => {
+        this.callChildren(this.representations, "drawBase", this.graphicBase);
+    };
     initialize = () => {
-        Object.keys(this.geoms).forEach((e) => {
-            this.geoms[e].registerScales(this.scales);
-        });
+        this.representations.points1.registerStat(this.statistics.identity1);
+        this.representations.points2.registerStat(this.statistics.summary1);
+        this.scales.x.registerData(this.xVals);
+        this.scales.y.registerData(this.yVals);
+        this.callChildren(this.representations, "registerScales", this.scales);
+        this.drawBase();
     };
 }

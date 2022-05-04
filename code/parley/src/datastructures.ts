@@ -1,5 +1,11 @@
+type VectorGeneric = (number | string | boolean)[];
+type VectorNumeric = number[];
+type VectorDiscrete = (string | boolean)[];
+
 type DataFrame = {
-  [index: string]: (number | string | boolean)[];
+  [index: string]: VectorGeneric;
 };
 
-export { DataFrame };
+type Mapping = Map<string, string>;
+
+export { VectorGeneric, VectorNumeric, VectorDiscrete, DataFrame, Mapping };

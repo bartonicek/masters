@@ -1,23 +1,17 @@
-import { DataFrame } from "../datastructures.js";
+import { DataFrame } from "./../datastructures.js";
 import { GraphicStack } from "./GraphicStack.js";
-import { Points } from "../geoms/Points.js";
-import { XYScaleContinuous } from "../scales/xyscalecontinuous.js";
+import * as reps from "../representations/representations.js";
+import * as scales from "../scales/scales.js";
+import * as stats from "../statistics/statistics.js";
 
 export class Plot extends GraphicStack {
-  stats: { [key: string]: object };
-  scales: { [key: string]: object };
-  geoms: {
-    [key: string]: {
-      statX: (number | string | boolean)[];
-      statY: (number | string | boolean)[];
-      registerScales: Function;
-    };
-  };
+  scales: any;
+  representations: any;
+  statistics: any;
 
   constructor(
     public data: DataFrame,
     public mapping: Map<string, string>,
-    //objects: string[],
     public marker: object
   ) {
     super();
@@ -25,33 +19,52 @@ export class Plot extends GraphicStack {
     this.mapping = mapping;
     this.marker = marker;
 
-    this.geoms = { points1: new Points(this.data, this.mapping) };
-    this.scales = {
-      x: new XYScaleContinuous(this.uniqueStatX, this.width),
-      y: new XYScaleContinuous(this.uniqueStatY, this.height),
+    this.representations = {
+      points2: new reps.Bars(),
+      points1: new reps.Points(),
+      axisbox1: new reps.AxisBox(),
     };
+    this.scales = {
+      x: new scales.XYScaleContinuous(this.width),
+      y: new scales.XYScaleContinuous(this.height, -1),
+    };
+    this.statistics = {
+      identity1: new stats.Identity(this.data, this.mapping),
+      summary1: new stats.Summary(this.data, this.mapping, ["mean"]),
+    };
+
     this.initialize();
   }
 
-  get uniqueStatX(): any[] {
-    let set = new Set();
-    Object.keys(this.geoms).forEach((geom) => {
-      set = new Set([...set, ...new Set(this.geoms[geom].statX)]);
-    });
-    return Array.from(set);
+  extractChildren = (object: object, what: string) => {
+    return Object.keys(object).map((e) => object?.[e]?.[what]);
+  };
+
+  callChildren = (object: object, fun: string, ...args: any) => {
+    Object.keys(object).forEach((e) => object?.[e]?.[fun](...args));
+  };
+
+  get xVals() {
+    const values = [].concat(...this.extractChildren(this.statistics, "x"));
+    return Array.from(new Set(values));
   }
 
-  get uniqueStatY(): any[] {
-    let set = new Set();
-    Object.keys(this.geoms).forEach((geom) => {
-      set = new Set([...set, ...new Set(this.geoms[geom].statX)]);
-    });
-    return Array.from(set);
+  get yVals() {
+    const values = [].concat(...this.extractChildren(this.statistics, "y"));
+    return Array.from(new Set(values));
   }
+
+  drawBase = () => {
+    this.callChildren(this.representations, "drawBase", this.graphicBase);
+  };
 
   initialize = () => {
-    Object.keys(this.geoms).forEach((e) => {
-      this.geoms[e].registerScales(this.scales);
-    });
+    this.representations.points1.registerStat(this.statistics.identity1);
+    this.representations.points2.registerStat(this.statistics.summary1);
+
+    this.scales.x.registerData(this.xVals);
+    this.scales.y.registerData(this.yVals);
+    this.callChildren(this.representations, "registerScales", this.scales);
+    this.drawBase();
   };
 }

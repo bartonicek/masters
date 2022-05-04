@@ -2,11 +2,11 @@ import { GraphicLayer } from "./GraphicLayer.js";
 
 export class GraphicStack {
   graphicContainer: HTMLDivElement;
-  protected graphicBase: any;
-  protected graphicHighlight: any;
-  protected graphicUser: any;
-  protected width: number;
-  protected height: number;
+  graphicBase: any;
+  graphicHighlight: any;
+  graphicUser: any;
+  width: number;
+  height: number;
 
   constructor() {
     this.graphicContainer = document.createElement("div");
