@@ -14,3 +14,4 @@ export class ScaleDiscrete extends Scale {
         return x.map((e) => offset + direction * length * positions[values.indexOf(e)]);
     };
 }
+console.log();
