@@ -21,3 +21,5 @@ export class ScaleDiscrete extends Scale {
     );
   };
 }
+
+console.log();
