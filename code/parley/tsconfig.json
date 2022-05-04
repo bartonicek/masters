@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "watch": true,
+        "outDir": "dist"
+    },
+    "include": ["src"]
+}
