@@ -1,8 +1,4 @@
-import { VectorGeneric } from "./datastructures.js";
 import { Plot } from "./plot/Plot.js";
-import { Scale } from "./scales/Scale.js";
-import { ScaleDiscrete } from "./scales/ScaleDiscrete.js";
-import { XYScaleDiscrete } from "./scales/XYScaleDiscrete.js";
 
 const getData = async (path: string) => {
   const response = await fetch(path);

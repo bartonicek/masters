@@ -28,25 +28,34 @@ export class GraphicLayer {
     y: number[],
     y0: number,
     col = "steelblue",
+    stroke = null,
     width = this.width / (3 * x.length)
   ) {
     const context = this.context;
     context.save();
     context.fillStyle = col;
     x.forEach((e, i) => {
-      context.fillRect(e - width / 2, y[i], width, y0 - y[i]);
+      col ? context.fillRect(e - width / 2, y[i], width, y0 - y[i]) : null;
+      stroke ? context.strokeRect(e - width / 2, y[i], width, y0 - y[i]) : null;
     });
     context.restore();
   }
 
-  drawPoints = (x: number[], y: number[], col = "steelblue", radius = 5) => {
+  drawPoints = (
+    x: number[],
+    y: number[],
+    col = "steelblue",
+    stroke = null,
+    radius = 5
+  ) => {
     const context = this.context;
     context.save();
     context.fillStyle = col;
     x.forEach((e, i) => {
       context.beginPath();
       context.arc(e, y[i], radius, 0, Math.PI * 2);
-      context.fill();
+      stroke ? context.stroke() : null;
+      col ? context.fill() : null;
     });
     context.restore();
   };

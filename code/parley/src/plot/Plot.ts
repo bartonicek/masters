@@ -20,7 +20,7 @@ export class Plot extends GraphicStack {
     this.marker = marker;
 
     this.representations = {
-      bars1: new reps.Bars(),
+      bars1: new reps.Bars("orange"),
       points1: new reps.Points(),
       axisbox1: new reps.AxisBox(),
     };
