@@ -10,12 +10,12 @@ const which = (x: datastr.VectorGeneric, value: any) => {
   return x.map((e, i) => (e === value ? i : NaN)).filter((e) => !isNaN(e));
 };
 
-const match = (x: datastr.VectorGeneric, values: datastr.VectorGeneric) => {
+const match = <Type>(x: Type[], values: Type[]): number[] | null => {
   return x.map((e) => values.indexOf(e));
 };
 
-const unique = (x: datastr.VectorGeneric) => {
-  return Array.from(new Set(x));
+const unique = <Type>(x: Type[]): Type[] | null => {
+  return x.filter((e, i) => x.indexOf(e) == i);
 };
 
 export { isNumeric, sum, mean, min, max, which, match, unique };

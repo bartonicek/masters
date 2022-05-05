@@ -1,6 +1,6 @@
-import { ScaleContinuous } from "./ScaleContinuous.js";
+import { ScaleDiscrete } from "./ScaleDiscrete.js";
 
-export class XYScaleContinuous extends ScaleContinuous {
+export class XYScaleDiscrete extends ScaleDiscrete {
   margins: { lower: number; upper: number };
 
   constructor(
@@ -26,19 +26,7 @@ export class XYScaleContinuous extends ScaleContinuous {
     return this.pctToUnits(1);
   }
 
-  dataToPlot = (data: number | number[]) => {
+  dataToPlot = (data: any | any[]) => {
     return this.dataToUnits(data);
-  };
-
-  plotToData = (units: number | number[]) => {
-    return this.unitsToData(units);
-  };
-
-  pctToPlot = (pct: number | number[]) => {
-    return this.pctToUnits(pct);
-  };
-
-  plotToPct = (units: number | number[]) => {
-    return this.unitsToPct(units);
   };
 }

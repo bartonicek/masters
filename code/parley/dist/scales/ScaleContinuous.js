@@ -24,7 +24,7 @@ export class ScaleContinuous extends Scale {
             ? dataMin + pct * range
             : pct.map((e) => dataMin + e * range);
     };
-    dataToPCt = (data) => {
+    dataToPct = (data) => {
         const { dataMin, range } = this;
         return typeof data === "number"
             ? (data - dataMin) / range
@@ -41,17 +41,5 @@ export class ScaleContinuous extends Scale {
         return typeof units === "number"
             ? dataMin + (direction * range * (units - offset)) / length
             : units.map((e) => dataMin + direction * range * ((e - offset) / length));
-    };
-    pctToUnits = (pct) => {
-        const { length, offset, direction } = this;
-        return typeof pct === "number"
-            ? offset + direction * length * pct
-            : pct.map((e) => offset + direction * length * e);
-    };
-    unitsToPct = (units) => {
-        const { length } = this;
-        return typeof units === "number"
-            ? units / length
-            : units.map((e) => e / length);
     };
 }

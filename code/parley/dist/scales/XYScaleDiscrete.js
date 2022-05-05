@@ -1,5 +1,5 @@
-import { ScaleContinuous } from "./ScaleContinuous.js";
-export class XYScaleContinuous extends ScaleContinuous {
+import { ScaleDiscrete } from "./ScaleDiscrete.js";
+export class XYScaleDiscrete extends ScaleDiscrete {
     margins;
     constructor(length, direction = 1, expand = 0.1, margins = { lower: 0.15, upper: 0.15 }) {
         super(length, direction, expand);
@@ -17,14 +17,5 @@ export class XYScaleContinuous extends ScaleContinuous {
     }
     dataToPlot = (data) => {
         return this.dataToUnits(data);
-    };
-    plotToData = (units) => {
-        return this.unitsToData(units);
-    };
-    pctToPlot = (pct) => {
-        return this.pctToUnits(pct);
-    };
-    plotToPct = (units) => {
-        return this.unitsToPct(units);
     };
 }

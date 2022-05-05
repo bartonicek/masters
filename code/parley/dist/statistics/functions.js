@@ -10,6 +10,6 @@ const match = (x, values) => {
     return x.map((e) => values.indexOf(e));
 };
 const unique = (x) => {
-    return Array.from(new Set(x));
+    return x.filter((e, i) => x.indexOf(e) == i);
 };
 export { isNumeric, sum, mean, min, max, which, match, unique };

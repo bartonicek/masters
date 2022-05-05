@@ -13,4 +13,16 @@ export class Scale {
     registerData = (data) => {
         this.data = data;
     };
+    pctToUnits = (pct) => {
+        const { length, offset, direction } = this;
+        return typeof pct === "number"
+            ? offset + direction * length * pct
+            : pct.map((e) => offset + direction * length * e);
+    };
+    unitsToPct = (units) => {
+        const { length } = this;
+        return typeof units === "number"
+            ? units / length
+            : units.map((e) => e / length);
+    };
 }

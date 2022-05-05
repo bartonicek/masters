@@ -1,14 +1,13 @@
-import { VectorNumeric } from "../datastructures.js";
 import { Scale } from "./Scale.js";
 
 export class ScaleContinuous extends Scale {
-  data: VectorNumeric = [];
+  data: number[] = [];
 
   constructor(length: number, direction = 1, expand = 0.1) {
     super(length, direction, expand);
   }
 
-  registerData = (data: VectorNumeric) => {
+  registerData = (data: number[]) => {
     this.data = data;
   };
 
@@ -33,7 +32,7 @@ export class ScaleContinuous extends Scale {
       : pct.map((e) => dataMin + e * range);
   };
 
-  dataToPCt = (data: number | number[]) => {
+  dataToPct = (data: number | number[]) => {
     const { dataMin, range } = this;
     return typeof data === "number"
       ? (data - dataMin) / range
@@ -52,19 +51,5 @@ export class ScaleContinuous extends Scale {
     return typeof units === "number"
       ? dataMin + (direction * range * (units - offset)) / length
       : units.map((e) => dataMin + direction * range * ((e - offset) / length));
-  };
-
-  pctToUnits = (pct: number | number[]) => {
-    const { length, offset, direction } = this;
-    return typeof pct === "number"
-      ? offset + direction * length * pct
-      : pct.map((e) => offset + direction * length * e);
-  };
-
-  unitsToPct = (units: number | number[]) => {
-    const { length } = this;
-    return typeof units === "number"
-      ? units / length
-      : units.map((e) => e / length);
   };
 }

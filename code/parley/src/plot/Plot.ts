@@ -20,12 +20,12 @@ export class Plot extends GraphicStack {
     this.marker = marker;
 
     this.representations = {
-      points2: new reps.Bars(),
+      bars1: new reps.Bars(),
       points1: new reps.Points(),
       axisbox1: new reps.AxisBox(),
     };
     this.scales = {
-      x: new scales.XYScaleContinuous(this.width),
+      x: new scales.XYScaleDiscrete(this.width),
       y: new scales.XYScaleContinuous(this.height, -1),
     };
     this.statistics = {
@@ -60,8 +60,7 @@ export class Plot extends GraphicStack {
 
   initialize = () => {
     this.representations.points1.registerStat(this.statistics.identity1);
-    this.representations.points2.registerStat(this.statistics.summary1);
-
+    this.representations.bars1.registerStat(this.statistics.summary1);
     this.scales.x.registerData(this.xVals);
     this.scales.y.registerData(this.yVals);
     this.callChildren(this.representations, "registerScales", this.scales);

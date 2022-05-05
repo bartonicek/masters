@@ -1,2 +1,2 @@
+export * from "./XYScaleDiscrete.js";
 export * from "./XYScaleContinuous.js";
-export * from "./Scale.js";

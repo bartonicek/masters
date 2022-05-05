@@ -1,5 +1,4 @@
 import { Plot } from "./plot/Plot.js";
-import { Scale } from "./scales/Scale.js";
 const getData = async (path) => {
     const response = await fetch(path);
     return response.json();
@@ -12,6 +11,4 @@ const mapping1 = new Map([
 ]);
 const marker1 = { label: "ADD MARKER" };
 const plot1 = new Plot(data1, mapping1, marker1);
-const scale1 = new Scale(100);
-scale1.registerData(data1.cyl);
-console.log(scale1);
+console.log(plot1.scales.x.dataToPlot(4));

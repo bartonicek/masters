@@ -3,8 +3,8 @@ import * as funs from "./functions.js";
 
 export class Summary {
   x: datastr.VectorGeneric;
-  y: datastr.VectorNumeric;
-  indices: datastr.VectorNumeric;
+  y: number[];
+  indices: number[];
 
   constructor(
     data: datastr.DataFrame,
