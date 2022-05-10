@@ -1,30 +1,25 @@
+import * as funs from "../functions.js";
 export class Summary {
     x;
     y;
+    indices;
     constructor(data, mapping, functions = ["mean"], across = "x") {
         const [x, y] = [
             data[mapping.get(across)],
             data[mapping.get(across === "x" ? "y" : "x")],
         ];
+        this.x = funs.unique(x);
+        this.indices = funs.match(x, this.x);
+        // Apply summarizing function(s) to either get a single y
+        // or multiple y's, indexed by a number
+        functions.length === 1
+            ? (this.y = this.x.map((e, i) => {
+                return funs[functions[0]](y.filter((f, j) => this.indices[j] === i));
+            }))
+            : functions.forEach((fun, i) => {
+                this[`y${i}`] = this.x.map((e, i) => {
+                    return funs[fun](y.filter((f, j) => this.indices[j] === i));
+                });
+            });
     }
 }
-const summary = (data, mapping, functions = ["sum"], across = "x") => {
-    const [x, y] = [
-        data[mapping.get(across)],
-        data[mapping.get(across === "x" ? "y" : "x")],
-    ];
-    const xu = funs.unique(x);
-    const xi = xu.map((e) => funs.which(x, e));
-    const self = {
-        indices: xi,
-        x: xu,
-    };
-    if (functions.length === 1) {
-        self.y = xu.map((f) => funs[functions[0]](y.filter((g, i) => f === x[i])));
-        return self;
-    }
-    functions.forEach((e, i) => {
-        self[`y${i}`] = xu.map((f) => funs[e](y.filter((g, i) => f === x[i])));
-    });
-    return self;
-};

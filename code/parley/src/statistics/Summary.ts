@@ -1,5 +1,5 @@
 import * as datastr from "../datastructures.js";
-import * as funs from "./functions.js";
+import * as funs from "../functions.js";
 
 export class Summary {
   x: datastr.VectorGeneric;

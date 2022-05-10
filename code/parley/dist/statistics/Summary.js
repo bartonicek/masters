@@ -1,4 +1,4 @@
-import * as funs from "./functions.js";
+import * as funs from "../functions.js";
 export class Summary {
     x;
     y;

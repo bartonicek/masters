@@ -1,17 +1,17 @@
 export class Representation {
-  stat: any;
+  wrangler: any;
   scales: any;
 
   get x() {
-    return this.scales.x.dataToPlot(this.stat.x);
+    return this.scales.x.dataToPlot(this.wrangler.x);
   }
 
   get y() {
-    return this.scales.y.dataToPlot(this.stat.y);
+    return this.scales.y.dataToPlot(this.wrangler.y);
   }
 
-  registerStat = (stat: any) => {
-    this.stat = stat;
+  registerWrangler = (stat: any) => {
+    this.wrangler = stat;
   };
 
   registerScales = (scales: any) => {

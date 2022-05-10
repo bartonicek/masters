@@ -1,17 +1,19 @@
-import { DataFrame } from "./../datastructures.js";
+import * as datastr from "./../datastructures.js";
 import { GraphicStack } from "./GraphicStack.js";
+import * as funs from "../functions.js";
 import * as reps from "../representations/representations.js";
 import * as scales from "../scales/scales.js";
 import * as stats from "../statistics/statistics.js";
+import { Wrangler } from "../wrangler/Wrangler.js";
 
 export class Plot extends GraphicStack {
   scales: any;
   representations: any;
-  statistics: any;
+  wranglers: any;
 
   constructor(
-    public data: DataFrame,
-    public mapping: Map<string, string>,
+    public data: datastr.DataFrame,
+    public mapping: datastr.Mapping,
     public marker: object
   ) {
     super();
@@ -28,9 +30,15 @@ export class Plot extends GraphicStack {
       x: new scales.XYScaleDiscrete(this.width),
       y: new scales.XYScaleContinuous(this.height, -1),
     };
-    this.statistics = {
-      identity1: new stats.Identity(this.data, this.mapping),
-      summary1: new stats.Summary(this.data, this.mapping, ["mean"]),
+    this.wranglers = {
+      identity1: new Wrangler(this.data, this.mapping).extractIdentical(
+        "x",
+        "y"
+      ),
+      summary1: new Wrangler(this.data, this.mapping)
+        .splitBy("x")
+        .splitWhat("y")
+        .doWithin(funs.mean),
     };
 
     this.initialize();
@@ -44,25 +52,23 @@ export class Plot extends GraphicStack {
     Object.keys(object).forEach((e) => object?.[e]?.[fun](...args));
   };
 
-  get xVals() {
-    const values = [].concat(...this.extractChildren(this.statistics, "x"));
+  getValues = (variable: string) => {
+    const values = [].concat(...this.extractChildren(this.wranglers, variable));
     return Array.from(new Set(values));
-  }
-
-  get yVals() {
-    const values = [].concat(...this.extractChildren(this.statistics, "y"));
-    return Array.from(new Set(values));
-  }
+  };
 
   drawBase = () => {
     this.callChildren(this.representations, "drawBase", this.graphicBase);
   };
 
   initialize = () => {
-    this.representations.points1.registerStat(this.statistics.identity1);
-    this.representations.bars1.registerStat(this.statistics.summary1);
-    this.scales.x.registerData(this.xVals);
-    this.scales.y.registerData(this.yVals);
+    this.representations.points1.registerWrangler(this.wranglers.identity1);
+    this.representations.bars1.registerWrangler(this.wranglers.summary1);
+
+    ["x", "y"].forEach((mapping) =>
+      this.scales[mapping].registerData(this.getValues(mapping))
+    );
+
     this.callChildren(this.representations, "registerScales", this.scales);
     this.drawBase();
   };

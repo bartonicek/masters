@@ -5,5 +5,5 @@
         "watch": true,
         "outDir": "dist"
     },
-    "include": ["src"]
+    "include": ["src"],
 }
