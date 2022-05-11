@@ -17,3 +17,7 @@ const wrangleMapping = new Map([
 //console.log(Array.from(wrangleMapping.keys()).map((e) => wrangleMap.get(e)));
 const marker1 = { label: "ADD MARKER" };
 const plot1 = new Plot(data1, mapping1, marker1);
+// const wrangler1 = new Wrangler(data1, mapping1);
+// wrangler1.extractUnchanged("x", "y");
+// console.log(wrangler1);
+console.log(plot1.wranglers);

@@ -3,13 +3,13 @@ import { GraphicStack } from "./GraphicStack.js";
 import * as funs from "../functions.js";
 import * as reps from "../representations/representations.js";
 import * as scales from "../scales/scales.js";
-import * as stats from "../statistics/statistics.js";
+//import * as stats from "../statistics/statistics.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 
 export class Plot extends GraphicStack {
-  scales: any;
-  representations: any;
-  wranglers: any;
+  scales: { [key: string]: scales.Scale };
+  representations: { [key: string]: reps.Representation };
+  wranglers: { [key: string]: Wrangler };
 
   constructor(
     public data: datastr.DataFrame,
@@ -26,18 +26,17 @@ export class Plot extends GraphicStack {
       points1: new reps.Points(),
       axisbox1: new reps.AxisBox(),
     };
+
     this.scales = {
       x: new scales.XYScaleDiscrete(this.width),
       y: new scales.XYScaleContinuous(this.height, -1),
     };
+
     this.wranglers = {
-      identity1: new Wrangler(this.data, this.mapping).extractIdentical(
-        "x",
-        "y"
-      ),
+      identity1: new Wrangler(this.data, this.mapping).extractAsIs("x", "y"),
       summary1: new Wrangler(this.data, this.mapping)
         .splitBy("x")
-        .splitWhat("y")
+        .splitWhat("y", "size")
         .doWithin(funs.mean),
     };
 
@@ -65,8 +64,8 @@ export class Plot extends GraphicStack {
     this.representations.points1.registerWrangler(this.wranglers.identity1);
     this.representations.bars1.registerWrangler(this.wranglers.summary1);
 
-    ["x", "y"].forEach((mapping) =>
-      this.scales[mapping].registerData(this.getValues(mapping))
+    Object.keys(this.scales).forEach((mapping) =>
+      this.scales[mapping]?.registerData(this.getValues(mapping))
     );
 
     this.callChildren(this.representations, "registerScales", this.scales);

@@ -16,7 +16,7 @@ export class Wrangler {
     getVar = (mapping) => {
         return this.data[this.mapping.get(mapping)];
     };
-    extractIdentical = (...mappings) => {
+    extractAsIs = (...mappings) => {
         mappings.forEach((mapping) => {
             this[mapping] = this.data[this.mapping.get(mapping)];
         });

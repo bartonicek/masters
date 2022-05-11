@@ -2,6 +2,7 @@ import { GraphicStack } from "./GraphicStack.js";
 import * as funs from "../functions.js";
 import * as reps from "../representations/representations.js";
 import * as scales from "../scales/scales.js";
+//import * as stats from "../statistics/statistics.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 export class Plot extends GraphicStack {
     data;
@@ -28,10 +29,10 @@ export class Plot extends GraphicStack {
             y: new scales.XYScaleContinuous(this.height, -1),
         };
         this.wranglers = {
-            identity1: new Wrangler(this.data, this.mapping).extractIdentical("x", "y"),
+            identity1: new Wrangler(this.data, this.mapping).extractAsIs("x", "y"),
             summary1: new Wrangler(this.data, this.mapping)
                 .splitBy("x")
-                .splitWhat("y")
+                .splitWhat("y", "size")
                 .doWithin(funs.mean),
         };
         this.initialize();
@@ -52,7 +53,7 @@ export class Plot extends GraphicStack {
     initialize = () => {
         this.representations.points1.registerWrangler(this.wranglers.identity1);
         this.representations.bars1.registerWrangler(this.wranglers.summary1);
-        ["x", "y"].forEach((mapping) => this.scales[mapping].registerData(this.getValues(mapping)));
+        Object.keys(this.scales).forEach((mapping) => this.scales[mapping]?.registerData(this.getValues(mapping)));
         this.callChildren(this.representations, "registerScales", this.scales);
         this.drawBase();
     };

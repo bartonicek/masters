@@ -1,14 +1,6 @@
 import { VectorGeneric } from "../datastructures.js";
 
-export type ScaleType = {
-  data: VectorGeneric;
-  length: number;
-  direction: number;
-  expand: number;
-  offset: number;
-};
-
-export class Scale implements ScaleType {
+export class Scale {
   data: VectorGeneric;
   length: number;
   direction: number;

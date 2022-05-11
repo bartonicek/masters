@@ -32,4 +32,6 @@ const plot1 = new Plot(data1, mapping1, marker1);
 // wrangler1.extractUnchanged("x", "y");
 // console.log(wrangler1);
 
+console.log(plot1.wranglers);
+
 export {};

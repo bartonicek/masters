@@ -21,7 +21,7 @@ export class Wrangler {
     return this.data[this.mapping.get(mapping)];
   };
 
-  extractIdentical = (...mappings: datastr.ValidMappings[]) => {
+  extractAsIs = (...mappings: datastr.ValidMappings[]) => {
     mappings.forEach((mapping) => {
       this[mapping] = this.data[this.mapping.get(mapping)];
     });
