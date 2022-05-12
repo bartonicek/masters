@@ -8,7 +8,11 @@ export class Wrangler {
   what: Set<string>;
   combinations: any[];
   entities: number;
-  indices: number[];
+  indices: number[][];
+  x: datastr.VectorGeneric;
+  y: datastr.VectorGeneric;
+  size: datastr.VectorGeneric;
+  col: datastr.VectorGeneric;
 
   constructor(data: datastr.DataFrame, mapping: datastr.Mapping) {
     this.data = data;
@@ -17,7 +21,7 @@ export class Wrangler {
     this.what = new Set();
   }
 
-  getVar = (mapping: datastr.ValidMappings) => {
+  getMapping = (mapping: datastr.ValidMappings) => {
     return this.data[this.mapping.get(mapping)];
   };
 
@@ -25,13 +29,14 @@ export class Wrangler {
     mappings.forEach((mapping) => {
       this[mapping] = this.data[this.mapping.get(mapping)];
     });
+    this.indices = Array.from(Array(this[mappings[0]].length), (e, i) => [i]);
     return this;
   };
 
   splitBy = (...mappings: datastr.ValidMappings[]) => {
     mappings.forEach((mapping) => this.by.add(mapping));
     const splitMappings = Array.from(this.by).map((e: datastr.ValidMappings) =>
-      this.getVar(e)
+      this.getMapping(e)
     );
 
     // Return unique combinations & indices
@@ -53,10 +58,10 @@ export class Wrangler {
 
   doWithin = (fun: Function, ...args: any[]) => {
     Array.from(this.what).forEach((mapping: datastr.ValidMappings) => {
-      const varTemp = this.getVar(mapping);
+      const varTemp = this.getMapping(mapping);
       this[mapping] = this.combinations.map((_, i) =>
         fun(
-          varTemp.filter((_, j) => this.indices[j] === i),
+          varTemp.filter((_, j) => this.indices[i].indexOf(j) !== -1),
           ...args
         )
       );

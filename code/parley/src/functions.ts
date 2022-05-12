@@ -7,12 +7,24 @@ const mean = (x: number[]) => x.reduce((a, b) => a + b) / x.length;
 const min = (x: number[]) => Math.min(...x);
 const max = (x: number[]) => Math.max(...x);
 
-const quantile = (x: number[], q: number) => {
+const quantile = (x: number[], q: number | number[]) => {
   const sorted = x.sort((a, b) => a - b);
-  const pos = q * (sorted.length - 1);
-  const lwr = Math.floor(pos);
-  const uppr = Math.ceil(pos);
-  return sorted[lwr] + (pos % 1) * (sorted[uppr] - sorted[lwr]);
+  if (typeof q === "number") {
+    // For a single quantile
+    const pos = q * (sorted.length - 1);
+    const { lwr, uppr } = { lwr: Math.floor(pos), uppr: Math.ceil(pos) };
+    return sorted[lwr] + (pos % 1) * (sorted[uppr] - sorted[lwr]);
+  } else {
+    // For multiple quantiles
+    const pos = q.map((e) => e * (sorted.length - 1));
+    const { lwr, uppr } = {
+      lwr: pos.map((e) => Math.floor(e)),
+      uppr: pos.map((e) => Math.ceil(e)),
+    };
+    return pos.map(
+      (e, i) => sorted[lwr[i]] + (e % 1) * (sorted[uppr[i]] - sorted[lwr[i]])
+    );
+  }
 };
 
 const which = (x: datastr.VectorGeneric, value: any) => {
@@ -29,7 +41,7 @@ const unique = <Type>(x: Type[]): Type[] | null => {
 };
 
 // arrEqual: Checks if two arrays are deeply equal
-const arrEqual = (array1: any[], array2: any[]) => {
+const arrEqual = <Type>(array1: Type[], array2: Type[]): boolean => {
   return (
     array1.length == array2.length && array1.every((e, i) => e === array2[i])
   );
@@ -49,11 +61,13 @@ const uniqueRows = (data: any[][]) => {
   );
 
   const stringValues = unique(stringDataT);
-  const indices = match(stringDataT, stringValues);
+  const indices = stringValues.map((e) =>
+    stringDataT.flatMap((f, j) => (f === e ? j : []))
+  );
+  const values = indices.map((e) => {
+    return data.map((f) => f[e[0]]);
+  });
 
-  const values = unique(indices)
-    .map((e) => stringDataT.indexOf(stringValues[e]))
-    .map((e) => data.map((f) => f[e]));
   return { values, indices };
 };
 

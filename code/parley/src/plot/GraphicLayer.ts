@@ -16,12 +16,17 @@ export class GraphicLayer {
     this.canvas.height = height;
   }
 
-  drawBackground() {
+  drawClear = () => {
+    const context = this.context;
+    context.clearRect(0, 0, this.width, this.height);
+  };
+
+  drawBackground = () => {
     this.context.save();
     this.context.fillStyle = "antiquewhite";
     this.context.fillRect(0, 0, this.width, this.height);
     this.context.restore();
-  }
+  };
 
   drawBarsV(
     x: number[],
@@ -72,6 +77,28 @@ export class GraphicLayer {
       context.lineTo(e, y[i]);
     });
     context.stroke();
+    context.restore();
+  };
+
+  drawWindow = (
+    start: [number, number],
+    end: [number, number],
+    col = "rgba(0, 0, 0, 0.1)",
+    stroke = "rgba(0, 0, 0, 0.25)"
+  ) => {
+    const context = this.context;
+    context.save();
+    context.fillStyle = col;
+    context.strokeStyle = stroke;
+    context.setLineDash([5, 5]);
+    context.fillRect(0, 0, this.width, this.height);
+    context.clearRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
+    context.strokeRect(
+      start[0],
+      start[1],
+      end[0] - start[0],
+      end[1] - start[1]
+    );
     context.restore();
   };
 }

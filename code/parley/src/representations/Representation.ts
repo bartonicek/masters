@@ -1,6 +1,9 @@
+import { Scale } from "../scales/Scale.js";
+import { Wrangler } from "../wrangler/Wrangler.js";
+
 export class Representation {
-  wrangler: any;
-  scales: any;
+  wrangler: Wrangler;
+  scales: { [key: string]: any };
 
   get x() {
     return this.scales.x.dataToPlot(this.wrangler.x);
@@ -10,8 +13,8 @@ export class Representation {
     return this.scales.y.dataToPlot(this.wrangler.y);
   }
 
-  registerWrangler = (stat: any) => {
-    this.wrangler = stat;
+  registerWrangler = (wrangler: any) => {
+    this.wrangler = wrangler;
   };
 
   registerScales = (scales: any) => {

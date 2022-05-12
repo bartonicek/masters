@@ -6,10 +6,21 @@ const min = (x) => Math.min(...x);
 const max = (x) => Math.max(...x);
 const quantile = (x, q) => {
     const sorted = x.sort((a, b) => a - b);
-    const pos = q * (sorted.length - 1);
-    const lwr = Math.floor(pos);
-    const uppr = Math.ceil(pos);
-    return sorted[lwr] + (pos % 1) * (sorted[uppr] - sorted[lwr]);
+    if (typeof q === "number") {
+        // For a single quantile
+        const pos = q * (sorted.length - 1);
+        const { lwr, uppr } = { lwr: Math.floor(pos), uppr: Math.ceil(pos) };
+        return sorted[lwr] + (pos % 1) * (sorted[uppr] - sorted[lwr]);
+    }
+    else {
+        // For multiple quantiles
+        const pos = q.map((e) => e * (sorted.length - 1));
+        const { lwr, uppr } = {
+            lwr: pos.map((e) => Math.floor(e)),
+            uppr: pos.map((e) => Math.ceil(e)),
+        };
+        return pos.map((e, i) => sorted[lwr[i]] + (e % 1) * (sorted[uppr[i]] - sorted[lwr[i]]));
+    }
 };
 const which = (x, value) => {
     return x.map((e, i) => (e === value ? i : NaN)).filter((e) => !isNaN(e));
@@ -35,10 +46,10 @@ const uniqueRows = (data) => {
     // Transpose dataframe from array of cols to array of rows & turn the rows into strings
     const stringDataT = data[0].map((_, i) => JSON.stringify(data.map((row) => row[i])));
     const stringValues = unique(stringDataT);
-    const indices = match(stringDataT, stringValues);
-    const values = unique(indices)
-        .map((e) => stringDataT.indexOf(stringValues[e]))
-        .map((e) => data.map((f) => f[e]));
+    const indices = stringValues.map((e) => stringDataT.flatMap((f, j) => (f === e ? j : [])));
+    const values = indices.map((e) => {
+        return data.map((f) => f[e[0]]);
+    });
     return { values, indices };
 };
 export { isNumeric, length, sum, mean, min, max, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, };

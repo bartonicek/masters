@@ -1,14 +1,21 @@
 export class Marker {
-  selected: Uint8Array;
-  callbacks: Array<(data: object) => void>;
+  n: number;
+  selected: number[];
+  callbacks: ((marker: Marker) => void)[];
 
   constructor(n: number) {
-    this.selected = new Uint8Array(Array(n));
+    this.n = n;
+    this.selected = [];
     this.callbacks = [];
   }
 
   hardReceive(points: number[]) {
-    this.selected = new Uint8Array(points);
+    this.selected = points;
+    this.notifyAll();
+  }
+
+  softReceive(points: number[]) {
+    this.selected = this.selected.concat(points);
     this.notifyAll();
   }
 

@@ -7,8 +7,8 @@ export class Representation {
     get y() {
         return this.scales.y.dataToPlot(this.wrangler.y);
     }
-    registerWrangler = (stat) => {
-        this.wrangler = stat;
+    registerWrangler = (wrangler) => {
+        this.wrangler = wrangler;
     };
     registerScales = (scales) => {
         this.scales = scales;
