@@ -1,11 +1,7 @@
 import { Representation } from "./Representation.js";
 export class Bars extends Representation {
-    col;
-    stroke;
-    constructor(col = "steelblue", stroke = null) {
-        super();
-        this.col = col;
-        this.stroke = stroke;
+    constructor(wrangler) {
+        super(wrangler);
     }
     draw = (context) => {
         context.drawBarsV(this.x, this.y, this.scales.y.plotMin, this.col, this.stroke);

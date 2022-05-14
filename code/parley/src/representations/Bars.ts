@@ -1,13 +1,9 @@
+import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
 
 export class Bars extends Representation {
-  col: string;
-  stroke: string;
-
-  constructor(col = "steelblue", stroke = null) {
-    super();
-    this.col = col;
-    this.stroke = stroke;
+  constructor(wrangler: Wrangler) {
+    super(wrangler);
   }
 
   draw = (context: any) => {

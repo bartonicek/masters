@@ -2,22 +2,25 @@ import * as datastr from "./../datastructures.js";
 import { GraphicStack } from "./GraphicStack.js";
 import * as funs from "../functions.js";
 import * as reps from "../representations/representations.js";
-import * as scales from "../scales/scales.js";
-import { Wrangler } from "../wrangler/Wrangler.js";
-import { RectDragHandler } from "../handlers/RectDragHandler.js";
+import * as scls from "../scales/scales.js";
 import * as auxs from "../auxiliaries/auxiliaries.js";
+import * as hndl from "../handlers/handlers.js";
+import { Wrangler } from "../wrangler/Wrangler.js";
+import { Marker } from "../marker/Marker.js";
 
 export class Plot extends GraphicStack {
-  scales: { [key: string]: scales.Scale };
+  marker: Marker;
+  active: boolean;
+  scales: { [key: string]: scls.Scale };
   representations: { [key: string]: reps.Representation };
   auxiliaries: { [key: string]: auxs.Auxiliary };
   wranglers: { [key: string]: Wrangler };
-  handlers: { [key: string]: RectDragHandler };
+  handlers: { [key: string]: hndl.Handler };
 
-  constructor(public marker: object) {
+  constructor(marker: Marker) {
     super();
+    this.active = false;
     this.marker = marker;
-
     this.representations = {};
     this.auxiliaries = {};
     this.wranglers = {};
@@ -25,13 +28,22 @@ export class Plot extends GraphicStack {
     this.handlers = {};
   }
 
+  // Extract a property from each child
   extractChildren = (object: object, what: string) => {
     return Object.keys(object).map((e) => object?.[e]?.[what]);
   };
 
-  callChildren = (object: object, fun: string, ...args: any) => {
-    Object.keys(object).forEach((e) => {
-      object[e][fun] ? object[e][fun](...args) : null;
+  // Call each child w/o returning anything
+  callChildren = (object: object, fun: string, ...args: any[]) => {
+    Object.keys(object).forEach((child) => {
+      object[child][fun] ? object[child][fun](...args) : null;
+    });
+  };
+
+  // Return something for each child
+  mapChildren = (object: object, fun: string, ...args: any[]) => {
+    return Object.keys(object).map((child) => {
+      return object[child][fun] ? object[child][fun](...args) : null;
     });
   };
 
@@ -40,14 +52,30 @@ export class Plot extends GraphicStack {
     return Array.from(new Set(values));
   };
 
-  drawBase = () => {
-    this.callChildren(this.representations, "drawBase", this.graphicBase);
-    this.callChildren(this.auxiliaries, "drawBase", this.graphicBase);
+  draw = (context: "base" | "highlight" | "user", ...args: any[]) => {
+    const what = "draw" + funs.capitalize(context);
+    const where = "graphic" + funs.capitalize(context);
+    this.callChildren(this.representations, what, this[where], ...args);
+    this.callChildren(this.auxiliaries, what, this[where], ...args);
   };
 
-  drawUser = () => {
-    this.callChildren(this.representations, "drawUser", this.graphicUser);
-    this.callChildren(this.auxiliaries, "drawUser", this.graphicUser);
+  drawBase = () => this.draw("base");
+  drawHighlight = () => this.draw("highlight", this.marker.selected);
+  drawUser = () => this.draw("user");
+
+  inSelection = (selectionPoints: number[]) => {
+    const allPoints = [].concat(
+      ...this.mapChildren(this.representations, "inSelection", selectionPoints)
+    );
+    return Array.from(new Set(allPoints));
+  };
+
+  updateMarker = (dataPoints: number[]) => {
+    this.marker.hardReceive(dataPoints);
+  };
+
+  onSelection = (handler: hndl.Handler) => {
+    this.updateMarker(this.inSelection(handler.selectionPoints));
   };
 
   initialize = () => {
@@ -60,14 +88,31 @@ export class Plot extends GraphicStack {
 
     this.drawBase();
 
-    const actions = ["mousedown", "mousemove", "mouseup"];
-    const handlers = ["draghandler1", "draghandler1", "draghandler1"];
-    const consequences = ["startDrag", "whileDrag", "endDrag"];
+    ["onSelection", "drawHighlight"].forEach((e) =>
+      this.handlers.draghandler1.registerCallback(this[e])
+    );
 
-    actions.forEach((action, index) => {
-      this.graphicContainer.addEventListener(action, (event) => {
-        this.handlers[handlers[index]][consequences[index]](event);
+    Object.keys(this.handlers).forEach((handlerName) => {
+      const handler = this.handlers[handlerName];
+      handler.actions.forEach((action, index) => {
+        this.graphicContainer.addEventListener(action, (event) => {
+          handler[handler.consequences[index]](event);
+        });
       });
+    });
+
+    document.body.addEventListener("dblclick", (event) => {
+      this.graphicHighlight.drawClear();
+      this.graphicUser.drawClear();
+      this.active = false;
+    });
+
+    document.body.addEventListener("mousedown", (event) => {
+      this.active = document
+        .getElementById(this.id)
+        .contains(event.target as Node)
+        ? true
+        : false;
     });
   };
 }

@@ -1,36 +1,32 @@
-export class RectDragHandler {
+import { Handler } from "./Handler.js";
+
+export class RectDragHandler extends Handler {
   dragging: boolean;
-  dragNodes: { start: [number, number]; end: [number, number] };
-  callbacks: (() => void)[];
 
   constructor() {
+    super();
     this.dragging = false;
-    this.dragNodes = { start: [0, 0], end: [0, 0] };
+    this.selectionPoints = [0, 0, 0, 0];
     this.callbacks = [];
+    this.actions = ["mousedown", "mousemove", "mouseup"];
+    this.consequences = ["startDrag", "whileDrag", "endDrag"];
   }
 
   startDrag = (event: { offsetX: number; offsetY: number }) => {
     this.dragging = true;
-    this.dragNodes.start = [event.offsetX, event.offsetY];
+    this.selectionPoints[0] = event.offsetX;
+    this.selectionPoints[2] = event.offsetY;
   };
 
   whileDrag = (event: { offsetX: number; offsetY: number }) => {
     if (this.dragging) {
-      this.dragNodes.end = [event.offsetX, event.offsetY];
+      this.selectionPoints[1] = event.offsetX;
+      this.selectionPoints[3] = event.offsetY;
       this.notifyAll();
     }
   };
 
   endDrag = () => {
     this.dragging = false;
-  };
-
-  registerCallback = (callback: () => void) => {
-    this.callbacks.push(callback);
-    return this;
-  };
-
-  notifyAll = () => {
-    this.callbacks.forEach((e) => e());
   };
 }

@@ -5,8 +5,5 @@ export class Auxiliary {
     registerScales = (scales) => {
         this.scales = scales;
     };
-    registerHandler = (handler) => {
-        this.handler = handler;
-    };
     drawUser = (context, handler) => { };
 }

@@ -56,6 +56,7 @@ export class GraphicLayer {
     const context = this.context;
     context.save();
     context.fillStyle = col;
+    context.strokeStyle = stroke;
     x.forEach((e, i) => {
       context.beginPath();
       context.arc(e, y[i], radius, 0, Math.PI * 2);
