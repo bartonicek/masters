@@ -19,8 +19,7 @@ export class Marker {
     this.notifyAll();
   }
 
-  addCallback(callback: (marker: object) => void) {
-    // Add when later
+  registerCallback(callback: (marker: object) => void) {
     this.callbacks.push(callback);
   }
 

@@ -8,6 +8,9 @@ import * as scls from "./scales/scales.js";
 import * as hndl from "./handlers/handlers.js";
 import * as funs from "./functions.js";
 import { GraphicStack } from "./plot/GraphicStack.js";
+import { ScatterPlot } from "./plot/ScatterPlot.js";
+import { BarPlot } from "./plot/BarPlot.js";
+import { Recastable } from "./Recastable.js";
 
 const getData = async (path: string) => {
   const response = await fetch(path);
@@ -23,50 +26,27 @@ const mapping1: dtstr.Mapping = new Map([
 ]);
 
 const mapping2: dtstr.Mapping = new Map([
+  ["x", "gear"],
+  ["y", "disp"],
+]);
+
+const mapping3: dtstr.Mapping = new Map([
   ["x", "cyl"],
   ["y", "disp"],
 ]);
 
 const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
-const plot1 = new Plot(marker1);
 
-plot1.wranglers.identity1 = new Wrangler(data1, mapping1).extractAsIs("x", "y");
-plot1.handlers.draghandler1 = new hndl.RectDragHandler().registerCallback(
-  plot1.drawUser
-);
+const plot1 = new ScatterPlot(data1, mapping1, marker1);
+const plot2 = new ScatterPlot(data1, mapping2, marker1);
+const plot3 = new BarPlot(data1, mapping3, marker1);
 
-plot1.scales.x = new scls.XYScaleContinuous(plot1.width);
-plot1.scales.y = new scls.XYScaleContinuous(plot1.height, -1);
-plot1.representations.points1 = new reps.Points(
-  plot1.wranglers.identity1,
-  plot1.handlers.draghandler1
-);
+const arr1 = [1, 10, 11, 15, 3, 3, 4, 2, 1];
+const arr2 = [0, 0, 0, 1, 1, 1, 2, 2, 2];
+const arr3 = [1, 1, 0, 0, 1, 0, 0, 1, 1];
 
-plot1.auxiliaries.axisbox1 = new auxs.AxisBox();
-plot1.auxiliaries.rectdragbox1 = new auxs.RectDragBox(
-  plot1.handlers.draghandler1
-);
-
-plot1.initialize();
-
-const plot2 = new Plot(marker1);
-plot2.wranglers.summary1 = new Wrangler(data1, mapping2)
-  .splitBy("x")
-  .splitWhat("y")
-  .doWithin(funs.mean);
-plot2.handlers.draghandler1 = new hndl.RectDragHandler().registerCallback(
-  plot2.drawUser
-);
-
-plot2.scales.x = new scls.XYScaleDiscrete(plot2.width);
-plot2.scales.y = new scls.XYScaleContinuous(plot2.height, -1);
-plot2.representations.bars1 = new reps.Bars(plot2.wranglers.summary1);
-
-plot2.auxiliaries.axisbox1 = new auxs.AxisBox();
-plot2.auxiliaries.rectdragbox1 = new auxs.RectDragBox(
-  plot2.handlers.draghandler1
-);
-
-plot2.initialize();
+const bb = new Recastable(arr1, arr2, arr3, funs.mean);
+console.log(bb.defaultSplit);
+console.log(bb.selectedSplit);
 
 export {};

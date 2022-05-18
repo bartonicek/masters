@@ -33,6 +33,7 @@ export class Representation {
 
   registerScales = (scales: any) => {
     this.scales = scales;
+    return this;
   };
 
   inSelection = (selectionPoints) => {};

@@ -6,10 +6,11 @@ export class XYScaleContinuous extends ScaleContinuous {
   constructor(
     length: number,
     direction = 1,
+    zero = false,
     expand = 0.1,
     margins = { lower: 0.15, upper: 0.15 }
   ) {
-    super(length, direction, expand);
+    super(length, direction, zero, expand);
     this.margins = margins;
 
     // Shift & shrink the scale by the plot margins

@@ -28,6 +28,7 @@ export class ScaleDiscrete extends Scale {
       Array(this.values.length),
       (e, i) => (i + 1) / (this.values.length + 1)
     );
+    return this;
   };
 
   dataToUnits = (x: any | any[]) => {

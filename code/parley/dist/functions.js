@@ -1,9 +1,9 @@
 const isNumeric = (x) => typeof x[0] === "number";
 const length = (x) => x.length;
-const sum = (x) => x.reduce((a, b) => a + b);
-const mean = (x) => x.reduce((a, b) => a + b) / x.length;
-const min = (x) => Math.min(...x);
-const max = (x) => Math.max(...x);
+const sum = (x) => x.reduce((a, b) => a + b, 0);
+const mean = (x) => x.length > 0 ? x.reduce((a, b) => a + b) / x.length : null;
+const min = (x) => (x.length > 0 ? Math.min(...x) : null);
+const max = (x) => (x.length > 0 ? Math.max(...x) : null);
 const capitalize = (x) => {
     return typeof x === "string"
         ? x.charAt(0).toUpperCase() + x.slice(1)
@@ -96,4 +96,10 @@ const insidePoly = (point, polygon, distance) => {
         .filter((f) => f > 0 && f < distance);
     return valid.length % 2 === 1;
 };
-export { isNumeric, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, pointInRect, };
+const timeExecution = (fun) => {
+    const start = performance.now();
+    fun();
+    const end = performance.now();
+    return end - start;
+};
+export { isNumeric, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, pointInRect, timeExecution, };

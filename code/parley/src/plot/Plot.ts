@@ -74,8 +74,11 @@ export class Plot extends GraphicStack {
     this.marker.hardReceive(dataPoints);
   };
 
-  onSelection = (handler: hndl.Handler) => {
-    this.updateMarker(this.inSelection(handler.selectionPoints));
+  onSelection = () => {
+    // THIS IS STILL HARDCODED - NEED TO FIGURE OUT HOW TO DO FOR MULTIPLE HANDLERS?
+    this.updateMarker(
+      this.inSelection(this.handlers.draghandler.selectionPoints)
+    );
   };
 
   initialize = () => {
@@ -88,9 +91,9 @@ export class Plot extends GraphicStack {
 
     this.drawBase();
 
-    ["onSelection", "drawHighlight"].forEach((e) =>
-      this.handlers.draghandler1.registerCallback(this[e])
-    );
+    this.callChildren(this.handlers, "registerCallback", this.onSelection);
+    this.marker.registerCallback(this.drawHighlight);
+    this.marker.registerCallback(this.drawUser);
 
     Object.keys(this.handlers).forEach((handlerName) => {
       const handler = this.handlers[handlerName];

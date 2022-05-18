@@ -1,22 +1,24 @@
-// const isScalar = (x: any | any[]) =>
-//   ["number", "string", "boolean"].some((e) => typeof x === e);
-// const vecMap = (x: any | any[], fun: Function, ...args: any) => {
-//   return isScalar(x) ? fun(x) : x.map((e) => fun(e, ...args));
-// };
 const isNumeric = (x) => typeof x[0] === "number";
 const length = (x) => x.length;
-const sum = (x) => x.reduce((a, b) => a + b);
+const sum = (x) => x.reduce((a, b) => a + b, 0);
 const mean = (x) => x.reduce((a, b) => a + b) / x.length;
 const min = (x) => Math.min(...x);
 const max = (x) => Math.max(...x);
+const capitalize = (x) => {
+    return typeof x === "string"
+        ? x.charAt(0).toUpperCase() + x.slice(1)
+        : x.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
+};
 const quantile = (x, q) => {
     const sorted = x.sort((a, b) => a - b);
     if (typeof q === "number") {
+        // For a single quantile
         const pos = q * (sorted.length - 1);
         const { lwr, uppr } = { lwr: Math.floor(pos), uppr: Math.ceil(pos) };
         return sorted[lwr] + (pos % 1) * (sorted[uppr] - sorted[lwr]);
     }
     else {
+        // For multiple quantiles
         const pos = q.map((e) => e * (sorted.length - 1));
         const { lwr, uppr } = {
             lwr: pos.map((e) => Math.floor(e)),
@@ -55,4 +57,49 @@ const uniqueRows = (data) => {
     });
     return { values, indices };
 };
-export { isNumeric, length, sum, mean, min, max, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, };
+const pointInRect = (point, // x, y
+rect // x0, x1, y0, y1
+) => {
+    return ((point[0] - rect[0]) * (point[0] - rect[1]) < 0 &&
+        (point[1] - rect[2]) * (point[1] - rect[3]) < 0);
+};
+const vecDiff = (x, y) => {
+    return x.map((e, i) => e - y[i]);
+};
+// Function to test if point is inside polygon based on linear algebra.
+// Hopefuly works. If not, try implementing the following:
+// https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html
+const insidePoly = (point, polygon, distance) => {
+    const xmin = Math.min(...polygon.map((e) => e[0]));
+    const ymin = Math.min(...polygon.map((e) => e[1]));
+    const xmax = Math.max(...polygon.map((e) => e[0]));
+    const ymax = Math.max(...polygon.map((e) => e[1]));
+    if (point[0] < xmin ||
+        point[0] > xmax ||
+        point[1] < ymin ||
+        point[1] > ymax) {
+        return false;
+    }
+    const inds1 = Array.from(Array(polygon.length), (e, i) => i);
+    const inds2 = Array.from(Array(polygon.length), (e, i) => i);
+    inds2.shift();
+    inds2.push(0);
+    const sides = inds1.map((e, i) => vecDiff(polygon[inds2[i]], polygon[e]));
+    const intersections = polygon.map((e, i) => {
+        return [
+            (point[1] - e[1]) / sides[i][1],
+            ((point[1] - e[1]) / sides[i][1]) * sides[i][0] + e[0] - point[0],
+        ];
+    });
+    const valid = intersections
+        .map((e) => e[1])
+        .filter((f) => f > 0 && f < distance);
+    return valid.length % 2 === 1;
+};
+const timeExecution = (fun) => {
+    const start = performance.now();
+    fun();
+    const end = performance.now();
+    return end - start;
+};
+export { isNumeric, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, pointInRect, timeExecution, };

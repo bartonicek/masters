@@ -15,8 +15,7 @@ export class Marker {
         this.selected = this.selected.concat(points);
         this.notifyAll();
     }
-    addCallback(callback) {
-        // Add when later
+    registerCallback(callback) {
         this.callbacks.push(callback);
     }
     notifyAll() {

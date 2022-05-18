@@ -2,10 +2,11 @@ import * as datastr from "./datastructures.js";
 
 const isNumeric = (x: datastr.VectorGeneric) => typeof x[0] === "number";
 const length = (x: datastr.VectorGeneric) => x.length;
-const sum = (x: number[]) => x.reduce((a, b) => a + b);
-const mean = (x: number[]) => x.reduce((a, b) => a + b) / x.length;
-const min = (x: number[]) => Math.min(...x);
-const max = (x: number[]) => Math.max(...x);
+const sum = (x: number[]) => x.reduce((a, b) => a + b, 0);
+const mean = (x: number[]) =>
+  x.length > 0 ? x.reduce((a, b) => a + b) / x.length : null;
+const min = (x: number[]) => (x.length > 0 ? Math.min(...x) : null);
+const max = (x: number[]) => (x.length > 0 ? Math.max(...x) : null);
 
 const capitalize = (x: string | string[]) => {
   return typeof x === "string"
@@ -126,6 +127,13 @@ const insidePoly = (point: number[], polygon: number[][], distance: number) => {
   return valid.length % 2 === 1;
 };
 
+const timeExecution = (fun: Function) => {
+  const start = performance.now();
+  fun();
+  const end = performance.now();
+  return end - start;
+};
+
 export {
   isNumeric,
   length,
@@ -142,4 +150,5 @@ export {
   arrTranspose,
   uniqueRows,
   pointInRect,
+  timeExecution,
 };

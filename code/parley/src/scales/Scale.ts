@@ -16,6 +16,7 @@ export class Scale {
 
   registerData = (data: VectorGeneric) => {
     this.data = data;
+    return this;
   };
 
   pctToUnits = (pct: number | number[]) => {

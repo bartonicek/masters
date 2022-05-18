@@ -1,12 +1,13 @@
+import { Handler } from "../handlers/Handler.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
 
 export class Bars extends Representation {
-  constructor(wrangler: Wrangler) {
-    super(wrangler);
+  constructor(wrangler: Wrangler, handler: Handler) {
+    super(wrangler, handler);
   }
 
-  draw = (context: any) => {
+  drawBase = (context: any) => {
     context.drawBarsV(
       this.x,
       this.y,
@@ -16,7 +17,22 @@ export class Bars extends Representation {
     );
   };
 
-  drawBase = (context: any) => {
-    this.draw(context);
+  drawHighlight = (context: any, selected: number[]) => {
+    const currSelected = this.wrangler.indices.map((indexList) => {
+      return selected.filter((point) => indexList.includes(point));
+    });
+
+    const lens = currSelected
+      .map((e) => e.length)
+      .map((e) => this.scales.y.dataToPlot(e));
+
+    context.drawClear();
+    context.drawBarsV(
+      this.x,
+      lens,
+      this.scales.y.plotMin,
+      "firebrick",
+      this.stroke
+    );
   };
 }

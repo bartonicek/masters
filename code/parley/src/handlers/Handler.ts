@@ -1,7 +1,7 @@
 export class Handler {
   actions: string[];
   consequences: string[];
-  callbacks: ((handler: Handler) => void)[];
+  callbacks: (() => void)[];
   selectionPoints: number[];
 
   registerCallback = (callback: () => void) => {
@@ -10,6 +10,6 @@ export class Handler {
   };
 
   notifyAll = () => {
-    this.callbacks.forEach((callback) => callback(this));
+    this.callbacks.forEach((callback) => callback());
   };
 }

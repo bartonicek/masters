@@ -13,34 +13,62 @@ export class GraphicLayer {
         this.canvas.width = width;
         this.canvas.height = height;
     }
-    drawBackground() {
+    drawClear = () => {
+        const context = this.context;
+        context.clearRect(0, 0, this.width, this.height);
+    };
+    drawBackground = () => {
         this.context.save();
         this.context.fillStyle = "antiquewhite";
         this.context.fillRect(0, 0, this.width, this.height);
         this.context.restore();
-    }
-    drawBarsV(x, y, y0, redraw = false, col = "steelblue", width = this.width / (2 * x.length)) {
+    };
+    drawBarsV(x, y, y0, col = "steelblue", stroke = null, width = this.width / (3 * x.length)) {
         const context = this.context;
         context.save();
         context.fillStyle = col;
-        if (redraw)
-            context.clearRect(0, 0, this.width, this.height);
         x.forEach((e, i) => {
-            context.fillRect(e, y0 - y[i], width, y[i]);
+            col ? context.fillRect(e - width / 2, y[i], width, y0 - y[i]) : null;
+            stroke ? context.strokeRect(e - width / 2, y[i], width, y0 - y[i]) : null;
         });
         context.restore();
     }
-    drawPoints(x, y, redraw = false, col = "steelblue", radius = 5) {
+    drawPoints = (x, y, col = "steelblue", stroke = null, radius = 5) => {
         const context = this.context;
         context.save();
         context.fillStyle = col;
-        if (redraw)
-            context.clearRect(0, 0, this.width, this.height);
+        context.strokeStyle = stroke;
         x.forEach((e, i) => {
             context.beginPath();
             context.arc(e, y[i], radius, 0, Math.PI * 2);
-            context.fill();
+            stroke ? context.stroke() : null;
+            col ? context.fill() : null;
         });
         context.restore();
-    }
+    };
+    drawLine = (x, y, col = "black") => {
+        const context = this.context;
+        context.save();
+        context.beginPath();
+        context.strokeStyle = col;
+        context.moveTo(x[0], y[0]);
+        x.shift();
+        y.shift();
+        x.forEach((e, i) => {
+            context.lineTo(e, y[i]);
+        });
+        context.stroke();
+        context.restore();
+    };
+    drawWindow = (start, end, col = "rgba(0, 0, 0, 0.1)", stroke = "rgba(0, 0, 0, 0.25)") => {
+        const context = this.context;
+        context.save();
+        context.fillStyle = col;
+        context.strokeStyle = stroke;
+        context.setLineDash([5, 5]);
+        context.fillRect(0, 0, this.width, this.height);
+        context.clearRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
+        context.strokeRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
+        context.restore();
+    };
 }
