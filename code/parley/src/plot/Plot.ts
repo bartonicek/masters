@@ -28,9 +28,11 @@ export class Plot extends GraphicStack {
     this.handlers = {};
   }
 
-  // Extract a property from each child
-  extractChildren = (object: object, what: string) => {
-    return Object.keys(object).map((e) => object?.[e]?.[what]);
+  // Extract a (nested?) property from each child
+  extractChildren = (object: object, ...what: string[]) => {
+    return Object.keys(object).flatMap((child) => {
+      return what.reduce((a, b) => a[b], object[child]);
+    });
   };
 
   // Call each child w/o returning anything
@@ -47,8 +49,12 @@ export class Plot extends GraphicStack {
     });
   };
 
-  getValues = (variable: string) => {
-    const values = [].concat(...this.extractChildren(this.wranglers, variable));
+  getUnique = (variable: string) => {
+    const values = [].concat(
+      Object.keys(this.wranglers).flatMap((e) =>
+        this.wranglers[e][variable].extract()
+      )
+    );
     return Array.from(new Set(values));
   };
 
@@ -64,14 +70,16 @@ export class Plot extends GraphicStack {
   drawUser = () => this.draw("user");
 
   inSelection = (selectionPoints: number[]) => {
-    const allPoints = [].concat(
-      ...this.mapChildren(this.representations, "inSelection", selectionPoints)
+    const allPoints = this.mapChildren(
+      this.representations,
+      "inSelection",
+      selectionPoints
     );
-    return Array.from(new Set(allPoints));
+    return allPoints[0].map((_, i) => allPoints.some((e) => e[i]));
   };
 
-  updateMarker = (dataPoints: number[]) => {
-    this.marker.hardReceive(dataPoints);
+  updateMarker = (selected: number[]) => {
+    this.marker.hardReceive(selected);
   };
 
   onSelection = () => {
@@ -83,7 +91,7 @@ export class Plot extends GraphicStack {
 
   initialize = () => {
     Object.keys(this.scales).forEach((mapping) =>
-      this.scales[mapping]?.registerData(this.getValues(mapping))
+      this.scales[mapping]?.registerData(this.getUnique(mapping))
     );
 
     this.callChildren(this.representations, "registerScales", this.scales);

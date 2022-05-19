@@ -1,21 +1,20 @@
 export class Representation {
     wrangler;
     handler;
+    plotDims;
     scales;
     alpha;
     col;
     stroke;
     radius;
-    constructor(wrangler, handler) {
+    constructor(wrangler, handler, plotDims) {
         this.wrangler = wrangler;
         this.handler = handler;
+        this.plotDims = plotDims;
     }
-    get x() {
-        return this.scales.x.dataToPlot(this.wrangler.x);
-    }
-    get y() {
-        return this.scales.y.dataToPlot(this.wrangler.y);
-    }
+    getMapping = (mapping, type) => {
+        return this.scales[mapping].dataToPlot(this.wrangler[mapping].extract(type));
+    };
     get boundingRects() {
         return [];
     }

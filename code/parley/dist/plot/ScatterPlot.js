@@ -14,11 +14,11 @@ export class ScatterPlot extends Plot {
             draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
         };
         this.scales = {
-            x: new scls.XYScaleContinuous(this.width).registerData(this.getValues("x")),
-            y: new scls.XYScaleContinuous(this.height, -1).registerData(this.getValues("y")),
+            x: new scls.XYScaleContinuous(this.width).registerData(this.getUnique("x")),
+            y: new scls.XYScaleContinuous(this.height, -1).registerData(this.getUnique("y")),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.draghandler).registerScales(this.scales),
+            points: new reps.Points(this.wranglers.identity, this.handlers.draghandler, { width: this.width, height: this.height }).registerScales(this.scales),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox().registerScales(this.scales),

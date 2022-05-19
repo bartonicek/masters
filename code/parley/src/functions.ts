@@ -1,6 +1,7 @@
 import * as datastr from "./datastructures.js";
 
 const isNumeric = (x: datastr.VectorGeneric) => typeof x[0] === "number";
+const identity = (x: datastr.VectorGeneric) => x;
 const length = (x: datastr.VectorGeneric) => x.length;
 const sum = (x: number[]) => x.reduce((a, b) => a + b, 0);
 const mean = (x: number[]) =>
@@ -78,6 +79,15 @@ const uniqueRows = (data: any[][]) => {
   return { values, indices };
 };
 
+const uniqueRowIds = (data: any[][]) => {
+  // Transpose dataframe from array of cols to array of rows & turn the rows into strings
+  const stringRows = data[0].map((_, i) =>
+    JSON.stringify(data.map((row) => row[i]))
+  );
+  const uniqueStringRows = unique(stringRows);
+  return stringRows.map((e) => uniqueStringRows.indexOf(e));
+};
+
 const pointInRect = (
   point: [number, number], // x, y
   rect: [number, number, number, number] // x0, x1, y0, y1
@@ -136,6 +146,7 @@ const timeExecution = (fun: Function) => {
 
 export {
   isNumeric,
+  identity,
   length,
   sum,
   mean,
@@ -149,6 +160,7 @@ export {
   arrEqual,
   arrTranspose,
   uniqueRows,
+  uniqueRowIds,
   pointInRect,
   timeExecution,
 };

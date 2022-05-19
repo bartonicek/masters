@@ -23,7 +23,7 @@ export class GraphicLayer {
         this.context.fillRect(0, 0, this.width, this.height);
         this.context.restore();
     };
-    drawBarsV(x, y, y0, col = "steelblue", stroke = null, width = this.width / (3 * x.length)) {
+    drawBarsV = (x, y, y0, col = "steelblue", stroke = null, width = 50) => {
         const context = this.context;
         context.save();
         context.fillStyle = col;
@@ -32,7 +32,7 @@ export class GraphicLayer {
             stroke ? context.strokeRect(e - width / 2, y[i], width, y0 - y[i]) : null;
         });
         context.restore();
-    }
+    };
     drawPoints = (x, y, col = "steelblue", stroke = null, radius = 5) => {
         const context = this.context;
         context.save();

@@ -1,4 +1,5 @@
 const isNumeric = (x) => typeof x[0] === "number";
+const identity = (x) => x;
 const length = (x) => x.length;
 const sum = (x) => x.reduce((a, b) => a + b, 0);
 const mean = (x) => x.length > 0 ? x.reduce((a, b) => a + b) / x.length : null;
@@ -57,6 +58,12 @@ const uniqueRows = (data) => {
     });
     return { values, indices };
 };
+const uniqueRowIds = (data) => {
+    // Transpose dataframe from array of cols to array of rows & turn the rows into strings
+    const stringRows = data[0].map((_, i) => JSON.stringify(data.map((row) => row[i])));
+    const uniqueStringRows = unique(stringRows);
+    return stringRows.map((e) => uniqueStringRows.indexOf(e));
+};
 const pointInRect = (point, // x, y
 rect // x0, x1, y0, y1
 ) => {
@@ -102,4 +109,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, pointInRect, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, timeExecution, };

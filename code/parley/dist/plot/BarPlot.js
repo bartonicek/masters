@@ -18,11 +18,14 @@ export class BarPlot extends Plot {
             draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
         };
         this.scales = {
-            x: new scls.XYScaleDiscrete(this.width).registerData(this.getValues("x")),
-            y: new scls.XYScaleContinuous(this.height, -1, true).registerData(this.getValues("y")),
+            x: new scls.XYScaleDiscrete(this.width).registerData(this.getUnique("x")),
+            y: new scls.XYScaleContinuous(this.height, -1, true).registerData(this.getUnique("y")),
         };
         this.representations = {
-            points: new reps.Bars(this.wranglers.summary, this.handlers.draghandler).registerScales(this.scales),
+            bars: new reps.Bars(this.wranglers.summary, this.handlers.draghandler, {
+                width: this.width,
+                height: this.height,
+            }).registerScales(this.scales),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox().registerScales(this.scales),

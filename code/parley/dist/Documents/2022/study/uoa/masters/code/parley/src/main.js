@@ -2,7 +2,6 @@ import { Marker } from "./marker/Marker.js";
 import * as funs from "./functions.js";
 import { ScatterPlot } from "./plot/ScatterPlot.js";
 import { BarPlot } from "./plot/BarPlot.js";
-import { Recastable } from "./Recastable.js";
 const getData = async (path) => {
     const response = await fetch(path);
     return response.json();
@@ -25,38 +24,45 @@ const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
 const plot2 = new ScatterPlot(data1, mapping2, marker1);
 const plot3 = new BarPlot(data1, mapping3, marker1);
-//console.log(bb.flatMap((e) => e.map((f) => plot1.wranglers.identity.x[f])));
-//console.log(plot3.wranglers);
-class Variable {
+class Wrangler2 {
     data;
-    indices;
+    mapping;
     marker;
-    fun;
-    constructor(data, indices, marker, fun) {
+    by;
+    what;
+    indices;
+    constructor(data, mapping, marker) {
         this.data = data;
-        this.indices = indices;
+        this.mapping = mapping;
         this.marker = marker;
-        this.fun = fun;
+        this.by = new Set();
+        this.what = new Set();
     }
-    subsetOnIndices = (x, indices) => {
-        return indices.map((e) => x[e]);
+    getMapping = (mapping) => {
+        return this.data[this.mapping.get(mapping)];
     };
-    get all() {
-        return this.indices.map((e) => this.fun(this.subsetOnIndices(this.data, e)));
-    }
-    get selected() {
-        const filteredIndices = this.indices.map((e) => e.filter((f) => this.marker.selected.indexOf(f) !== -1));
-        return filteredIndices.map((e) => e.length > 0 ? this.fun(this.subsetOnIndices(this.data, e)) : null);
-    }
+    splitBy = (...mappings) => {
+        mappings.forEach((mapping) => this.by.add(mapping));
+        const splitData = Array.from(this.by).map((e) => this.getMapping(e));
+        return splitData;
+    };
+    splitWhat = (...mappings) => {
+        mappings.forEach((mapping) => this.what.add(mapping));
+    };
 }
-marker1.selected = [1, 3, 4];
-//console.log(marker1.selected);
-const aa = new Variable([20, 21, 22, 23, 25], [[0, 1], [2], [3, 4]], marker1, funs.sum);
-const arr1 = [1, 10, 11, 15, 3, 3, 4, 2, 1];
-const arr2 = [1, 1, 1, 2, 2, 1, 3, 3, 3];
-// const splitByGroup = (data: any[], indices: number[]) => {
-//   return Array.from(new Set(indices)).map((uniqueIndex) =>
-//     indices.flatMap((f, j) => (f === uniqueIndex ? j : [])).map((g) => data[g])
-//   );
-// };
-const bb = new Recastable(arr1, arr2, arr2);
+const uniqueRows2 = (data) => {
+    // Transpose dataframe from array of cols to array of rows & turn the rows into strings
+    const stringRows = data[0].map((_, i) => JSON.stringify(data.map((row) => row[i])));
+    const uniqueStringRows = funs.unique(stringRows);
+    // const indices = stringValues.map((e) =>
+    //   stringDataT.flatMap((f, j) => (f === e ? j : []))
+    // );
+    // const values = indices.map((e) => {
+    //   return data.map((f) => f[e[0]]);
+    // });
+    // return { values, indices };
+    return uniqueStringRows;
+};
+const dt2 = [data1.cyl, data1.am];
+console.log(uniqueRows2(dt2));
+const wr1 = new Wrangler2(data1, mapping3, marker1);

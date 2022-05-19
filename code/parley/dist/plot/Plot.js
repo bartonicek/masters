@@ -18,9 +18,11 @@ export class Plot extends GraphicStack {
         this.scales = {};
         this.handlers = {};
     }
-    // Extract a property from each child
-    extractChildren = (object, what) => {
-        return Object.keys(object).map((e) => object?.[e]?.[what]);
+    // Extract a (nested?) property from each child
+    extractChildren = (object, ...what) => {
+        return Object.keys(object).flatMap((child) => {
+            return what.reduce((a, b) => a[b], object[child]);
+        });
     };
     // Call each child w/o returning anything
     callChildren = (object, fun, ...args) => {
@@ -34,8 +36,8 @@ export class Plot extends GraphicStack {
             return object[child][fun] ? object[child][fun](...args) : null;
         });
     };
-    getValues = (variable) => {
-        const values = [].concat(...this.extractChildren(this.wranglers, variable));
+    getUnique = (variable) => {
+        const values = [].concat(Object.keys(this.wranglers).flatMap((e) => this.wranglers[e][variable].extract()));
         return Array.from(new Set(values));
     };
     draw = (context, ...args) => {
@@ -48,18 +50,18 @@ export class Plot extends GraphicStack {
     drawHighlight = () => this.draw("highlight", this.marker.selected);
     drawUser = () => this.draw("user");
     inSelection = (selectionPoints) => {
-        const allPoints = [].concat(...this.mapChildren(this.representations, "inSelection", selectionPoints));
-        return Array.from(new Set(allPoints));
+        const allPoints = this.mapChildren(this.representations, "inSelection", selectionPoints);
+        return allPoints[0].map((_, i) => allPoints.some((e) => e[i]));
     };
-    updateMarker = (dataPoints) => {
-        this.marker.hardReceive(dataPoints);
+    updateMarker = (selected) => {
+        this.marker.hardReceive(selected);
     };
     onSelection = () => {
         // THIS IS STILL HARDCODED - NEED TO FIGURE OUT HOW TO DO FOR MULTIPLE HANDLERS?
         this.updateMarker(this.inSelection(this.handlers.draghandler.selectionPoints));
     };
     initialize = () => {
-        Object.keys(this.scales).forEach((mapping) => this.scales[mapping]?.registerData(this.getValues(mapping)));
+        Object.keys(this.scales).forEach((mapping) => this.scales[mapping]?.registerData(this.getUnique(mapping)));
         this.callChildren(this.representations, "registerScales", this.scales);
         this.callChildren(this.auxiliaries, "registerScales", this.scales);
         this.drawBase();

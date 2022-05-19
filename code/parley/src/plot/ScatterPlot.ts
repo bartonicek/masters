@@ -21,17 +21,18 @@ export class ScatterPlot extends Plot {
 
     this.scales = {
       x: new scls.XYScaleContinuous(this.width).registerData(
-        this.getValues("x")
+        this.getUnique("x")
       ),
       y: new scls.XYScaleContinuous(this.height, -1).registerData(
-        this.getValues("y")
+        this.getUnique("y")
       ),
     };
 
     this.representations = {
       points: new reps.Points(
         this.wranglers.identity,
-        this.handlers.draghandler
+        this.handlers.draghandler,
+        { width: this.width, height: this.height }
       ).registerScales(this.scales),
     };
 
