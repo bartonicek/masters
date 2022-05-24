@@ -1,17 +1,14 @@
 import * as funs from "../functions.js";
+import { Cast } from "./Cast.js";
 export class Wrangler {
     data;
     mapping;
     marker;
     by;
     what;
-    combinations;
-    entities;
     indices;
     x;
     y;
-    size;
-    col;
     constructor(data, mapping, marker) {
         this.data = data;
         this.mapping = mapping;
@@ -19,49 +16,34 @@ export class Wrangler {
         this.by = new Set();
         this.what = new Set();
     }
-    get selectedIndices() {
-        return this.indices.map((e) => {
-            return e.filter((f) => this.marker.selected.indexOf(f) !== -1);
-        });
-    }
     getMapping = (mapping) => {
         return this.data[this.mapping.get(mapping)];
     };
     extractAsIs = (...mappings) => {
+        this.indices = Array.from(Array(this.marker.n), (e, i) => i);
         mappings.forEach((mapping) => {
-            this[mapping] = this.getMapping(mapping);
+            this[mapping] = new Cast(this.getMapping(mapping), this).registerFun(funs.identity);
         });
-        this.indices = Array.from(Array(this[mappings[0]].length), (e, i) => [i]);
         return this;
     };
     splitBy = (...mappings) => {
         mappings.forEach((mapping) => this.by.add(mapping));
-        const splitMappings = Array.from(this.by).map((e) => this.getMapping(e));
-        // Return unique combinations & indices
-        const res = funs.uniqueRows(splitMappings);
-        this.combinations = res.values;
-        this.indices = res.indices;
-        this.entities = funs.unique(this.indices).length;
-        mappings.forEach((e, i) => (this[e] = this.combinations.map((f) => f[i])));
+        const splittingVars = Array.from(this.by).map((e) => this.getMapping(e));
+        this.indices = funs.uniqueRowIds(splittingVars);
+        mappings.forEach((mapping, i) => {
+            this[mapping] = new Cast(this.getMapping(mapping), this).registerFun(funs.unique);
+        });
         return this;
     };
     splitWhat = (...mappings) => {
-        mappings.forEach((variable) => this.what.add(variable));
+        mappings.forEach((mapping) => {
+            this.what.add(mapping);
+            this[mapping] = new Cast(this.getMapping(mapping), this);
+        });
         return this;
     };
-    subsetOnIndices = (x, indices) => {
-        return indices.map((e) => x[e]);
-    };
     doWithin = (fun, ...args) => {
-        const compute = () => {
-            Array.from(this.what).forEach((mapping) => {
-                const temp = this.getMapping(mapping);
-                this[mapping] = this.combinations.map((_, i) => fun(this.subsetOnIndices(temp, this.indices[i]), ...args));
-                this[mapping + "Selected"] = this.combinations.map((_, i) => fun(this.subsetOnIndices(temp, this.selectedIndices[i]), ...args));
-            });
-        };
-        compute();
-        this.marker.registerCallback(compute);
+        Array.from(this.what).forEach((mapping) => this[mapping].registerFun(fun, ...args));
         return this;
     };
 }

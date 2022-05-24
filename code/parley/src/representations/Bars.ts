@@ -33,7 +33,6 @@ export class Bars extends Representation {
     const x = this.getMapping("x", "selected");
     const y = this.getMapping("y", "selected");
 
-    console.log(y);
     context.drawClear();
     context.drawBarsV(
       x,
@@ -72,7 +71,6 @@ export class Bars extends Representation {
           funs.pointInRect(point, selectionPoints)
         );
     });
-    //console.log(this.wrangler.indices.map((e) => sel[e]));
     return this.wrangler.indices.map((e) => sel[e]);
   };
 }

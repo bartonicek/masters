@@ -2,6 +2,7 @@ import { Handler } from "../handlers/Handler.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
+import * as dtstr from "../datastructures.js";
 
 export class Points extends Representation {
   constructor(
@@ -15,28 +16,33 @@ export class Points extends Representation {
     this.radius = 5;
   }
 
+  getMappings = (type?: "selected") => {
+    let [x, y, size] = ["x", "y", "size"].map((mapping: dtstr.ValidMappings) =>
+      this.getMapping(mapping, type)
+    );
+    size = size ? size.map((e) => e) : Array.from(Array(x.length), (e) => 5);
+    [x, y, size] = this.dropMissing(x, y, size);
+    return [x, y, size];
+  };
+
   drawBase = (context: any) => {
-    const x = this.getMapping("x");
-    const y = this.getMapping("y");
-    context.drawPoints(x, y, this.col, this.stroke, this.radius);
+    const [x, y, size] = this.getMappings();
+    context.drawPoints(x, y, this.col, this.stroke, size);
   };
 
   drawHighlight = (context: any, selected: number[]) => {
-    const x = this.getMapping("x", "selected");
-    const y = this.getMapping("y", "selected");
+    const [x, y, size] = this.getMappings("selected");
     context.drawClear();
-    context.drawPoints(x, y, "firebrick", this.stroke, this.radius);
+    context.drawPoints(x, y, "firebrick", this.stroke, size);
   };
 
   get boundingRects() {
-    const x = this.getMapping("x");
-    const y = this.getMapping("y");
-
+    const [x, y, size] = this.getMappings();
     return x.map((e, i) => [
-      e - this.radius,
-      e + this.radius,
-      y[i] - this.radius,
-      y[i] + this.radius,
+      e - size[i],
+      e + size[i],
+      y[i] - size[i],
+      y[i] + size[i],
     ]);
   }
 
@@ -48,12 +54,13 @@ export class Points extends Representation {
       [1, 3],
     ];
 
-    return this.boundingRects.map((points) => {
+    const sel = this.boundingRects.map((points) => {
       return combns
         .map((indices) => indices.map((index) => points[index]))
         .some((point: [number, number]) =>
           funs.pointInRect(point, selectionPoints)
         );
     });
+    return this.wrangler.indices.map((e) => sel[e]);
   };
 }

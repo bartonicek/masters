@@ -2,7 +2,7 @@ import * as datastr from "./datastructures.js";
 
 const isNumeric = (x: datastr.VectorGeneric) => typeof x[0] === "number";
 const identity = (x: datastr.VectorGeneric) => x;
-const length = (x: datastr.VectorGeneric) => x.length;
+const length = (x: datastr.VectorGeneric) => (x.length ? x.length : 0);
 const sum = (x: number[]) => x.reduce((a, b) => a + b, 0);
 const mean = (x: number[]) =>
   x.length > 0 ? x.reduce((a, b) => a + b) / x.length : null;
@@ -43,8 +43,9 @@ const match = <Type>(x: Type[], values: Type[]): number[] | null => {
   return x.map((e) => values.indexOf(e));
 };
 
-const unique = <Type>(x: Type[]): Type[] | null => {
-  return Array.from(new Set(x));
+const unique = <Type>(x: Type[]): Type | Type[] | null => {
+  const uniqueArray = Array.from(new Set(x));
+  return uniqueArray.length === 1 ? uniqueArray[0] : uniqueArray;
   //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
 

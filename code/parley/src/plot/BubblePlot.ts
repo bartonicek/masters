@@ -8,14 +8,14 @@ import { Marker } from "../marker/Marker.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 
-export class BarPlot extends Plot {
+export class BubblePlot extends Plot {
   constructor(data: dtstr.DataFrame, mapping: dtstr.Mapping, marker: Marker) {
     super(marker);
 
     this.wranglers = {
-      summary: new Wrangler(data, mapping, marker)
-        .splitBy("x")
-        .splitWhat("y")
+      identity: new Wrangler(data, mapping, marker)
+        .splitBy("x", "y")
+        .splitWhat("size")
         .doWithin(funs.length),
     };
 
@@ -25,16 +25,20 @@ export class BarPlot extends Plot {
 
     this.scales = {
       x: new scls.XYScaleDiscrete(this.width).registerData(this.getUnique("x")),
-      y: new scls.XYScaleContinuous(this.height, -1, true).registerData(
+      y: new scls.XYScaleDiscrete(this.height, -1).registerData(
         this.getUnique("y")
+      ),
+      size: new scls.AreaScaleContinuous(this.width / 10).registerData(
+        this.getUnique("size")
       ),
     };
 
     this.representations = {
-      bars: new reps.Bars(this.wranglers.summary, this.handlers.draghandler, {
-        width: this.width,
-        height: this.height,
-      }).registerScales(this.scales),
+      points: new reps.Points(
+        this.wranglers.identity,
+        this.handlers.draghandler,
+        { width: this.width, height: this.height }
+      ).registerScales(this.scales),
     };
 
     this.auxiliaries = {

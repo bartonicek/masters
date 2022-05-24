@@ -1,9 +1,10 @@
 const isNumeric = (x) => typeof x[0] === "number";
+const identity = (x) => x;
 const length = (x) => x.length;
 const sum = (x) => x.reduce((a, b) => a + b, 0);
-const mean = (x) => x.reduce((a, b) => a + b) / x.length;
-const min = (x) => Math.min(...x);
-const max = (x) => Math.max(...x);
+const mean = (x) => x.length > 0 ? x.reduce((a, b) => a + b) / x.length : null;
+const min = (x) => (x.length > 0 ? Math.min(...x) : null);
+const max = (x) => (x.length > 0 ? Math.max(...x) : null);
 const capitalize = (x) => {
     return typeof x === "string"
         ? x.charAt(0).toUpperCase() + x.slice(1)
@@ -34,7 +35,8 @@ const match = (x, values) => {
     return x.map((e) => values.indexOf(e));
 };
 const unique = (x) => {
-    return Array.from(new Set(x));
+    const uniqueArray = Array.from(new Set(x));
+    return uniqueArray.length === 1 ? uniqueArray[0] : uniqueArray;
     //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
 // arrEqual: Checks if two arrays are deeply equal
@@ -56,6 +58,12 @@ const uniqueRows = (data) => {
         return data.map((f) => f[e[0]]);
     });
     return { values, indices };
+};
+const uniqueRowIds = (data) => {
+    // Transpose dataframe from array of cols to array of rows & turn the rows into strings
+    const stringRows = data[0].map((_, i) => JSON.stringify(data.map((row) => row[i])));
+    const uniqueStringRows = unique(stringRows);
+    return stringRows.map((e) => uniqueStringRows.indexOf(e));
 };
 const pointInRect = (point, // x, y
 rect // x0, x1, y0, y1
@@ -102,4 +110,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, pointInRect, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, timeExecution, };

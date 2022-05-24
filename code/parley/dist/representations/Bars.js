@@ -15,7 +15,6 @@ export class Bars extends Representation {
     drawHighlight = (context, selected) => {
         const x = this.getMapping("x", "selected");
         const y = this.getMapping("y", "selected");
-        console.log(y);
         context.drawClear();
         context.drawBarsV(x, y, this.scales.y.plotMin, "firebrick", this.stroke, this.width);
     };
@@ -41,7 +40,6 @@ export class Bars extends Representation {
                 .map((indices) => indices.map((index) => points[index]))
                 .some((point) => funs.pointInRect(point, selectionPoints));
         });
-        //console.log(this.wrangler.indices.map((e) => sel[e]));
         return this.wrangler.indices.map((e) => sel[e]);
     };
 }

@@ -32,4 +32,6 @@ export class Scale {
       ? units / length
       : units.map((e) => e / length);
   };
+
+  dataToPlot = (data: any | any[]) => {};
 }

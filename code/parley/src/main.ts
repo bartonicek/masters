@@ -11,6 +11,8 @@ import { GraphicStack } from "./plot/GraphicStack.js";
 import { ScatterPlot } from "./plot/ScatterPlot.js";
 import { BarPlot } from "./plot/BarPlot.js";
 import { Cast } from "./wrangler/Cast.js";
+import { AxisText } from "./auxiliaries/AxisText.js";
+import { BubblePlot } from "./plot/BubblePlot.js";
 
 const getData = async (path: string) => {
   const response = await fetch(path);
@@ -26,7 +28,7 @@ const mapping1: dtstr.Mapping = new Map([
 ]);
 
 const mapping2: dtstr.Mapping = new Map([
-  ["x", "gear"],
+  ["x", "cyl"],
   ["y", "disp"],
 ]);
 
@@ -35,13 +37,23 @@ const mapping3: dtstr.Mapping = new Map([
   ["y", "disp"],
 ]);
 
+const mapping4: dtstr.Mapping = new Map([
+  ["x", "cyl"],
+  ["y", "am"],
+  ["size", "mpg"],
+]);
+
 const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 
-const plot3 = new BarPlot(data1, mapping3, marker1);
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
-const plot2 = new ScatterPlot(data1, mapping2, marker1);
+const plot2 = new BubblePlot(data1, mapping4, marker1);
+const plot3 = new BarPlot(data1, mapping3, marker1);
+const plot4 = new ScatterPlot(data1, mapping2, marker1);
 
-console.log(plot3.representations.bars.boundingRects);
-//plot3.graphicBase.drawBarsV([337], [200], 425, "red");
+const arr1: number[][] = [[1], [null], [3], [4], [5]];
+const arr2: number[][] = [[6], [7], [8], [9], [10]];
+const aa = [arr1, arr2];
+
+//console.log(plot2.scales.size.dataToPlot(3));
 
 export {};

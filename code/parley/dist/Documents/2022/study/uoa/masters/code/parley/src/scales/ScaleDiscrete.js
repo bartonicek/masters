@@ -13,18 +13,23 @@ export class ScaleDiscrete extends Scale {
         this.data = data;
         const arr = Array.from(new Set([...data]));
         typeof arr[0] === "number"
-            ? (this.values = arr
-                .sort((a, b) => a - b)
-                .map((e) => `${e}`))
-            : this.values.sort().map((e) => `${e}`);
+            ? (this.values = arr.sort((a, b) => a - b))
+            : //.map((e) => `${e}`))
+                this.values.sort().map((e) => `${e}`);
         this.positions = Array.from(Array(this.values.length), (e, i) => (i + 1) / (this.values.length + 1));
         return this;
     };
     dataToUnits = (x) => {
         const { values, length, direction, positions, offset } = this;
-        const xs = this.toString(x);
-        return typeof xs === "string"
-            ? offset + direction * length * positions[values.indexOf(xs)]
-            : xs.map((e) => offset + direction * length * positions[values.indexOf(e)]);
+        const xString = this.toString(x);
+        const valuesString = this.toString(values);
+        if (typeof xString === "string") {
+            return valuesString.indexOf(xString) !== -1
+                ? offset + direction * length * positions[valuesString.indexOf(xString)]
+                : null;
+        }
+        return xString.map((e) => valuesString.indexOf(e) !== -1
+            ? offset + direction * length * positions[valuesString.indexOf(e)]
+            : null);
     };
 }

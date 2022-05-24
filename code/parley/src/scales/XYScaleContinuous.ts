@@ -8,7 +8,7 @@ export class XYScaleContinuous extends ScaleContinuous {
     direction = 1,
     zero = false,
     expand = 0.1,
-    margins = { lower: 0.15, upper: 0.15 }
+    margins = { lower: 0.2, upper: 0.1 }
   ) {
     super(length, direction, zero, expand);
     this.margins = margins;

@@ -1,27 +1,36 @@
 import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
 export class Points extends Representation {
-    constructor(wrangler, handler) {
-        super(wrangler, handler);
+    constructor(wrangler, handler, plotDims) {
+        super(wrangler, handler, plotDims);
         this.col = "steelblue";
         this.stroke = null;
         this.radius = 5;
     }
+    getMappings = (type) => {
+        let [x, y, size] = ["x", "y", "size"].map((mapping) => this.getMapping(mapping, type));
+        size = size
+            ? size.map((e) => Math.sqrt(e))
+            : Array.from(Array(x.length), (e) => 5);
+        [x, y, size] = this.dropMissing(x, y, size);
+        return [x, y, size];
+    };
     drawBase = (context) => {
-        context.drawPoints(this.x, this.y, this.col, this.stroke, this.radius);
+        const [x, y, size] = this.getMappings();
+        context.drawPoints(x, y, this.col, this.stroke, size);
     };
     drawHighlight = (context, selected) => {
-        const x = this.x.filter((e, i) => selected.indexOf(i) !== -1);
-        const y = this.y.filter((e, i) => selected.indexOf(i) !== -1);
+        const [x, y, size] = this.getMappings("selected");
         context.drawClear();
-        context.drawPoints(x, y, "firebrick", this.stroke, this.radius);
+        context.drawPoints(x, y, "firebrick", this.stroke, size);
     };
     get boundingRects() {
-        return this.x.map((e, i) => [
-            e - this.radius,
-            e + this.radius,
-            this.y[i] - this.radius,
-            this.y[i] + this.radius,
+        const [x, y, size] = this.getMappings();
+        return x.map((e, i) => [
+            e - size[i],
+            e + size[i],
+            y[i] - size[i],
+            y[i] + size[i],
         ]);
     }
     inSelection = (selectionPoints) => {
@@ -31,12 +40,11 @@ export class Points extends Representation {
             [1, 2],
             [1, 3],
         ];
-        return this.boundingRects
-            .map((points) => {
+        const sel = this.boundingRects.map((points) => {
             return combns
                 .map((indices) => indices.map((index) => points[index]))
                 .some((point) => funs.pointInRect(point, selectionPoints));
-        })
-            .flatMap((bool, index) => (bool ? index : []));
+        });
+        return this.wrangler.indices.map((e) => sel[e]);
     };
 }

@@ -1,6 +1,6 @@
 const isNumeric = (x) => typeof x[0] === "number";
 const identity = (x) => x;
-const length = (x) => x.length;
+const length = (x) => (x.length ? x.length : 0);
 const sum = (x) => x.reduce((a, b) => a + b, 0);
 const mean = (x) => x.length > 0 ? x.reduce((a, b) => a + b) / x.length : null;
 const min = (x) => (x.length > 0 ? Math.min(...x) : null);
@@ -35,7 +35,8 @@ const match = (x, values) => {
     return x.map((e) => values.indexOf(e));
 };
 const unique = (x) => {
-    return Array.from(new Set(x));
+    const uniqueArray = Array.from(new Set(x));
+    return uniqueArray.length === 1 ? uniqueArray[0] : uniqueArray;
     //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
 // arrEqual: Checks if two arrays are deeply equal

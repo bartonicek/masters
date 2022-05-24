@@ -30,6 +30,10 @@ export class ScaleContinuous extends Scale {
     return this.dataMax - this.dataMin;
   }
 
+  inRange = (x: number) => {
+    return x >= this.dataMin && x <= this.dataMax;
+  };
+
   pctToData = (pct: number | number[]) => {
     const { dataMin, range } = this;
     return typeof pct === "number"
@@ -46,9 +50,21 @@ export class ScaleContinuous extends Scale {
 
   dataToUnits = (data: number | number[]) => {
     const { dataMin, length, offset, direction, range } = this;
+
     return typeof data === "number"
       ? offset + (direction * length * (data - dataMin)) / range
       : data.map((e) => offset + direction * length * ((e - dataMin) / range));
+    // if (typeof data === "number") {
+    //   return this.inRange(data)
+    //     ? offset + (direction * length * (data - dataMin)) / range
+    //     : null;
+    // }
+
+    // return data.map((e) =>
+    //   this.inRange(e)
+    //     ? offset + direction * length * ((e - dataMin) / range)
+    //     : null
+    // );
   };
 
   unitsToData = (units: number | number[]) => {

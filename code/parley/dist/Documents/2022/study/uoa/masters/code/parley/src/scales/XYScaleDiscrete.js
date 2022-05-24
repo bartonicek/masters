@@ -1,7 +1,7 @@
 import { ScaleDiscrete } from "./ScaleDiscrete.js";
 export class XYScaleDiscrete extends ScaleDiscrete {
     margins;
-    constructor(length, direction = 1, expand = 0.1, margins = { lower: 0.15, upper: 0.15 }) {
+    constructor(length, direction = 1, expand = 0.1, margins = { lower: 0.2, upper: 0.1 }) {
         super(length, direction, expand);
         this.margins = margins;
         // Shift & shrink the scale by the plot margins

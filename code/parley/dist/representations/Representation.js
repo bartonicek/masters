@@ -13,7 +13,19 @@ export class Representation {
         this.plotDims = plotDims;
     }
     getMapping = (mapping, type) => {
-        return this.scales[mapping].dataToPlot(this.wrangler[mapping].extract(type));
+        let res = this.wrangler[mapping]?.extract(type);
+        res = this.scales[mapping]?.dataToPlot(res);
+        // const res = this.scales[mapping]?.dataToPlot(
+        //   this.wrangler[mapping]?.extract(type)
+        // );
+        return res;
+    };
+    dropMissing = (...vectors) => {
+        let missingIndices = [...vectors].flatMap((vector) => vector
+            .flatMap((value, index) => (value === null ? index : []))
+            .sort((a, b) => a - b));
+        missingIndices = Array.from(new Set(missingIndices));
+        return [...vectors].map((vector) => vector.flatMap((value, index) => missingIndices.indexOf(index) === -1 ? value : []));
     };
     get boundingRects() {
         return [];

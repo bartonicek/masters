@@ -7,7 +7,7 @@ export class XYScaleDiscrete extends ScaleDiscrete {
     length: number,
     direction = 1,
     expand = 0.1,
-    margins = { lower: 0.15, upper: 0.15 }
+    margins = { lower: 0.2, upper: 0.1 }
   ) {
     super(length, direction, expand);
     this.margins = margins;

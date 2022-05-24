@@ -1,7 +1,7 @@
 import { ScaleContinuous } from "./ScaleContinuous.js";
 export class XYScaleContinuous extends ScaleContinuous {
     margins;
-    constructor(length, direction = 1, zero = false, expand = 0.1, margins = { lower: 0.15, upper: 0.15 }) {
+    constructor(length, direction = 1, zero = false, expand = 0.1, margins = { lower: 0.2, upper: 0.1 }) {
         super(length, direction, zero, expand);
         this.margins = margins;
         // Shift & shrink the scale by the plot margins

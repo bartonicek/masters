@@ -9,5 +9,7 @@ export class Auxiliary {
     return this;
   };
 
+  draw = (context: any) => {};
+  drawBase = (context: any) => {};
   drawUser = (context: any, handler: any) => {};
 }

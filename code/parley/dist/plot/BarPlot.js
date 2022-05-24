@@ -29,6 +29,8 @@ export class BarPlot extends Plot {
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox().registerScales(this.scales),
+            axistextx: new auxs.AxisText("x"),
+            axistexy: new auxs.AxisText("y"),
             rectdragbox: new auxs.RectDragBox(this.handlers.draghandler).registerScales(this.scales),
         };
         this.initialize();

@@ -31,20 +31,27 @@ export class Cast {
 
   get selectedSplit() {
     const { vector, indices, uniqueIndices, marker } = this;
-    return uniqueIndices.map((uniqueIndex) =>
+    const res = uniqueIndices.map((uniqueIndex) =>
       indices
         .flatMap((index, position) =>
           index === uniqueIndex && marker.selected[position] ? position : []
         )
         .map((index) => vector[index])
     );
+    return res;
   }
 
   extract = (type?: "selected") => {
     if (type === "selected") {
-      return this.selectedSplit.map((e) => this.fun(e, ...this.args));
+      const res = this.selectedSplit
+        .filter((e) => e.length > 0)
+        .map((e) => this.fun(e, ...this.args));
+      return res;
     }
-    return this.defaultSplit.flatMap((e) => this.fun(e, ...this.args));
+    const res = this.defaultSplit
+      .filter((e) => e.length > 0)
+      .map((e) => this.fun(e, ...this.args));
+    return res;
   };
 
   registerFun = (fun: Function, ...args: any[]) => {

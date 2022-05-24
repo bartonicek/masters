@@ -2,9 +2,9 @@ import { GraphicLayer } from "./GraphicLayer.js";
 
 export class GraphicStack {
   graphicContainer: HTMLDivElement;
-  graphicBase: any;
-  graphicHighlight: any;
-  graphicUser: any;
+  graphicBase: GraphicLayer;
+  graphicHighlight: GraphicLayer;
+  graphicUser: GraphicLayer;
   id: string;
   width: number;
   height: number;

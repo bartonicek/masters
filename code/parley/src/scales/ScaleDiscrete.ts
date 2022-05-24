@@ -2,7 +2,7 @@ import { VectorGeneric } from "../datastructures.js";
 import { Scale } from "./Scale.js";
 
 export class ScaleDiscrete extends Scale {
-  values: string[];
+  values: VectorGeneric;
   positions: number[];
 
   constructor(length: number, direction = 1, expand = 0.1) {
@@ -19,10 +19,9 @@ export class ScaleDiscrete extends Scale {
     const arr = Array.from(new Set([...data]));
 
     typeof arr[0] === "number"
-      ? (this.values = (arr as number[])
-          .sort((a, b) => a - b)
-          .map((e) => `${e}`))
-      : this.values.sort().map((e) => `${e}`);
+      ? (this.values = (arr as number[]).sort((a, b) => a - b))
+      : //.map((e) => `${e}`))
+        this.values.sort().map((e) => `${e}`);
 
     this.positions = Array.from(
       Array(this.values.length),
@@ -33,12 +32,19 @@ export class ScaleDiscrete extends Scale {
 
   dataToUnits = (x: any | any[]) => {
     const { values, length, direction, positions, offset } = this;
-    const xs = this.toString(x);
+    const xString = this.toString(x);
+    const valuesString = this.toString(values);
 
-    return typeof xs === "string"
-      ? offset + direction * length * positions[values.indexOf(xs)]
-      : xs.map(
-          (e: any) => offset + direction * length * positions[values.indexOf(e)]
-        );
+    if (typeof xString === "string") {
+      return valuesString.indexOf(xString) !== -1
+        ? offset + direction * length * positions[valuesString.indexOf(xString)]
+        : null;
+    }
+
+    return xString.map((e: any) =>
+      valuesString.indexOf(e) !== -1
+        ? offset + direction * length * positions[valuesString.indexOf(e)]
+        : null
+    );
   };
 }
