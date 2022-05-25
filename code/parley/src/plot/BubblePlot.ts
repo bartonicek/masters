@@ -21,16 +21,13 @@ export class BubblePlot extends Plot {
 
     this.handlers = {
       draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
+      keypresshandler: new hndl.KeypressHandler(),
     };
 
     this.scales = {
-      x: new scls.XYScaleDiscrete(this.width).registerData(this.getUnique("x")),
-      y: new scls.XYScaleDiscrete(this.height, -1).registerData(
-        this.getUnique("y")
-      ),
-      size: new scls.AreaScaleContinuous(this.width / 10).registerData(
-        this.getUnique("size")
-      ),
+      x: new scls.XYScaleDiscrete(this.width),
+      y: new scls.XYScaleDiscrete(this.height, -1),
+      size: new scls.AreaScaleContinuous(this.width / 10),
     };
 
     this.representations = {
@@ -38,16 +35,16 @@ export class BubblePlot extends Plot {
         this.wranglers.identity,
         this.handlers.draghandler,
         { width: this.width, height: this.height }
-      ).registerScales(this.scales),
+      ),
     };
 
     this.auxiliaries = {
-      axisbox: new auxs.AxisBox().registerScales(this.scales),
+      axisbox: new auxs.AxisBox(),
       axistextx: new auxs.AxisText("x"),
       axistexy: new auxs.AxisText("y"),
-      rectdragbox: new auxs.RectDragBox(
-        this.handlers.draghandler
-      ).registerScales(this.scales),
+      axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
+      axistitley: new auxs.AxisTitle("y", mapping.get("y")),
+      rectdragbox: new auxs.RectDragBox(this.handlers.draghandler),
     };
 
     this.initialize();

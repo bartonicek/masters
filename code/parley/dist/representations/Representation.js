@@ -7,6 +7,8 @@ export class Representation {
     col;
     stroke;
     radius;
+    sizeMultiplier;
+    alphaMultiplier;
     constructor(wrangler, handler, plotDims) {
         this.wrangler = wrangler;
         this.handler = handler;
@@ -15,17 +17,7 @@ export class Representation {
     getMapping = (mapping, type) => {
         let res = this.wrangler[mapping]?.extract(type);
         res = this.scales[mapping]?.dataToPlot(res);
-        // const res = this.scales[mapping]?.dataToPlot(
-        //   this.wrangler[mapping]?.extract(type)
-        // );
         return res;
-    };
-    dropMissing = (...vectors) => {
-        let missingIndices = [...vectors].flatMap((vector) => vector
-            .flatMap((value, index) => (value === null ? index : []))
-            .sort((a, b) => a - b));
-        missingIndices = Array.from(new Set(missingIndices));
-        return [...vectors].map((vector) => vector.flatMap((value, index) => missingIndices.indexOf(index) === -1 ? value : []));
     };
     get boundingRects() {
         return [];
@@ -36,5 +28,21 @@ export class Representation {
         this.scales = scales;
         return this;
     };
+    defaultize = () => {
+        this.alphaMultiplier = 1;
+        this.sizeMultiplier = 1;
+    };
+    incrementSizeMultiplier = () => { };
     inSelection = (selectionPoints) => { };
+    onKeypress = (key) => {
+        if (key === "Minus" && this.sizeMultiplier)
+            this.sizeMultiplier *= 0.8;
+        if (key === "Equal" && this.sizeMultiplier)
+            this.sizeMultiplier *= 1.2;
+        if (key === "BracketLeft" && this.alphaMultiplier) {
+            this.alphaMultiplier === 0 ? 0 : (this.alphaMultiplier *= 0.8);
+        }
+        if (key === "BracketRight" && this.alphaMultiplier)
+            this.alphaMultiplier === 1 ? 1 : (this.alphaMultiplier *= 1.2);
+    };
 }

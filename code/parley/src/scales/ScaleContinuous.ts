@@ -10,7 +10,7 @@ export class ScaleContinuous extends Scale {
   }
 
   registerData = (data: number[]) => {
-    this.data = data;
+    this.data = this.zero ? [].concat([0], data) : data;
     return this;
   };
 

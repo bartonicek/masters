@@ -12,4 +12,6 @@ export class Handler {
   notifyAll = () => {
     this.callbacks.forEach((callback) => callback());
   };
+
+  reportKey = (event) => {};
 }

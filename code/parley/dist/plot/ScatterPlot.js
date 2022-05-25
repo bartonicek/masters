@@ -5,26 +5,31 @@ import * as auxs from "../auxiliaries/auxiliaries.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 export class ScatterPlot extends Plot {
+    mapping;
     constructor(data, mapping, marker) {
         super(marker);
+        this.mapping = mapping;
         this.wranglers = {
             identity: new Wrangler(data, mapping, marker).extractAsIs("x", "y"),
         };
         this.handlers = {
             draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
+            keypresshandler: new hndl.KeypressHandler(),
         };
         this.scales = {
-            x: new scls.XYScaleContinuous(this.width).registerData(this.getUnique("x")),
-            y: new scls.XYScaleContinuous(this.height, -1).registerData(this.getUnique("y")),
+            x: new scls.XYScaleContinuous(this.width),
+            y: new scls.XYScaleContinuous(this.height, -1),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.draghandler, { width: this.width, height: this.height }).registerScales(this.scales),
+            points: new reps.Points(this.wranglers.identity, this.handlers.draghandler, { width: this.width, height: this.height }),
         };
         this.auxiliaries = {
-            axisbox: new auxs.AxisBox().registerScales(this.scales),
+            axisbox: new auxs.AxisBox(),
             axistextx: new auxs.AxisText("x"),
             axistexy: new auxs.AxisText("y"),
-            rectdragbox: new auxs.RectDragBox(this.handlers.draghandler).registerScales(this.scales),
+            axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
+            axistitley: new auxs.AxisTitle("y", mapping.get("y")),
+            rectdragbox: new auxs.RectDragBox(this.handlers.draghandler),
         };
         this.initialize();
     }

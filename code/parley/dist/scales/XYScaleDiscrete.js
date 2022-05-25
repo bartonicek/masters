@@ -18,4 +18,10 @@ export class XYScaleDiscrete extends ScaleDiscrete {
     dataToPlot = (data) => {
         return this.dataToUnits(data);
     };
+    pctToPlot = (pct) => {
+        return this.pctToUnits(pct);
+    };
+    plotToPct = (units) => {
+        return this.unitsToPct(units);
+    };
 }

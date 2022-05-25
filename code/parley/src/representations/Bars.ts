@@ -2,6 +2,7 @@ import { Handler } from "../handlers/Handler.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
+import * as dtstr from "../datastructures.js";
 
 export class Bars extends Representation {
   width: number;
@@ -13,32 +14,40 @@ export class Bars extends Representation {
     super(wrangler, handler, plotDims);
     this.width =
       plotDims.width / (3 * funs.unique(wrangler.x.extract()).length);
+    this.alphaMultiplier = 1;
   }
 
-  drawBase = (context: any) => {
-    const x = this.getMapping("x");
-    const y = this.getMapping("y");
+  getMappings = (type?: "selected") => {
+    let [x, y] = ["x", "y"].map((mapping: dtstr.ValidMappings) =>
+      this.getMapping(mapping, type)
+    );
+    return [x, y];
+  };
 
+  drawBase = (context: any) => {
+    const [x, y] = this.getMappings();
+    context.drawClear();
+    context.drawBackground();
     context.drawBarsV(
       x,
       y,
       this.scales.y.plotMin,
       this.col,
+      this.alphaMultiplier,
       this.stroke,
       this.width
     );
   };
 
   drawHighlight = (context: any, selected: number[]) => {
-    const x = this.getMapping("x", "selected");
-    const y = this.getMapping("y", "selected");
-
+    const [x, y] = this.getMappings("selected");
     context.drawClear();
     context.drawBarsV(
       x,
       y,
       this.scales.y.plotMin,
       "firebrick",
+      this.alphaMultiplier,
       this.stroke,
       this.width
     );

@@ -6,17 +6,22 @@ export class Bars extends Representation {
         super(wrangler, handler, plotDims);
         this.width =
             plotDims.width / (3 * funs.unique(wrangler.x.extract()).length);
+        this.alphaMultiplier = 1;
     }
+    getMappings = (type) => {
+        let [x, y] = ["x", "y"].map((mapping) => this.getMapping(mapping, type));
+        return [x, y];
+    };
     drawBase = (context) => {
-        const x = this.getMapping("x");
-        const y = this.getMapping("y");
-        context.drawBarsV(x, y, this.scales.y.plotMin, this.col, this.stroke, this.width);
+        const [x, y] = this.getMappings();
+        context.drawClear();
+        context.drawBackground();
+        context.drawBarsV(x, y, this.scales.y.plotMin, this.col, this.alphaMultiplier, this.stroke, this.width);
     };
     drawHighlight = (context, selected) => {
-        const x = this.getMapping("x", "selected");
-        const y = this.getMapping("y", "selected");
+        const [x, y] = this.getMappings("selected");
         context.drawClear();
-        context.drawBarsV(x, y, this.scales.y.plotMin, "firebrick", this.stroke, this.width);
+        context.drawBarsV(x, y, this.scales.y.plotMin, "firebrick", this.alphaMultiplier, this.stroke, this.width);
     };
     get boundingRects() {
         const x = this.getMapping("x");

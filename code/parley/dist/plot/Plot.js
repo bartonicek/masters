@@ -18,12 +18,6 @@ export class Plot extends GraphicStack {
         this.scales = {};
         this.handlers = {};
     }
-    // Extract a (nested?) property from each child
-    extractChildren = (object, ...what) => {
-        return Object.keys(object).flatMap((child) => {
-            return what.reduce((a, b) => a[b], object[child]);
-        });
-    };
     // Call each child w/o returning anything
     callChildren = (object, fun, ...args) => {
         Object.keys(object).forEach((child) => {
@@ -60,6 +54,11 @@ export class Plot extends GraphicStack {
         // THIS IS STILL HARDCODED - NEED TO FIGURE OUT HOW TO DO FOR MULTIPLE HANDLERS?
         this.updateMarker(this.inSelection(this.handlers.draghandler.selectionPoints));
     };
+    onKeypress = (key) => {
+        if (key === "KeyR")
+            this.mapChildren(this.representations, "defaultize");
+        this.callChildren(this.representations, "onKeypress", key);
+    };
     initialize = () => {
         Object.keys(this.scales).forEach((mapping) => this.scales[mapping]?.registerData(this.getUnique(mapping)));
         this.callChildren(this.representations, "registerScales", this.scales);
@@ -70,16 +69,25 @@ export class Plot extends GraphicStack {
         this.marker.registerCallback(this.drawUser);
         Object.keys(this.handlers).forEach((handlerName) => {
             const handler = this.handlers[handlerName];
-            handler.actions.forEach((action, index) => {
+            handler?.actions?.forEach((action, index) => {
                 this.graphicContainer.addEventListener(action, (event) => {
                     handler[handler.consequences[index]](event);
                 });
             });
         });
+        document.body.addEventListener("keyup", (event) => {
+            if (this.active) {
+                this.handlers.keypresshandler?.reportKey(event);
+                this.onKeypress(this.handlers?.keypresshandler?.lastPressed);
+                this.drawBase();
+                this.graphicHighlight.drawClear();
+                //this.drawUser();
+            }
+        });
         document.body.addEventListener("dblclick", (event) => {
             this.graphicHighlight.drawClear();
             this.graphicUser.drawClear();
-            this.active = false;
+            this.active = this.active ? true : false;
         });
         document.body.addEventListener("mousedown", (event) => {
             this.active = document

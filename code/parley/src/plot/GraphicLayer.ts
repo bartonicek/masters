@@ -1,3 +1,5 @@
+import * as funs from "../functions.js";
+
 export class GraphicLayer {
   canvas: HTMLCanvasElement;
   context: CanvasRenderingContext2D;
@@ -32,14 +34,17 @@ export class GraphicLayer {
 
   drawClear = () => {
     const context = this.context;
+    context.save();
     context.clearRect(0, 0, this.width, this.height);
+    context.restore();
   };
 
   drawBackground = () => {
-    this.context.save();
-    this.context.fillStyle = "antiquewhite";
-    this.context.fillRect(0, 0, this.width, this.height);
-    this.context.restore();
+    const context = this.context;
+    context.save();
+    context.fillStyle = "antiquewhite";
+    context.fillRect(0, 0, this.width, this.height);
+    context.restore();
   };
 
   drawBarsV = (
@@ -47,13 +52,14 @@ export class GraphicLayer {
     y: number[],
     y0: number,
     col = "steelblue",
+    alpha = 1,
     stroke = null,
     width = 50
   ) => {
     const [xs, ys] = this.dropMissing(x, y);
     const context = this.context;
     context.save();
-    context.fillStyle = col;
+    context.fillStyle = funs.colnameWithAlpha(col, alpha);
     xs.forEach((e, i) => {
       col ? context.fillRect(e - width / 2, ys[i], width, y0 - ys[i]) : null;
       stroke
@@ -68,15 +74,17 @@ export class GraphicLayer {
     y: number[],
     col = "steelblue",
     stroke = null,
-    radius = 5
+    radius = 5,
+    alpha = 1
   ) => {
     const context = this.context;
     const rs =
       typeof radius === "number"
         ? Array.from(Array(x.length), (e) => radius)
         : radius;
+    const colAlpha = funs.colnameWithAlpha(col, alpha);
     context.save();
-    context.fillStyle = col;
+    context.fillStyle = colAlpha;
     context.strokeStyle = stroke;
     x.forEach((e, i) => {
       context.beginPath();
@@ -102,12 +110,22 @@ export class GraphicLayer {
     context.restore();
   };
 
-  drawText = (x: number[], y: number[], labels: string[], size = 20) => {
+  drawText = (
+    x: number[],
+    y: number[],
+    labels: string[],
+    size = 20,
+    rotate?: number
+  ) => {
     const context = this.context;
     context.save();
+    context.textAlign = "center";
     context.font = `${size}px Times New Roman`;
     x.forEach((e, i) => {
-      context.fillText(labels[i], e, y[i]);
+      context.translate(e, y[i]);
+      if (rotate) context.rotate((rotate / 360) * Math.PI * 2);
+      context.fillText(labels[i], 0, 0);
+      context.translate(-e, -y[i]);
     });
     context.restore();
   };

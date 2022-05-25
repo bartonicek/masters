@@ -14,26 +14,40 @@ export class Points extends Representation {
     this.col = "steelblue";
     this.stroke = null;
     this.radius = 5;
+    this.sizeMultiplier = 1;
+    this.alphaMultiplier = 1;
   }
 
   getMappings = (type?: "selected") => {
     let [x, y, size] = ["x", "y", "size"].map((mapping: dtstr.ValidMappings) =>
       this.getMapping(mapping, type)
     );
-    size = size ? size.map((e) => e) : Array.from(Array(x.length), (e) => 5);
-    [x, y, size] = this.dropMissing(x, y, size);
+    size = size
+      ? size.map((e) => e * this.sizeMultiplier)
+      : Array.from(Array(x.length), (e) => 5).map(
+          (e) => e * this.sizeMultiplier
+        );
     return [x, y, size];
   };
 
   drawBase = (context: any) => {
     const [x, y, size] = this.getMappings();
-    context.drawPoints(x, y, this.col, this.stroke, size);
+    context.drawClear();
+    context.drawBackground();
+    context.drawPoints(x, y, this.col, this.stroke, size, this.alphaMultiplier);
   };
 
   drawHighlight = (context: any, selected: number[]) => {
     const [x, y, size] = this.getMappings("selected");
     context.drawClear();
-    context.drawPoints(x, y, "firebrick", this.stroke, size);
+    context.drawPoints(
+      x,
+      y,
+      "firebrick",
+      this.stroke,
+      size,
+      this.alphaMultiplier
+    );
   };
 
   get boundingRects() {

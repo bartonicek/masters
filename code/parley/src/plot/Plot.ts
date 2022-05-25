@@ -28,13 +28,6 @@ export class Plot extends GraphicStack {
     this.handlers = {};
   }
 
-  // Extract a (nested?) property from each child
-  extractChildren = (object: object, ...what: string[]) => {
-    return Object.keys(object).flatMap((child) => {
-      return what.reduce((a, b) => a[b], object[child]);
-    });
-  };
-
   // Call each child w/o returning anything
   callChildren = (object: object, fun: string, ...args: any[]) => {
     Object.keys(object).forEach((child) => {
@@ -89,6 +82,11 @@ export class Plot extends GraphicStack {
     );
   };
 
+  onKeypress = (key: string) => {
+    if (key === "KeyR") this.mapChildren(this.representations, "defaultize");
+    this.callChildren(this.representations, "onKeypress", key);
+  };
+
   initialize = () => {
     Object.keys(this.scales).forEach((mapping) =>
       this.scales[mapping]?.registerData(this.getUnique(mapping))
@@ -105,17 +103,29 @@ export class Plot extends GraphicStack {
 
     Object.keys(this.handlers).forEach((handlerName) => {
       const handler = this.handlers[handlerName];
-      handler.actions.forEach((action, index) => {
+      handler?.actions?.forEach((action, index) => {
         this.graphicContainer.addEventListener(action, (event) => {
           handler[handler.consequences[index]](event);
         });
       });
     });
 
+    document.body.addEventListener("keyup", (event) => {
+      if (this.active) {
+        this.handlers.keypresshandler?.reportKey(event);
+        this.onKeypress(
+          (this.handlers?.keypresshandler as hndl.KeypressHandler)?.lastPressed
+        );
+        this.drawBase();
+        this.graphicHighlight.drawClear();
+        //this.drawUser();
+      }
+    });
+
     document.body.addEventListener("dblclick", (event) => {
       this.graphicHighlight.drawClear();
       this.graphicUser.drawClear();
-      this.active = false;
+      this.active = this.active ? true : false;
     });
 
     document.body.addEventListener("mousedown", (event) => {

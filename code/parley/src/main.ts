@@ -48,12 +48,11 @@ const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
 const plot2 = new BubblePlot(data1, mapping4, marker1);
 const plot3 = new BarPlot(data1, mapping3, marker1);
-const plot4 = new ScatterPlot(data1, mapping2, marker1);
 
-const arr1: number[][] = [[1], [null], [3], [4], [5]];
-const arr2: number[][] = [[6], [7], [8], [9], [10]];
-const aa = [arr1, arr2];
+//plot1.graphicBase.drawPoints([100], [100], "steelblue", null, 10, 0.25);
 
-//console.log(plot2.scales.size.dataToPlot(3));
+// document.body.addEventListener("keyup", (event) => {
+//   console.log(event.code);
+// });
 
 export {};
