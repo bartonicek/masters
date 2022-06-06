@@ -20,7 +20,7 @@ export class BubblePlot extends Plot {
     };
 
     this.handlers = {
-      draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
+      draghandler: new hndl.RectDragHandler(),
       keypresshandler: new hndl.KeypressHandler(),
     };
 

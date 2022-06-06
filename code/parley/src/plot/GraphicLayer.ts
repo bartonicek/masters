@@ -1,4 +1,5 @@
 import * as funs from "../functions.js";
+import { globalParameters as gpars } from "../globalparameters.js";
 
 export class GraphicLayer {
   canvas: HTMLCanvasElement;
@@ -42,7 +43,7 @@ export class GraphicLayer {
   drawBackground = () => {
     const context = this.context;
     context.save();
-    context.fillStyle = "antiquewhite";
+    context.fillStyle = gpars.bgCol;
     context.fillRect(0, 0, this.width, this.height);
     context.restore();
   };
@@ -51,7 +52,7 @@ export class GraphicLayer {
     x: number[],
     y: number[],
     y0: number,
-    col = "steelblue",
+    col = gpars.reps.base.col,
     alpha = 1,
     stroke = null,
     width = 50
@@ -59,7 +60,8 @@ export class GraphicLayer {
     const [xs, ys] = this.dropMissing(x, y);
     const context = this.context;
     context.save();
-    context.fillStyle = funs.colnameWithAlpha(col, alpha);
+    context.fillStyle =
+      alpha < 1 ? col + Math.round(alpha * 255).toString(16) : col;
     xs.forEach((e, i) => {
       col ? context.fillRect(e - width / 2, ys[i], width, y0 - ys[i]) : null;
       stroke
@@ -72,7 +74,7 @@ export class GraphicLayer {
   drawPoints = (
     x: number[],
     y: number[],
-    col = "steelblue",
+    col = gpars.reps.base.col,
     stroke = null,
     radius = 5,
     alpha = 1
@@ -82,9 +84,9 @@ export class GraphicLayer {
       typeof radius === "number"
         ? Array.from(Array(x.length), (e) => radius)
         : radius;
-    const colAlpha = funs.colnameWithAlpha(col, alpha);
     context.save();
-    context.fillStyle = colAlpha;
+    context.fillStyle =
+      alpha < 1 ? col + Math.round(alpha * 255).toString(16) : col;
     context.strokeStyle = stroke;
     x.forEach((e, i) => {
       context.beginPath();

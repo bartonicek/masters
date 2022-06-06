@@ -34,11 +34,6 @@ const mapping2: dtstr.Mapping = new Map([
 
 const mapping3: dtstr.Mapping = new Map([
   ["x", "cyl"],
-  ["y", "disp"],
-]);
-
-const mapping4: dtstr.Mapping = new Map([
-  ["x", "cyl"],
   ["y", "am"],
   ["size", "mpg"],
 ]);
@@ -46,13 +41,10 @@ const mapping4: dtstr.Mapping = new Map([
 const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
-const plot2 = new BubblePlot(data1, mapping4, marker1);
-const plot3 = new BarPlot(data1, mapping3, marker1);
+const plot2 = new BubblePlot(data1, mapping3, marker1);
+const plot3 = new BarPlot(data1, mapping2, marker1);
 
-//plot1.graphicBase.drawPoints([100], [100], "steelblue", null, 10, 0.25);
-
-// document.body.addEventListener("keyup", (event) => {
-//   console.log(event.code);
-// });
+// marker1.selected = [true, true, true, false, true];
+// plot3.representations.bars.drawHighlight(plot3.graphicHighlight);
 
 export {};

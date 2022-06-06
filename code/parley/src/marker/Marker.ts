@@ -1,30 +1,38 @@
 export class Marker {
   n: number;
-  selected: number[];
-  callbacks: ((marker: Marker) => void)[];
+  selected: boolean[];
+  callbacks: (() => void)[];
 
   constructor(n: number) {
     this.n = n;
-    this.selected = [];
+    this.selected = Array.from(Array(n), (e) => false);
     this.callbacks = [];
   }
 
-  hardReceive(points: number[]) {
+  hardReceive = (points: boolean[]) => {
     this.selected = points;
     this.notifyAll();
-  }
+  };
 
-  softReceive(points: number[]) {
-    this.selected = this.selected.concat(points);
+  softReceive = (points: boolean) => {
+    this.selected = this.selected.map((e, i) => e || points[i]);
     this.notifyAll();
-  }
+  };
 
-  registerCallback(callback: (marker: object) => void) {
+  unSelect = () => {
+    this.selected = Array.from(Array(this.n), (e) => false);
+    this.notifyAll();
+  };
+
+  registerCallback(callback: () => void) {
     this.callbacks.push(callback);
   }
 
+  registerCallbacks = (...callbacks: (() => void)[]) => {
+    this.callbacks.push(...callbacks);
+  };
+
   notifyAll() {
-    const self = this;
-    this.callbacks.forEach((e) => e(self));
+    this.callbacks.forEach((fun) => fun());
   }
 }

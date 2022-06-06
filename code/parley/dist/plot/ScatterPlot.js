@@ -13,7 +13,7 @@ export class ScatterPlot extends Plot {
             identity: new Wrangler(data, mapping, marker).extractAsIs("x", "y"),
         };
         this.handlers = {
-            draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
+            draghandler: new hndl.RectDragHandler(),
             keypresshandler: new hndl.KeypressHandler(),
         };
         this.scales = {

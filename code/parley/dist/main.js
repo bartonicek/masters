@@ -18,14 +18,10 @@ const mapping2 = new Map([
 ]);
 const mapping3 = new Map([
     ["x", "cyl"],
-    ["y", "disp"],
-]);
-const mapping4 = new Map([
-    ["x", "cyl"],
     ["y", "am"],
     ["size", "mpg"],
 ]);
 const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
-const plot2 = new BubblePlot(data1, mapping4, marker1);
-const plot3 = new BarPlot(data1, mapping3, marker1);
+const plot2 = new BubblePlot(data1, mapping3, marker1);
+const plot3 = new BarPlot(data1, mapping2, marker1);

@@ -1,5 +1,6 @@
 import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
+import { globalParameters as gpars } from "../globalparameters.js";
 export class Bars extends Representation {
     width;
     constructor(wrangler, handler, plotDims) {
@@ -8,43 +9,41 @@ export class Bars extends Representation {
             plotDims.width / (3 * funs.unique(wrangler.x.extract()).length);
         this.alphaMultiplier = 1;
     }
+    get y0() {
+        return this.scales.y.plotMin;
+    }
     getMappings = (type) => {
-        let [x, y] = ["x", "y"].map((mapping) => this.getMapping(mapping, type));
-        return [x, y];
+        return ["x", "y"].map((mapping) => this.getMapping(mapping, type));
     };
     drawBase = (context) => {
         const [x, y] = this.getMappings();
+        const { y0, width, alphaMultiplier } = this;
+        const { col, strokeCol } = gpars.reps.base;
         context.drawClear();
         context.drawBackground();
-        context.drawBarsV(x, y, this.scales.y.plotMin, this.col, this.alphaMultiplier, this.stroke, this.width);
+        context.drawBarsV(x, y, y0, col, alphaMultiplier, strokeCol, width);
     };
-    drawHighlight = (context, selected) => {
+    drawHighlight = (context) => {
         const [x, y] = this.getMappings("selected");
+        const { y0, width, alphaMultiplier } = this;
+        const { col, strokeCol } = gpars.reps.highlight;
         context.drawClear();
-        context.drawBarsV(x, y, this.scales.y.plotMin, "firebrick", this.alphaMultiplier, this.stroke, this.width);
+        x
+            ? context.drawBarsV(x, y, y0, col, alphaMultiplier, strokeCol, width)
+            : null;
     };
     get boundingRects() {
-        const x = this.getMapping("x");
-        const y = this.getMapping("y");
-        return x.map((e, i) => [
-            e - this.width / 2,
-            e + this.width / 2,
-            this.scales.y.plotMin,
-            y[i],
+        const [x, y] = this.getMappings();
+        const [wh, y0] = [this.width / 2, this.scales.y.plotMin];
+        return x.map((xi, i) => [
+            [xi - wh, y0],
+            [xi + wh, y0],
+            [xi - wh, y[i]],
+            [xi + wh, y[i]],
         ]);
     }
     inSelection = (selectionPoints) => {
-        const combns = [
-            [0, 2],
-            [0, 3],
-            [1, 2],
-            [1, 3],
-        ];
-        const sel = this.boundingRects.map((points) => {
-            return combns
-                .map((indices) => indices.map((index) => points[index]))
-                .some((point) => funs.pointInRect(point, selectionPoints));
-        });
-        return this.wrangler.indices.map((e) => sel[e]);
+        const selected = this.boundingRects.map((points) => points.some((point) => funs.pointInRect(point, selectionPoints)));
+        return this.wrangler.indices.map((index) => selected[index]);
     };
 }

@@ -49,29 +49,24 @@ const unique = <Type>(x: Type[]): Type | Type[] | null => {
   //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
 
+const debounce = (fun: Function, delay: number) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fun(...args), delay);
+  };
+};
+
 // Function to construct "pretty" breaks, a basic version of R's pretty()
 const prettyBreaks = (x: number[], n = 4) => {
   const [min, max] = [Math.min(...x), Math.max(...x)];
   const range = max - min;
-  const unit = range / n;
-  const base = 10 ** Math.floor(Math.log10(unit));
-  return Array.from(
-    Array(n + 1),
-    (e, i) => base * Math.round((min + unit * i) / base)
-  );
-};
-
-const colnameToRgb = (name: string) => {
-  const temp = document.createElement("div");
-  temp.style.color = name;
-  document.body.appendChild(temp);
-  const rgbVal = window.getComputedStyle(temp).getPropertyValue("color");
-  document.body.removeChild(temp);
-  return rgbVal.slice(4, rgbVal.length - 1);
-};
-
-const colnameWithAlpha = (name: string, alpha: number) => {
-  return `rgba(${colnameToRgb(name)}, ${alpha})`;
+  const unitGross = range / n;
+  const base = 10 ** Math.floor(Math.log10(unitGross));
+  const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / base) ** 2);
+  const unitNeat =
+    base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
+  return Array.from(Array(n + 1), (e, i) => Math.round(min) + unitNeat * i);
 };
 
 // arrEqual: Checks if two arrays are deeply equal
@@ -183,9 +178,8 @@ export {
   which,
   match,
   unique,
+  debounce,
   prettyBreaks,
-  colnameToRgb,
-  colnameWithAlpha,
   arrEqual,
   arrTranspose,
   uniqueRows,

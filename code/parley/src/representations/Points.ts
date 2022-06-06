@@ -3,6 +3,7 @@ import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
 import * as dtstr from "../datastructures.js";
+import { globalParameters as gpars } from "../globalparameters.js";
 
 export class Points extends Representation {
   constructor(
@@ -11,8 +12,6 @@ export class Points extends Representation {
     plotDims: { width: number; height: number }
   ) {
     super(wrangler, handler, plotDims);
-    this.col = "steelblue";
-    this.stroke = null;
     this.radius = 5;
     this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
@@ -22,9 +21,12 @@ export class Points extends Representation {
     let [x, y, size] = ["x", "y", "size"].map((mapping: dtstr.ValidMappings) =>
       this.getMapping(mapping, type)
     );
+    const { radius } =
+      type === "selected" ? gpars.reps.highlight : gpars.reps.base;
+
     size = size
       ? size.map((e) => e * this.sizeMultiplier)
-      : Array.from(Array(x.length), (e) => 5).map(
+      : Array.from(Array(x.length), (e) => radius).map(
           (e) => e * this.sizeMultiplier
         );
     return [x, y, size];
@@ -32,49 +34,34 @@ export class Points extends Representation {
 
   drawBase = (context: any) => {
     const [x, y, size] = this.getMappings();
+    const { col, strokeCol, strokeWidth } = gpars.reps.base;
     context.drawClear();
     context.drawBackground();
-    context.drawPoints(x, y, this.col, this.stroke, size, this.alphaMultiplier);
+    context.drawPoints(x, y, col, strokeCol, size, this.alphaMultiplier);
   };
 
-  drawHighlight = (context: any, selected: number[]) => {
+  drawHighlight = (context: any) => {
     const [x, y, size] = this.getMappings("selected");
+    const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
+    const { alphaMultiplier } = this;
     context.drawClear();
-    context.drawPoints(
-      x,
-      y,
-      "firebrick",
-      this.stroke,
-      size,
-      this.alphaMultiplier
-    );
+    x ? context.drawPoints(x, y, col, strokeCol, size, alphaMultiplier) : null;
   };
 
   get boundingRects() {
     const [x, y, size] = this.getMappings();
-    return x.map((e, i) => [
-      e - size[i],
-      e + size[i],
-      y[i] - size[i],
-      y[i] + size[i],
+    return x.map((xi, i) => [
+      [xi - size[i], y[i] - size[i]],
+      [xi + size[i], y[i] - size[i]],
+      [xi - size[i], y[i] + size[i]],
+      [xi + size[i], y[i] + size[i]],
     ]);
   }
 
-  inSelection = (selectionPoints) => {
-    const combns = [
-      [0, 2],
-      [0, 3],
-      [1, 2],
-      [1, 3],
-    ];
-
-    const sel = this.boundingRects.map((points) => {
-      return combns
-        .map((indices) => indices.map((index) => points[index]))
-        .some((point: [number, number]) =>
-          funs.pointInRect(point, selectionPoints)
-        );
-    });
-    return this.wrangler.indices.map((e) => sel[e]);
+  inSelection = (selectionPoints: [number, number, number, number]) => {
+    const selected = this.boundingRects.map((points) =>
+      points.some((point) => funs.pointInRect(point, selectionPoints))
+    );
+    return this.wrangler.indices.map((index) => selected[index]);
   };
 }

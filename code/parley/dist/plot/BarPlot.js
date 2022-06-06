@@ -15,7 +15,7 @@ export class BarPlot extends Plot {
                 .doWithin(funs.length),
         };
         this.handlers = {
-            draghandler: new hndl.RectDragHandler().registerCallback(this.drawUser),
+            draghandler: new hndl.RectDragHandler(),
             keypresshandler: new hndl.KeypressHandler(),
         };
         this.scales = {
