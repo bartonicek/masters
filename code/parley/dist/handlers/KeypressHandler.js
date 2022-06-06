@@ -1,17 +1,20 @@
 import { Handler } from "./Handler.js";
 export class KeypressHandler extends Handler {
-    lastPressed;
-    pressing;
+    last;
+    current;
     constructor() {
         super();
         this.callbacks = [];
-        this.lastPressed = "";
-        this.pressing = "";
+        this.last = "";
+        this.current = "";
         this.actions = ["keydown", "keyup"];
         this.consequences = ["keyPressed", "keyReleased"];
     }
     keyPressed = (event) => {
-        this.pressing = event.code;
-        console.log(event.code);
+        this.current = event.code;
+        this.last = event.code;
+    };
+    keyReleased = (event) => {
+        this.current = "";
     };
 }

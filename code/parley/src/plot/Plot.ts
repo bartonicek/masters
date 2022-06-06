@@ -165,7 +165,7 @@ export class Plot extends GraphicStack {
   representations: { [key: string]: reps.Representation };
   auxiliaries: { [key: string]: auxs.Auxiliary };
   wranglers: { [key: string]: Wrangler };
-  handlers: { [key: string]: hndl.Handler };
+  handlers: { drag: hndl.RectDragHandler; keypress: hndl.KeypressHandler };
 
   constructor(marker: Marker) {
     super();
@@ -216,8 +216,13 @@ export class Plot extends GraphicStack {
   };
 
   onSelection = () => {
-    const { marker, inSelection } = this;
-    marker.hardReceive(inSelection(this.handlers.draghandler.selectionPoints));
+    const { marker, handlers, inSelection } = this;
+
+    if (handlers.keypress.current === "ShiftLeft") {
+      marker.softReceive(inSelection(handlers.drag.selectionPoints));
+    } else {
+      marker.hardReceive(inSelection(handlers.drag.selectionPoints));
+    }
   };
 
   draw = (context: "base" | "highlight" | "user", ...args: any[]) => {
@@ -267,11 +272,9 @@ export class Plot extends GraphicStack {
       });
     });
 
-    handlers.keypresshandler.actions.forEach((action, index) => {
+    handlers.keypress.actions.forEach((action, index) => {
       document.body.addEventListener(action, (event) => {
-        handlers.keypresshandler[handlers.keypresshandler.consequences[index]](
-          event
-        );
+        handlers.keypress[handlers.keypress.consequences[index]](event);
       });
     });
 

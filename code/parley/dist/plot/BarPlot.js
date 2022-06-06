@@ -1,4 +1,3 @@
-import * as hndl from "../handlers/handlers.js";
 import * as scls from "../scales/scales.js";
 import * as reps from "../representations/representations.js";
 import * as auxs from "../auxiliaries/auxiliaries.js";
@@ -14,16 +13,12 @@ export class BarPlot extends Plot {
                 .splitWhat("y")
                 .doWithin(funs.length),
         };
-        this.handlers = {
-            draghandler: new hndl.RectDragHandler(),
-            keypresshandler: new hndl.KeypressHandler(),
-        };
         this.scales = {
             x: new scls.XYScaleDiscrete(this.width),
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.draghandler, {
+            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, {
                 width: this.width,
                 height: this.height,
             }),
@@ -34,7 +29,7 @@ export class BarPlot extends Plot {
             axistexy: new auxs.AxisText("y"),
             axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
             axistitley: new auxs.AxisTitle("y", mapping.get("y")),
-            rectdragbox: new auxs.RectDragBox(this.handlers.draghandler),
+            rectdragbox: new auxs.RectDragBox(this.handlers.drag),
         };
         this.initialize();
     }

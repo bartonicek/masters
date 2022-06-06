@@ -181,8 +181,13 @@ export class Plot extends GraphicStack {
         return allPoints[0].map((_, i) => allPoints.some((points) => points[i]));
     };
     onSelection = () => {
-        const { marker, inSelection } = this;
-        marker.hardReceive(inSelection(this.handlers.draghandler.selectionPoints));
+        const { marker, handlers, inSelection } = this;
+        if (handlers.keypress.current === "ShiftLeft") {
+            marker.softReceive(inSelection(handlers.drag.selectionPoints));
+        }
+        else {
+            marker.hardReceive(inSelection(handlers.drag.selectionPoints));
+        }
     };
     draw = (context, ...args) => {
         const { representations, auxiliaries, callChildren } = this;
@@ -213,9 +218,9 @@ export class Plot extends GraphicStack {
                 });
             });
         });
-        handlers.keypresshandler.actions.forEach((action, index) => {
+        handlers.keypress.actions.forEach((action, index) => {
             document.body.addEventListener(action, (event) => {
-                handlers.keypresshandler[handlers.keypresshandler.consequences[index]](event);
+                handlers.keypress[handlers.keypress.consequences[index]](event);
             });
         });
         graphicContainer.addEventListener("dblclick", (event) => {
