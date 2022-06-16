@@ -1,92 +1,124 @@
 import { GraphicStack } from "./GraphicStack.js";
 import * as funs from "../functions.js";
+import * as hndl from "../handlers/handlers.js";
+import { boolean } from "../../../../../../../../../node_modules/mathjs/types/index.js";
 export class Plot extends GraphicStack {
     marker;
-    active;
     scales;
     representations;
     auxiliaries;
     wranglers;
     handlers;
+    stayActive = boolean;
     constructor(marker) {
         super();
-        this.active = false;
         this.marker = marker;
         this.representations = {};
         this.auxiliaries = {};
         this.wranglers = {};
         this.scales = {};
-        this.handlers = {};
+        this.handlers = {
+            drag: new hndl.RectDragHandler(),
+            keypress: new hndl.KeypressHandler(),
+        };
+        this.stayActive = false;
     }
-    // Extract a (nested?) property from each child
-    extractChildren = (object, ...what) => {
-        return Object.keys(object).flatMap((child) => {
-            return what.reduce((a, b) => a[b], object[child]);
-        });
-    };
-    // Call each child w/o returning anything
+    get active() {
+        return this.graphicContainer.classList.contains("active");
+    }
+    // Calls a method [string] on each child of a property [string]
+    // e.g. call method "drawBase" on each child of "representations"
     callChildren = (object, fun, ...args) => {
-        Object.keys(object).forEach((child) => {
-            object[child][fun] ? object[child][fun](...args) : null;
+        const obj = this[object];
+        Object.keys(obj).forEach((child) => {
+            obj[child][fun] ? obj[child][fun](...args) : null;
         });
     };
-    // Return something for each child
+    // Returns a result of a function [string] from each child of a property [string]
+    // e.g. return selected points from each representation
     mapChildren = (object, fun, ...args) => {
-        return Object.keys(object).map((child) => {
-            return object[child][fun] ? object[child][fun](...args) : null;
+        const obj = this[object];
+        return Object.keys(obj).map((child) => {
+            return obj[child][fun] ? obj[child][fun](...args) : null;
         });
     };
-    getUnique = (variable) => {
-        const values = [].concat(Object.keys(this.wranglers).flatMap((e) => this.wranglers[e][variable].extract()));
-        return Array.from(new Set(values));
+    // Gets all unique values of a mapping [string], across all wranglers
+    getUnique = (mapping) => {
+        const { wranglers } = this;
+        const arr = Object.keys(wranglers).flatMap((name) => wranglers[name][mapping].extract() ?? []);
+        return Array.from(new Set(arr));
     };
-    draw = (context, ...args) => {
-        const what = "draw" + funs.capitalize(context);
-        const where = "graphic" + funs.capitalize(context);
-        this.callChildren(this.representations, what, this[where], ...args);
-        this.callChildren(this.auxiliaries, what, this[where], ...args);
-    };
-    drawBase = () => this.draw("base");
-    drawHighlight = () => this.draw("highlight", this.marker.selected);
-    drawUser = () => this.draw("user");
-    inSelection = (selectionPoints) => {
-        const allPoints = this.mapChildren(this.representations, "inSelection", selectionPoints);
-        return allPoints[0].map((_, i) => allPoints.some((e) => e[i]));
-    };
-    updateMarker = (selected) => {
-        this.marker.hardReceive(selected);
+    // Given an array of selection points, checks each representation
+    inSelection = (selPoints) => {
+        const { mapChildren } = this;
+        const allPoints = mapChildren("representations", "inSelection", selPoints);
+        return allPoints[0].map((_, i) => allPoints.some((points) => points[i]));
     };
     onSelection = () => {
-        // THIS IS STILL HARDCODED - NEED TO FIGURE OUT HOW TO DO FOR MULTIPLE HANDLERS?
-        this.updateMarker(this.inSelection(this.handlers.draghandler.selectionPoints));
+        const { marker, handlers, inSelection } = this;
+        if (handlers.keypress.current === "ShiftLeft") {
+            marker.softReceive(inSelection(handlers.drag.selectionPoints));
+        }
+        else {
+            marker.hardReceive(inSelection(handlers.drag.selectionPoints));
+        }
+    };
+    onKeypress = () => {
+        const { handlers, callChildren } = this;
+        if (this.active)
+            callChildren("representations", "onKeypress", handlers.keypress.current);
+    };
+    draw = (context, ...args) => {
+        const { representations, auxiliaries, callChildren } = this;
+        const what = "draw" + funs.capitalize(context);
+        const where = "graphic" + funs.capitalize(context);
+        callChildren("representations", what, this[where], ...args);
+        callChildren("auxiliaries", what, this[where], ...args);
+    };
+    drawBase = () => this.draw("base");
+    drawHighlight = () => this.draw("highlight");
+    drawUser = () => this.draw("user");
+    activateAll = () => {
+        const containers = document.querySelectorAll(".graphicContainer");
+        containers.forEach((e) => e.classList.add("active"));
+    };
+    deactivateAll = () => {
+        const containers = document.querySelectorAll(".graphicContainer");
+        containers.forEach((e) => e.classList.remove("active"));
     };
     initialize = () => {
-        Object.keys(this.scales).forEach((mapping) => this.scales[mapping]?.registerData(this.getUnique(mapping)));
-        this.callChildren(this.representations, "registerScales", this.scales);
-        this.callChildren(this.auxiliaries, "registerScales", this.scales);
-        this.drawBase();
-        this.callChildren(this.handlers, "registerCallback", this.onSelection);
-        this.marker.registerCallback(this.drawHighlight);
-        this.marker.registerCallback(this.drawUser);
-        Object.keys(this.handlers).forEach((handlerName) => {
-            const handler = this.handlers[handlerName];
-            handler.actions.forEach((action, index) => {
-                this.graphicContainer.addEventListener(action, (event) => {
-                    handler[handler.consequences[index]](event);
-                });
+        const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
+        Object.keys(scales).forEach((mapping) => {
+            scales[mapping]?.registerData(this.getUnique(mapping));
+        });
+        callChildren("representations", "registerScales", scales);
+        callChildren("auxiliaries", "registerScales", scales);
+        handlers.drag.registerCallbacks(onSelection);
+        handlers.keypress.registerCallbacks(onKeypress, drawBase, drawHighlight);
+        marker.registerCallbacks(drawHighlight, drawUser);
+        // For each handler, register event listeners for actions
+        // and corresponding consequences on the graphiContainer
+        Object.keys(handlers).forEach((name) => {
+            const handler = handlers[name];
+            handler?.actions?.forEach((action, index) => {
+                graphicContainer.addEventListener(action, funs.throttle(handler[handler.consequences[index]], 50));
             });
         });
+        handlers.keypress.actions.forEach((action, index) => {
+            document.body.addEventListener(action, (event) => {
+                handlers.keypress[handlers.keypress.consequences[index]](event);
+            });
+        });
+        const containers = document.querySelectorAll(".graphicContainer");
         document.body.addEventListener("dblclick", (event) => {
-            this.graphicHighlight.drawClear();
-            this.graphicUser.drawClear();
-            this.active = false;
+            this.activateAll();
+            marker.unSelect();
+            this.deactivateAll();
         });
-        document.body.addEventListener("mousedown", (event) => {
-            this.active = document
-                .getElementById(this.id)
-                .contains(event.target)
-                ? true
-                : false;
+        graphicContainer.addEventListener("mousedown", (event) => {
+            this.deactivateAll();
+            event.currentTarget.classList.add("active");
         });
+        drawBase();
     };
 }

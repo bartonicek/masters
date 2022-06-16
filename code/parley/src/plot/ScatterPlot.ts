@@ -37,7 +37,7 @@ export class ScatterPlot extends Plot {
       axistexy: new auxs.AxisText("y"),
       axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
       axistitley: new auxs.AxisTitle("y", mapping.get("y")),
-      rectdragbox: new auxs.RectDragBox(this.handlers.drag),
+      rectdragbox: new auxs.RectDragBox(this.handlers),
     };
 
     this.initialize();

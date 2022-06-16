@@ -49,11 +49,13 @@ const unique = <Type>(x: Type[]): Type | Type[] | null => {
   //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
 
-const debounce = (fun: Function, delay: number) => {
-  let timeout;
+const throttle = (fun: Function, delay: number) => {
+  let lastTime = 0;
   return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fun(...args), delay);
+    const now = new Date().getTime();
+    if (now - lastTime < delay) return;
+    lastTime = now;
+    fun(...args);
   };
 };
 
@@ -62,11 +64,19 @@ const prettyBreaks = (x: number[], n = 4) => {
   const [min, max] = [Math.min(...x), Math.max(...x)];
   const range = max - min;
   const unitGross = range / n;
-  const base = 10 ** Math.floor(Math.log10(unitGross));
-  const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / base) ** 2);
+  const base = Math.floor(Math.log10(unitGross));
+  const dists = [1, 2, 4, 5, 6, 8, 10].map(
+    (e) => (e - unitGross / 10 ** base) ** 2
+  );
   const unitNeat =
-    base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
-  return Array.from(Array(n + 1), (e, i) => Math.round(min) + unitNeat * i);
+    10 ** base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
+  const minNeat = Math.round(min / unitNeat) * unitNeat;
+
+  return Array.from(Array(n + 1), (e, i) => {
+    return Math.abs(base) > 4
+      ? (minNeat + unitNeat * i).toExponential()
+      : minNeat + unitNeat * i;
+  });
 };
 
 // arrEqual: Checks if two arrays are deeply equal
@@ -90,7 +100,7 @@ const uniqueRows = (data: any[][]) => {
   );
 
   const stringValues = unique(stringDataT);
-  const indices = stringValues.map((e) =>
+  const indices = (stringValues as string[]).map((e) =>
     stringDataT.flatMap((f, j) => (f === e ? j : []))
   );
   const values = indices.map((e) => {
@@ -178,7 +188,7 @@ export {
   which,
   match,
   unique,
-  debounce,
+  throttle,
   prettyBreaks,
   arrEqual,
   arrTranspose,

@@ -8,14 +8,15 @@ import { Marker } from "../marker/Marker.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 
-export class BarPlot extends Plot {
+export class HistoPlot extends Plot {
   constructor(data: dtstr.DataFrame, mapping: dtstr.Mapping, marker: Marker) {
     super(marker);
 
     this.wranglers = {
       summary: new Wrangler(data, mapping, marker)
         .splitBy("x")
-        .splitWhat("y")
+        .splitWhat("x")
+        .doOn(funs.bin)
         .doWithin(funs.length),
     };
 

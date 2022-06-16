@@ -3,6 +3,7 @@
 export class Auxiliary {
   scales: { [key: string]: any };
   handler: any;
+  handlers: any;
 
   registerScales = (scales: any) => {
     this.scales = scales;

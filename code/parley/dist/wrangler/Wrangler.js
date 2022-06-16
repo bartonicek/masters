@@ -23,6 +23,7 @@ export class Wrangler {
         this.indices = Array.from(Array(this.marker.n), (e, i) => i);
         mappings.forEach((mapping) => {
             this[mapping] = new Cast(this.getMapping(mapping), this).registerFun(funs.identity);
+            this[mapping].allUnique = true;
         });
         return this;
     };
@@ -40,6 +41,10 @@ export class Wrangler {
             this.what.add(mapping);
             this[mapping] = new Cast(this.getMapping(mapping), this);
         });
+        return this;
+    };
+    doOn = (fun, ...args) => {
+        Array.from(this.by).forEach((mapping) => this[mapping].registerFun(fun, ...args));
         return this;
     };
     doWithin = (fun, ...args) => {

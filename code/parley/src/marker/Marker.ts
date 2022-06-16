@@ -14,7 +14,7 @@ export class Marker {
     this.notifyAll();
   };
 
-  softReceive = (points: boolean) => {
+  softReceive = (points: boolean[]) => {
     this.selected = this.selected.map((e, i) => e || points[i]);
     this.notifyAll();
   };
@@ -23,10 +23,6 @@ export class Marker {
     this.selected = Array.from(Array(this.n), (e) => false);
     this.notifyAll();
   };
-
-  registerCallback(callback: () => void) {
-    this.callbacks.push(callback);
-  }
 
   registerCallbacks = (...callbacks: (() => void)[]) => {
     this.callbacks.push(...callbacks);

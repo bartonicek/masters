@@ -3,8 +3,12 @@ export class Handler {
     consequences;
     callbacks;
     selectionPoints;
-    registerCallback = (callback) => {
-        this.callbacks.push(callback);
+    // registerCallback = (callback: () => void) => {
+    //   this.callbacks.push(callback);
+    //   return this;
+    // };
+    registerCallbacks = (...callbacks) => {
+        this.callbacks.push(...callbacks);
         return this;
     };
     notifyAll = () => {

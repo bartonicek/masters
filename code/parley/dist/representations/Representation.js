@@ -35,6 +35,8 @@ export class Representation {
     incrementSizeMultiplier = () => { };
     inSelection = (selectionPoints) => { };
     onKeypress = (key) => {
+        if (key === "KeyR")
+            this.defaultize();
         if (key === "Minus" && this.sizeMultiplier)
             this.sizeMultiplier *= 0.8;
         if (key === "Equal" && this.sizeMultiplier)

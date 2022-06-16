@@ -1,3 +1,4 @@
+import { globalParameters as gpars } from "../globalparameters.js";
 export class GraphicLayer {
     canvas;
     context;
@@ -22,19 +23,23 @@ export class GraphicLayer {
     };
     drawClear = () => {
         const context = this.context;
+        context.save();
         context.clearRect(0, 0, this.width, this.height);
+        context.restore();
     };
     drawBackground = () => {
-        this.context.save();
-        this.context.fillStyle = "antiquewhite";
-        this.context.fillRect(0, 0, this.width, this.height);
-        this.context.restore();
+        const context = this.context;
+        context.save();
+        context.fillStyle = gpars.bgCol;
+        context.fillRect(0, 0, this.width, this.height);
+        context.restore();
     };
-    drawBarsV = (x, y, y0, col = "steelblue", stroke = null, width = 50) => {
+    drawBarsV = (x, y, y0, col = gpars.reps.base.col, alpha = 1, stroke = null, width = 50) => {
         const [xs, ys] = this.dropMissing(x, y);
         const context = this.context;
         context.save();
-        context.fillStyle = col;
+        context.fillStyle =
+            alpha < 1 ? col + Math.round(alpha * 255).toString(16) : col;
         xs.forEach((e, i) => {
             col ? context.fillRect(e - width / 2, ys[i], width, y0 - ys[i]) : null;
             stroke
@@ -43,13 +48,14 @@ export class GraphicLayer {
         });
         context.restore();
     };
-    drawPoints = (x, y, col = "steelblue", stroke = null, radius = 5) => {
+    drawPoints = (x, y, col = gpars.reps.base.col, stroke = null, radius = 5, alpha = 1) => {
         const context = this.context;
         const rs = typeof radius === "number"
             ? Array.from(Array(x.length), (e) => radius)
             : radius;
         context.save();
-        context.fillStyle = col;
+        context.fillStyle =
+            alpha < 1 ? col + Math.round(alpha * 255).toString(16) : col;
         context.strokeStyle = stroke;
         x.forEach((e, i) => {
             context.beginPath();
@@ -73,22 +79,30 @@ export class GraphicLayer {
         context.stroke();
         context.restore();
     };
-    drawText = (x, y, labels, size = 20) => {
+    drawText = (x, y, labels, size = 20, rotate) => {
         const context = this.context;
         context.save();
+        context.textAlign = "center";
         context.font = `${size}px Times New Roman`;
         x.forEach((e, i) => {
-            context.fillText(labels[i], e, y[i]);
+            context.translate(e, y[i]);
+            if (rotate)
+                context.rotate((rotate / 360) * Math.PI * 2);
+            context.fillText(labels[i], 0, 0);
+            context.translate(-e, -y[i]);
         });
         context.restore();
     };
-    drawWindow = (start, end, col = "rgba(0, 0, 0, 0.1)", stroke = "rgba(0, 0, 0, 0.25)") => {
+    drawDim = (col = "rgba(0, 0, 0, 0.1)") => {
+        const context = this.context;
+        context.fillStyle = col;
+        context.fillRect(0, 0, this.width, this.height);
+    };
+    drawWindow = (start, end, stroke = "rgba(0, 0, 0, 0.25)") => {
         const context = this.context;
         context.save();
-        context.fillStyle = col;
         context.strokeStyle = stroke;
         context.setLineDash([5, 5]);
-        context.fillRect(0, 0, this.width, this.height);
         context.clearRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
         context.strokeRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
         context.restore();

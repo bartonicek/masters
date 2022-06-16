@@ -2,6 +2,7 @@
 export class Auxiliary {
     scales;
     handler;
+    handlers;
     registerScales = (scales) => {
         this.scales = scales;
         return this;

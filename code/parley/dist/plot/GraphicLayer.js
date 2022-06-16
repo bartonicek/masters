@@ -10,7 +10,7 @@ export class GraphicLayer {
         this.context = this.canvas.getContext("2d");
         this.width = width;
         this.height = height;
-        this.backgroundColour = "antiquewhite";
+        this.backgroundColour = gpars.bgCol;
         this.canvas.width = width;
         this.canvas.height = height;
     }
@@ -93,15 +93,23 @@ export class GraphicLayer {
         });
         context.restore();
     };
-    drawWindow = (start, end, col = "rgba(0, 0, 0, 0.1)", stroke = "rgba(0, 0, 0, 0.25)") => {
+    drawDim = (col = "rgba(0, 0, 0, 0.1)") => {
+        const context = this.context;
+        context.fillStyle = col;
+        context.fillRect(0, 0, this.width, this.height);
+    };
+    drawWindow = (start, end, stroke = "rgba(0, 0, 0, 0.25)") => {
         const context = this.context;
         context.save();
-        context.fillStyle = col;
         context.strokeStyle = stroke;
         context.setLineDash([5, 5]);
-        context.fillRect(0, 0, this.width, this.height);
         context.clearRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
-        context.strokeRect(start[0], start[1], end[0] - start[0], end[1] - start[1]);
+        // context.strokeRect(
+        //   start[0],
+        //   start[1],
+        //   end[0] - start[0],
+        //   end[1] - start[1]
+        // );
         context.restore();
     };
 }

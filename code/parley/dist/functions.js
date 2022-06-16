@@ -39,11 +39,14 @@ const unique = (x) => {
     return uniqueArray.length === 1 ? uniqueArray[0] : uniqueArray;
     //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
-const debounce = (fun, delay) => {
-    let timeout;
+const throttle = (fun, delay) => {
+    let lastTime = 0;
     return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => fun(...args), delay);
+        const now = new Date().getTime();
+        if (now - lastTime < delay)
+            return;
+        lastTime = now;
+        fun(...args);
     };
 };
 // Function to construct "pretty" breaks, a basic version of R's pretty()
@@ -51,10 +54,15 @@ const prettyBreaks = (x, n = 4) => {
     const [min, max] = [Math.min(...x), Math.max(...x)];
     const range = max - min;
     const unitGross = range / n;
-    const base = 10 ** Math.floor(Math.log10(unitGross));
-    const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / base) ** 2);
-    const unitNeat = base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
-    return Array.from(Array(n + 1), (e, i) => Math.round(min) + unitNeat * i);
+    const base = Math.floor(Math.log10(unitGross));
+    const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / 10 ** base) ** 2);
+    const unitNeat = 10 ** base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
+    const minNeat = Math.round(min / unitNeat) * unitNeat;
+    return Array.from(Array(n + 1), (e, i) => {
+        return Math.abs(base) > 4
+            ? (minNeat + unitNeat * i).toExponential()
+            : minNeat + unitNeat * i;
+    });
 };
 // arrEqual: Checks if two arrays are deeply equal
 const arrEqual = (array1, array2) => {
@@ -127,4 +135,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, debounce, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, timeExecution, };

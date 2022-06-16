@@ -7,15 +7,17 @@ export class ScaleDiscrete extends Scale {
         this.values = [];
     }
     toString = (x) => {
+        if (typeof x === "string" || typeof x[0] === "string")
+            return x;
         return x.length ? x.map((e) => `${e}`) : `${x}`;
     };
     registerData = (data) => {
         this.data = data;
         const arr = Array.from(new Set([...data]));
-        typeof arr[0] === "number"
-            ? (this.values = arr.sort((a, b) => a - b))
-            : //.map((e) => `${e}`))
-                this.values.sort().map((e) => `${e}`);
+        this.values =
+            typeof arr[0] === "number"
+                ? arr.sort((a, b) => a - b)
+                : arr.sort();
         this.positions = Array.from(Array(this.values.length), (e, i) => (i + 1) / (this.values.length + 1));
         return this;
     };

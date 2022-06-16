@@ -1,4 +1,5 @@
 import { Handler } from "./Handler.js";
+import * as funs from "../functions.js";
 
 export class RectDragHandler extends Handler {
   dragging: boolean;

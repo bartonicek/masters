@@ -4,22 +4,22 @@ import * as auxs from "../auxiliaries/auxiliaries.js";
 import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
-export class BubblePlot extends Plot {
+export class HistoPlot extends Plot {
     constructor(data, mapping, marker) {
         super(marker);
         this.wranglers = {
-            identity: new Wrangler(data, mapping, marker)
-                .splitBy("x", "y")
-                .splitWhat("size")
+            summary: new Wrangler(data, mapping, marker)
+                .splitBy("x")
+                .splitWhat("x")
+                .doOn(funs.bin)
                 .doWithin(funs.length),
         };
         this.scales = {
             x: new scls.XYScaleDiscrete(this.width),
-            y: new scls.XYScaleDiscrete(this.height, -1),
-            size: new scls.AreaScaleContinuous(this.width / 10),
+            y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.drag, {
+            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, {
                 width: this.width,
                 height: this.height,
             }),
@@ -29,7 +29,7 @@ export class BubblePlot extends Plot {
             axistextx: new auxs.AxisText("x"),
             axistexy: new auxs.AxisText("y"),
             axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
-            axistitley: new auxs.AxisTitle("y", mapping.get("y")),
+            //axistitley: new auxs.AxisTitle("y", mapping.get("y")),
             rectdragbox: new auxs.RectDragBox(this.handlers),
         };
         this.initialize();

@@ -4,8 +4,13 @@ export class Handler {
   callbacks: (() => void)[];
   selectionPoints: number[];
 
-  registerCallback = (callback: () => void) => {
-    this.callbacks.push(callback);
+  // registerCallback = (callback: () => void) => {
+  //   this.callbacks.push(callback);
+  //   return this;
+  // };
+
+  registerCallbacks = (...callbacks: (() => void)[]) => {
+    this.callbacks.push(...callbacks);
     return this;
   };
 
