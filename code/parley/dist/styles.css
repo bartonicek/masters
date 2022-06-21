@@ -1,10 +1,22 @@
+
+.graphicDiv {
+  background-color: #BDC7C2;
+  text-align: center;
+  margin: 0px;
+  top: 0;
+  right: 0;
+  padding-top: 100px;
+  padding-bottom: 100px;
+}
+
 .graphicContainer {
   position: relative;
   display: inline-block;
-  width: 600px;
-  height:600px;
+  width: 800px;
+  height:800px;
   padding: 0px;
-  margin: 5px;
+  margin: 10px;
+  box-shadow: 5px 5px 3px #00000025;
 }
 
 .graphicContainer canvas {
@@ -13,6 +25,61 @@
   left: 0;
 }
 
-.active {
-  outline: 3px solid burlywood;
+.sidePanelHelp {
+  width: 0px;
+  height: 50%;
+  padding-top: 20px;
+  position: fixed;
+  white-space: nowrap;
+  top: 20px;
+  right: 20px;
+  background-color: #00000090;
+  color: aliceblue;
+  font-family: serif;  
+  font-size: 20pt;
+  text-shadow: #2E3532;
+  transition: 1s;
 }
+
+.sidePanelHelpActive{
+  width: 90%;
+}
+
+.textHelp {
+  padding-left: 50px;
+  margin: 10px;
+  padding: 5px;
+  overflow: hidden;
+}
+
+kbd {
+  background-color:#2E3532;
+  border-radius: 3px;
+  padding: 2px 4px;
+  box-shadow: 2px 2px 3px #00000025;
+  white-space: nowrap;
+}
+
+.buttonHelp {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 0%;
+  right: 0%;
+  border: none;
+  background-color: #2E3532;
+  color: antiquewhite;
+  font-family: serif;
+  font-size: 40pt;
+  font-weight: bold;
+}
+
+.buttonHelp:hover {
+  color: #FDF6ED;
+  background-color:#39413D
+}
+
+.active {
+  outline: 3px solid #2E3532
+}
+

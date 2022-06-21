@@ -14,6 +14,14 @@ import { Cast } from "./wrangler/Cast.js";
 import { AxisText } from "./auxiliaries/AxisText.js";
 import { BubblePlot } from "./plot/BubblePlot.js";
 
+document
+  .querySelector<HTMLElement>(".buttonHelp")
+  .addEventListener("click", (event) => {
+    document
+      .querySelector<HTMLElement>(".sidePanelHelp")
+      .classList.toggle("sidePanelHelpActive");
+  });
+
 const getData = async (path: string) => {
   const response = await fetch(path);
   return response.json();

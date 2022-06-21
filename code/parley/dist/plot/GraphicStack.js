@@ -1,5 +1,6 @@
 import { GraphicLayer } from "./GraphicLayer.js";
 export class GraphicStack {
+    graphicDiv;
     graphicContainer;
     graphicBase;
     graphicHighlight;
@@ -13,12 +14,13 @@ export class GraphicStack {
     };
     constructor() {
         this.id = `plot${GraphicStack.count}`;
+        this.graphicDiv = document.querySelector(".graphicDiv");
         this.graphicContainer = document.createElement("div");
         this.initialize();
         GraphicStack.incrementCount();
     }
     initialize() {
-        document.body.appendChild(this.graphicContainer);
+        this.graphicDiv.appendChild(this.graphicContainer);
         this.graphicContainer.setAttribute("class", "graphicContainer");
         this.graphicContainer.setAttribute("id", this.id);
         this.width = parseInt(getComputedStyle(this.graphicContainer).width, 10);

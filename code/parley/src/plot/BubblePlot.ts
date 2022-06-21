@@ -22,7 +22,7 @@ export class BubblePlot extends Plot {
     this.scales = {
       x: new scls.XYScaleDiscrete(this.width),
       y: new scls.XYScaleDiscrete(this.height, -1),
-      size: new scls.AreaScaleContinuous(this.width / 10),
+      size: new scls.AreaScaleContinuous(this.width / 5),
     };
 
     this.representations = {

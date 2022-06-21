@@ -2,6 +2,13 @@ import { Marker } from "./marker/Marker.js";
 import { ScatterPlot } from "./plot/ScatterPlot.js";
 import { BarPlot } from "./plot/BarPlot.js";
 import { BubblePlot } from "./plot/BubblePlot.js";
+document
+    .querySelector(".buttonHelp")
+    .addEventListener("click", (event) => {
+    document
+        .querySelector(".sidePanelHelp")
+        .classList.toggle("sidePanelHelpActive");
+});
 const getData = async (path) => {
     const response = await fetch(path);
     return response.json();
