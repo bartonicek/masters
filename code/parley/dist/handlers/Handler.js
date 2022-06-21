@@ -2,7 +2,6 @@ export class Handler {
     actions;
     consequences;
     callbacks;
-    selectionPoints;
     // registerCallback = (callback: () => void) => {
     //   this.callbacks.push(callback);
     //   return this;

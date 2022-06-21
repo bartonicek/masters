@@ -63,7 +63,7 @@ export class Plot extends GraphicStack {
   };
 
   // Given an array of selection points, checks each representation
-  inSelection = (selPoints: number[]) => {
+  inSelection = (selPoints: [number, number][]) => {
     const { mapChildren } = this;
     const allPoints = mapChildren("representations", "inSelection", selPoints);
     return allPoints[0].map((_, i) => allPoints.some((points) => points[i]));

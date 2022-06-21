@@ -21,6 +21,16 @@ export class GraphicLayer {
         missingIndices = Array.from(new Set(missingIndices));
         return [...vectors].map((vector) => vector.flatMap((value, index) => missingIndices.indexOf(index) === -1 ? value : []));
     };
+    toAlpha = (col, alpha) => {
+        if (alpha === 1)
+            return col;
+        const alpha16 = Math.floor(alpha * 255)
+            .toString(16)
+            .toUpperCase();
+        const colString = alpha16.length < 2 ? col + "0" + alpha16 : col + alpha16;
+        console.log(colString);
+        return colString;
+    };
     drawClear = () => {
         const context = this.context;
         context.save();
@@ -38,8 +48,7 @@ export class GraphicLayer {
         const [xs, ys] = this.dropMissing(x, y);
         const context = this.context;
         context.save();
-        context.fillStyle =
-            alpha < 1 ? col + Math.round(alpha * 255).toString(16) : col;
+        context.fillStyle = this.toAlpha(col, alpha);
         xs.forEach((e, i) => {
             col ? context.fillRect(e - width / 2, ys[i], width, y0 - ys[i]) : null;
             stroke
@@ -54,8 +63,7 @@ export class GraphicLayer {
             ? Array.from(Array(x.length), (e) => radius)
             : radius;
         context.save();
-        context.fillStyle =
-            alpha < 1 ? col + Math.round(alpha * 255).toString(16) : col;
+        context.fillStyle = this.toAlpha(col, alpha);
         context.strokeStyle = stroke;
         x.forEach((e, i) => {
             context.beginPath();

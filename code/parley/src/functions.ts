@@ -121,11 +121,22 @@ const uniqueRowIds = (data: any[][]) => {
 
 const pointInRect = (
   point: [number, number], // x, y
-  rect: [number, number, number, number] // x0, x1, y0, y1
+  rect: [[number, number], [number, number]] // x0, x1, y0, y1
 ) => {
   return (
-    (point[0] - rect[0]) * (point[0] - rect[1]) < 0 &&
-    (point[1] - rect[2]) * (point[1] - rect[3]) < 0
+    (point[0] - rect[0][0]) * (point[0] - rect[1][0]) < 0 &&
+    (point[1] - rect[0][1]) * (point[1] - rect[1][1]) < 0
+  );
+};
+
+const polyOverlap = (poly1: [number, number][], poly2: [number, number][]) => {
+  const [p1x, p1y] = [0, 1].map((e) => poly1.map((f) => f[e]));
+  const [p2x, p2y] = [0, 1].map((e) => poly2.map((f) => f[e]));
+  return !(
+    Math.max(...p1x) < Math.min(...p2x) ||
+    Math.min(...p1x) > Math.max(...p2x) ||
+    Math.max(...p1y) < Math.min(...p2y) ||
+    Math.min(...p1y) > Math.max(...p2y)
   );
 };
 
@@ -195,5 +206,6 @@ export {
   uniqueRows,
   uniqueRowIds,
   pointInRect,
+  polyOverlap,
   timeExecution,
 };

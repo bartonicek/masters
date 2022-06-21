@@ -56,7 +56,10 @@ export class Representation {
     if (key === "Minus" && this.sizeMultiplier) this.sizeMultiplier *= 0.8;
     if (key === "Equal" && this.sizeMultiplier) this.sizeMultiplier *= 1.2;
     if (key === "BracketLeft" && this.alphaMultiplier) {
-      this.alphaMultiplier *= 0.8;
+      this.alphaMultiplier =
+        0.8 * this.alphaMultiplier < 0.01
+          ? 0.01
+          : (this.alphaMultiplier *= 0.8);
     }
     if (key === "BracketRight" && this.alphaMultiplier)
       this.alphaMultiplier =

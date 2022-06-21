@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-0.9.598">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adam Bartonicek">
+<meta name="dcterms.date" content="2022-06-20">
+
+<title>Draft</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="draft_files/libs/clipboard/clipboard.min.js"></script>
+<script src="draft_files/libs/quarto-html/quarto.js"></script>
+<script src="draft_files/libs/quarto-html/popper.min.js"></script>
+<script src="draft_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="draft_files/libs/quarto-html/anchor.min.js"></script>
+<link href="draft_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="draft_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="draft_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="draft_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="draft_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Draft</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adam Bartonicek </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 20, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="interactive-vs.-dynamic-visualization" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="interactive-vs.-dynamic-visualization">Interactive vs.&nbsp;Dynamic Visualization</h2>
+<p>While “interactive data visualization” is a popular term, there seems to be little consensus as to what the titular “interactivity” means. For example, the R Graph Gallery page on Interactive charts (https://r-graph-gallery.com/interactive-charts.html) features several plots which allow for the following user interactions: zooming, panning, hovering, 3D rotation, and node repositioning in a network graph. Importantly, in all of the examples above, the interaction and its results take place within the same plot. In contrast, the plotly Dash documentation page on Interactive Visualizations (https://dash.plotly.com/interactive-graphing) features examples of linked hovering and cross-filtering, where the user’s interaction within one plot propagates into another plot (e.g.&nbsp;selecting few points within a scatterplot highlights the same data rows in another). These two sets of examples represent fundamentally different types of interactivity. The first – interaction within a single isolated plot – requires only access to the data and manipulation of either the graphical attributes of the plot or the scales/coordinate system. The second – interaction which propagates between plots – requires an additional data structure that keeps track of which rows are currently selected. Furthemore, when there isn’t a one-to-one relationship between the rows of the data and their graphical representation shown on screen – when, for example, the height of a bar in a barplot represents a number of cases with the identical x-value – then whatever statistical transformation underlies the graphical representation also needs to be recomputed every time new rows of data are selected.</p>
+<div class="column-page-inset">
+<table class="table">
+<caption>Table 1: Interactive visualization types and their features</caption>
+<colgroup>
+<col style="width: 22%">
+<col style="width: 16%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 22%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Representation</th>
+<th>Typical tasks</th>
+<th>Compute statistics</th>
+<th>Requires</th>
+<th>Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Truly interactive/ Communicating</td>
+<td><ul>
+<li>One-to-one</li>
+<li>Many-to-one</li>
+</ul></td>
+<td><ul>
+<li>Brushing</li>
+<li>Linking</li>
+<li>Cross-filtering</li>
+</ul></td>
+<td>Often</td>
+<td><ul>
+<li>Data</li>
+<li>Graphical attributes</li>
+<li>Selected cases</li>
+<li>Statistical transformations</li>
+</ul></td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td>Embarassingly interactive</td>
+<td><ul>
+<li>Strictly one-to-one</li>
+</ul></td>
+<td><ul>
+<li>Brushing</li>
+<li>Linking</li>
+<li>Cross-filtering</li>
+</ul></td>
+<td>Never</td>
+<td><ul>
+<li>Data</li>
+<li>Graphical attributes</li>
+<li>Selected cases</li>
+</ul></td>
+<td>Intermediate</td>
+</tr>
+<tr class="odd">
+<td>Dynamic</td>
+<td><ul>
+<li>One-to-one</li>
+<li>Many-to-one</li>
+</ul></td>
+<td><ul>
+<li>Zooming</li>
+<li>Panning</li>
+<li>Hovering</li>
+</ul></td>
+<td>Once</td>
+<td><ul>
+<li>Data</li>
+<li>Graphical attributes</li>
+</ul></td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -25,7 +25,7 @@ export class Points extends Representation {
       type === "selected" ? gpars.reps.highlight : gpars.reps.base;
 
     size = size
-      ? size.map((e) => e * this.sizeMultiplier)
+      ? size.map((e) => radius * e * this.sizeMultiplier)
       : Array.from(Array(x.length), (e) => radius).map(
           (e) => e * this.sizeMultiplier
         );
@@ -50,17 +50,18 @@ export class Points extends Representation {
 
   get boundingRects() {
     const [x, y, size] = this.getMappings();
+    const c = 1 / Math.sqrt(2);
     return x.map((xi, i) => [
-      [xi - size[i], y[i] - size[i]],
-      [xi + size[i], y[i] - size[i]],
-      [xi - size[i], y[i] + size[i]],
-      [xi + size[i], y[i] + size[i]],
+      [xi - c * size[i], y[i] - c * size[i]],
+      [xi + c * size[i], y[i] - c * size[i]],
+      [xi - c * size[i], y[i] + c * size[i]],
+      [xi + c * size[i], y[i] + c * size[i]],
     ]);
   }
 
-  inSelection = (selectionPoints: [number, number, number, number]) => {
-    const selected = this.boundingRects.map((points) =>
-      points.some((point) => funs.pointInRect(point, selectionPoints))
+  inSelection = (selectionPoints: [[number, number], [number, number]]) => {
+    const selected = this.boundingRects.map((rect) =>
+      funs.polyOverlap(rect, selectionPoints)
     );
     return this.wrangler.indices.map((index) => selected[index]);
   };

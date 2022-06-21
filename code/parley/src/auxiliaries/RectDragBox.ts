@@ -21,11 +21,17 @@ export class RectDragBox extends Auxiliary {
     }
 
     if (dragging && current === "ShiftLeft") {
-      context.drawWindow([points[0], points[2]], [points[1], points[3]]);
+      context.drawWindow(
+        [points[0][0], points[0][1]],
+        [points[1][0], points[1][1]]
+      );
     } else if (dragging) {
       context.drawClear();
       context.drawDim();
-      context.drawWindow([points[0], points[2]], [points[1], points[3]]);
+      context.drawWindow(
+        [points[0][0], points[0][1]],
+        [points[1][0], points[1][1]]
+      );
     } else {
       context.drawClear();
       this.bgDrawn = false;
