@@ -11,6 +11,7 @@ export class BubblePlot extends Plot {
             identity: new Wrangler(data, mapping, marker)
                 .splitBy("x", "y")
                 .splitWhat("size")
+                .doOn(funs.unique)
                 .doWithin(funs.length),
         };
         this.scales = {

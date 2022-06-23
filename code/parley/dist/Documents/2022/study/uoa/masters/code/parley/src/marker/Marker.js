@@ -19,9 +19,6 @@ export class Marker {
         this.selected = Array.from(Array(this.n), (e) => false);
         this.notifyAll();
     };
-    registerCallback(callback) {
-        this.callbacks.push(callback);
-    }
     registerCallbacks = (...callbacks) => {
         this.callbacks.push(...callbacks);
     };

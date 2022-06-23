@@ -7,6 +7,9 @@ export class AreaScaleContinuous extends ScaleContinuous {
         return 0;
     }
     dataToPlot = (data) => {
-        return this.dataToUnits(data);
+        const res = this.dataToUnits(data);
+        return typeof res === "number"
+            ? Math.sqrt(res)
+            : res.map((e) => Math.sqrt(e));
     };
 }

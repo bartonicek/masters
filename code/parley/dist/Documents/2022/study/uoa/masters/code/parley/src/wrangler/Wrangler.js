@@ -13,6 +13,7 @@ export class Wrangler {
         this.data = data;
         this.mapping = mapping;
         this.marker = marker;
+        this.indices = [];
         this.by = new Set();
         this.what = new Set();
     }
@@ -28,11 +29,17 @@ export class Wrangler {
         return this;
     };
     splitBy = (...mappings) => {
-        mappings.forEach((mapping) => this.by.add(mapping));
-        const splittingVars = Array.from(this.by).map((e) => this.getMapping(e));
-        this.indices = funs.uniqueRowIds(splittingVars);
+        // mappings.forEach((mapping) => this.by.add(mapping));
+        // const splittingVars = Array.from(this.by).map((e: dtstr.ValidMappings) =>
+        //   this.getMapping(e)
+        // );
+        // this.indices = funs.uniqueRowIds(splittingVars);
         mappings.forEach((mapping, i) => {
-            this[mapping] = new Cast(this.getMapping(mapping), this).registerFun(funs.unique);
+            this.by.add(mapping);
+            this[mapping] = new Cast(this.getMapping(mapping), this);
+            this[mapping].marker = this.marker;
+            this[mapping].indices = this.indices;
+            console.log(this[mapping]);
         });
         return this;
     };
@@ -40,11 +47,16 @@ export class Wrangler {
         mappings.forEach((mapping) => {
             this.what.add(mapping);
             this[mapping] = new Cast(this.getMapping(mapping), this);
+            this[mapping].marker = this.marker;
+            this[mapping].indices = this.indices;
         });
         return this;
     };
     doOn = (fun, ...args) => {
         Array.from(this.by).forEach((mapping) => this[mapping].registerFun(fun, ...args));
+        const splittingVars = Array.from(this.by).map((e) => this[e].vector);
+        this.indices = funs.uniqueRowIds(splittingVars);
+        return this;
     };
     doWithin = (fun, ...args) => {
         Array.from(this.what).forEach((mapping) => this[mapping].registerFun(fun, ...args));

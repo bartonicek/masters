@@ -11,6 +11,7 @@ export class BarPlot extends Plot {
             summary: new Wrangler(data, mapping, marker)
                 .splitBy("x")
                 .splitWhat("y")
+                .doOn(funs.unique)
                 .doWithin(funs.length),
         };
         this.scales = {

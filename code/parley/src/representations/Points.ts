@@ -12,7 +12,6 @@ export class Points extends Representation {
     plotDims: { width: number; height: number }
   ) {
     super(wrangler, handler, plotDims);
-    this.radius = 5;
     this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
   }

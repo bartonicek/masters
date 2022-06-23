@@ -1,7 +1,6 @@
 import { GraphicStack } from "./GraphicStack.js";
 import * as funs from "../functions.js";
 import * as hndl from "../handlers/handlers.js";
-import { boolean } from "../../../../../../../../../node_modules/mathjs/types/index.js";
 export class Plot extends GraphicStack {
     marker;
     scales;
@@ -9,7 +8,7 @@ export class Plot extends GraphicStack {
     auxiliaries;
     wranglers;
     handlers;
-    stayActive = boolean;
+    freeze;
     constructor(marker) {
         super();
         this.marker = marker;
@@ -21,7 +20,7 @@ export class Plot extends GraphicStack {
             drag: new hndl.RectDragHandler(),
             keypress: new hndl.KeypressHandler(),
         };
-        this.stayActive = false;
+        this.freeze = false;
     }
     get active() {
         return this.graphicContainer.classList.contains("active");
@@ -65,6 +64,7 @@ export class Plot extends GraphicStack {
     };
     onKeypress = () => {
         const { handlers, callChildren } = this;
+        this.freeze = handlers.keypress.current === "ShiftLeft" ? true : false;
         if (this.active)
             callChildren("representations", "onKeypress", handlers.keypress.current);
     };
@@ -77,14 +77,16 @@ export class Plot extends GraphicStack {
     };
     drawBase = () => this.draw("base");
     drawHighlight = () => this.draw("highlight");
-    drawUser = () => this.draw("user");
+    drawUser = () => {
+        this.active || !this.freeze ? this.draw("user") : null;
+    };
     activateAll = () => {
-        const containers = document.querySelectorAll(".graphicContainer");
-        containers.forEach((e) => e.classList.add("active"));
+        const graphicContainers = document.querySelectorAll(".graphicContainer");
+        graphicContainers.forEach((e) => e.classList.add("active"));
     };
     deactivateAll = () => {
-        const containers = document.querySelectorAll(".graphicContainer");
-        containers.forEach((e) => e.classList.remove("active"));
+        const graphicContainers = document.querySelectorAll(".graphicContainer");
+        graphicContainers.forEach((e) => e.classList.remove("active"));
     };
     initialize = () => {
         const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
@@ -109,8 +111,9 @@ export class Plot extends GraphicStack {
                 handlers.keypress[handlers.keypress.consequences[index]](event);
             });
         });
-        const containers = document.querySelectorAll(".graphicContainer");
-        document.body.addEventListener("dblclick", (event) => {
+        const graphicContainers = document.querySelectorAll(".graphicContainer");
+        const graphicDiv = document.querySelector(".graphicDiv");
+        graphicDiv.addEventListener("dblclick", (event) => {
             this.activateAll();
             marker.unSelect();
             this.deactivateAll();

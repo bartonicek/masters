@@ -15,6 +15,19 @@ const capitalize = (x: string | string[]) => {
     : x.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
 };
 
+const bin = (x: number[], n = 5) => {
+  const range = Math.max(...x) - Math.min(...x);
+  const width = range / n;
+  const breaks = Array.from(Array(n + 1), (e, i) => Math.min(...x) + i * width);
+  const centroids = breaks.map((e, i) => (e + breaks[i - 1]) / 2);
+  breaks.reverse();
+  centroids.shift();
+  return x
+    .map((e) => breaks.findIndex((f) => e >= f))
+    .map((e) => (e === 0 ? breaks.length - 2 : breaks.length - e - 1))
+    .map((e) => centroids[e]);
+};
+
 const quantile = (x: number[], q: number | number[]) => {
   const sorted = x.sort((a, b) => a - b);
   if (typeof q === "number") {
@@ -195,6 +208,7 @@ export {
   min,
   max,
   capitalize,
+  bin,
   quantile,
   which,
   match,

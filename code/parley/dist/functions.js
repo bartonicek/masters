@@ -10,6 +10,18 @@ const capitalize = (x) => {
         ? x.charAt(0).toUpperCase() + x.slice(1)
         : x.map((e) => e.charAt(0).toUpperCase() + e.slice(1));
 };
+const bin = (x, n = 5) => {
+    const range = Math.max(...x) - Math.min(...x);
+    const width = range / n;
+    const breaks = Array.from(Array(n + 1), (e, i) => Math.min(...x) + i * width);
+    const centroids = breaks.map((e, i) => (e + breaks[i - 1]) / 2);
+    breaks.reverse();
+    centroids.shift();
+    return x
+        .map((e) => breaks.findIndex((f) => e >= f))
+        .map((e) => (e === 0 ? breaks.length - 2 : breaks.length - e - 1))
+        .map((e) => centroids[e]);
+};
 const quantile = (x, q) => {
     const sorted = x.sort((a, b) => a - b);
     if (typeof q === "number") {
@@ -143,4 +155,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, polyOverlap, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, bin, quantile, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, polyOverlap, timeExecution, };

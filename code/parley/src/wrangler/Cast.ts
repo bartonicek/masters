@@ -5,21 +5,20 @@ export class Cast {
   vector: dtstr.VectorGeneric;
   marker: Marker;
   indices: number[];
-  uniqueIndices: number[];
   allUnique: boolean;
   selected: number[];
   fun: Function;
   args: any[];
 
-  constructor(
-    vector: dtstr.VectorGeneric,
-    wrangler: { indices: number[]; marker: Marker }
-  ) {
+  constructor(vector: dtstr.VectorGeneric) {
     this.vector = vector;
-    this.marker = wrangler.marker;
-    this.indices = wrangler.indices;
-    this.uniqueIndices = Array.from(new Set(this.indices));
+    this.marker = null;
+    this.indices = null;
     this.allUnique = false;
+  }
+
+  get uniqueIndices() {
+    return Array.from(new Set(this.indices));
   }
 
   get defaultSplit() {
@@ -29,7 +28,6 @@ export class Cast {
     const res = uniqueIndices.map((uniqueIndex) =>
       indices.flatMap((index, i) => (index === uniqueIndex ? vector[i] : []))
     );
-
     return res;
   }
 

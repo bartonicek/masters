@@ -2,17 +2,18 @@ export class Cast {
     vector;
     marker;
     indices;
-    uniqueIndices;
     allUnique;
     selected;
     fun;
     args;
-    constructor(vector, wrangler) {
+    constructor(vector) {
         this.vector = vector;
-        this.marker = wrangler.marker;
-        this.indices = wrangler.indices;
-        this.uniqueIndices = Array.from(new Set(this.indices));
+        this.marker = null;
+        this.indices = null;
         this.allUnique = false;
+    }
+    get uniqueIndices() {
+        return Array.from(new Set(this.indices));
     }
     get defaultSplit() {
         const { vector, indices, uniqueIndices, allUnique } = this;

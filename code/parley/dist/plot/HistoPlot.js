@@ -10,7 +10,7 @@ export class HistoPlot extends Plot {
         this.wranglers = {
             summary: new Wrangler(data, mapping, marker)
                 .splitBy("x")
-                .splitWhat("x")
+                .splitWhat("y")
                 .doOn(funs.bin)
                 .doWithin(funs.length),
         };
@@ -29,7 +29,6 @@ export class HistoPlot extends Plot {
             axistextx: new auxs.AxisText("x"),
             axistexy: new auxs.AxisText("y"),
             axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
-            //axistitley: new auxs.AxisTitle("y", mapping.get("y")),
             rectdragbox: new auxs.RectDragBox(this.handlers),
         };
         this.initialize();

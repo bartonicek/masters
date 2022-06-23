@@ -43,7 +43,7 @@ export class Bars extends Representation {
         ]);
     }
     inSelection = (selectionPoints) => {
-        const selected = this.boundingRects.map((points) => points.some((point) => funs.pointInRect(point, selectionPoints)));
+        const selected = this.boundingRects.map((rect) => funs.polyOverlap(rect, selectionPoints));
         return this.wrangler.indices.map((index) => selected[index]);
     };
 }

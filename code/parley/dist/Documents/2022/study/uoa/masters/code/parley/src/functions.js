@@ -1,4 +1,3 @@
-import { arg } from "../../../../../../../../node_modules/mathjs/types/index.js";
 const isNumeric = (x) => typeof x[0] === "number";
 const identity = (x) => x;
 const length = (x) => (x.length ? x.length : 0);
@@ -40,13 +39,6 @@ const unique = (x) => {
     return uniqueArray.length === 1 ? uniqueArray[0] : uniqueArray;
     //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
-const debounce = (fun, delay) => {
-    let timeout;
-    return (...args) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => fun(...args), delay);
-    };
-};
 const throttle = (fun, delay) => {
     let lastTime = 0;
     return (...args) => {
@@ -54,7 +46,7 @@ const throttle = (fun, delay) => {
         if (now - lastTime < delay)
             return;
         lastTime = now;
-        fun(...arg);
+        fun(...args);
     };
 };
 // Function to construct "pretty" breaks, a basic version of R's pretty()
@@ -62,10 +54,15 @@ const prettyBreaks = (x, n = 4) => {
     const [min, max] = [Math.min(...x), Math.max(...x)];
     const range = max - min;
     const unitGross = range / n;
-    const base = 10 ** Math.floor(Math.log10(unitGross));
-    const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / base) ** 2);
-    const unitNeat = base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
-    return Array.from(Array(n + 1), (e, i) => Math.round(min) + unitNeat * i);
+    const base = Math.floor(Math.log10(unitGross));
+    const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / 10 ** base) ** 2);
+    const unitNeat = 10 ** base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
+    const minNeat = Math.round(min / unitNeat) * unitNeat;
+    return Array.from(Array(n + 1), (e, i) => {
+        return Math.abs(base) > 4
+            ? (minNeat + unitNeat * i).toExponential()
+            : minNeat + unitNeat * i;
+    });
 };
 // arrEqual: Checks if two arrays are deeply equal
 const arrEqual = (array1, array2) => {
@@ -96,8 +93,16 @@ const uniqueRowIds = (data) => {
 const pointInRect = (point, // x, y
 rect // x0, x1, y0, y1
 ) => {
-    return ((point[0] - rect[0]) * (point[0] - rect[1]) < 0 &&
-        (point[1] - rect[2]) * (point[1] - rect[3]) < 0);
+    return ((point[0] - rect[0][0]) * (point[0] - rect[1][0]) < 0 &&
+        (point[1] - rect[0][1]) * (point[1] - rect[1][1]) < 0);
+};
+const polyOverlap = (poly1, poly2) => {
+    const [p1x, p1y] = [0, 1].map((e) => poly1.map((f) => f[e]));
+    const [p2x, p2y] = [0, 1].map((e) => poly2.map((f) => f[e]));
+    return !(Math.max(...p1x) < Math.min(...p2x) ||
+        Math.min(...p1x) > Math.max(...p2x) ||
+        Math.max(...p1y) < Math.min(...p2y) ||
+        Math.min(...p1y) > Math.max(...p2y));
 };
 const vecDiff = (x, y) => {
     return x.map((e, i) => e - y[i]);
@@ -138,4 +143,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, debounce, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, quantile, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, polyOverlap, timeExecution, };

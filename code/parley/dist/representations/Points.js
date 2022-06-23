@@ -4,7 +4,6 @@ import { globalParameters as gpars } from "../globalparameters.js";
 export class Points extends Representation {
     constructor(wrangler, handler, plotDims) {
         super(wrangler, handler, plotDims);
-        this.radius = 5;
         this.sizeMultiplier = 1;
         this.alphaMultiplier = 1;
     }

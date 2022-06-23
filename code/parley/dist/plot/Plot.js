@@ -81,12 +81,12 @@ export class Plot extends GraphicStack {
         this.active || !this.freeze ? this.draw("user") : null;
     };
     activateAll = () => {
-        const containers = document.querySelectorAll(".graphicContainer");
-        containers.forEach((e) => e.classList.add("active"));
+        const graphicContainers = document.querySelectorAll(".graphicContainer");
+        graphicContainers.forEach((e) => e.classList.add("active"));
     };
     deactivateAll = () => {
-        const containers = document.querySelectorAll(".graphicContainer");
-        containers.forEach((e) => e.classList.remove("active"));
+        const graphicContainers = document.querySelectorAll(".graphicContainer");
+        graphicContainers.forEach((e) => e.classList.remove("active"));
     };
     initialize = () => {
         const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
@@ -111,8 +111,9 @@ export class Plot extends GraphicStack {
                 handlers.keypress[handlers.keypress.consequences[index]](event);
             });
         });
-        const containers = document.querySelectorAll(".graphicContainer");
-        document.body.addEventListener("dblclick", (event) => {
+        const graphicContainers = document.querySelectorAll(".graphicContainer");
+        const graphicDiv = document.querySelector(".graphicDiv");
+        graphicDiv.addEventListener("dblclick", (event) => {
             this.activateAll();
             marker.unSelect();
             this.deactivateAll();

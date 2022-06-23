@@ -102,13 +102,13 @@ export class Plot extends GraphicStack {
   };
 
   activateAll = () => {
-    const containers = document.querySelectorAll(".graphicContainer");
-    containers.forEach((e) => e.classList.add("active"));
+    const graphicContainers = document.querySelectorAll(".graphicContainer");
+    graphicContainers.forEach((e) => e.classList.add("active"));
   };
 
   deactivateAll = () => {
-    const containers = document.querySelectorAll(".graphicContainer");
-    containers.forEach((e) => e.classList.remove("active"));
+    const graphicContainers = document.querySelectorAll(".graphicContainer");
+    graphicContainers.forEach((e) => e.classList.remove("active"));
   };
 
   initialize = () => {
@@ -155,9 +155,10 @@ export class Plot extends GraphicStack {
       });
     });
 
-    const containers = document.querySelectorAll(".graphicContainer");
+    const graphicContainers = document.querySelectorAll(".graphicContainer");
+    const graphicDiv = document.querySelector<HTMLElement>(".graphicDiv");
 
-    document.body.addEventListener("dblclick", (event) => {
+    graphicDiv.addEventListener("dblclick", (event) => {
       this.activateAll();
       marker.unSelect();
       this.deactivateAll();

@@ -13,6 +13,7 @@ import { BarPlot } from "./plot/BarPlot.js";
 import { Cast } from "./wrangler/Cast.js";
 import { AxisText } from "./auxiliaries/AxisText.js";
 import { BubblePlot } from "./plot/BubblePlot.js";
+import { HistoPlot } from "./plot/HistoPlot.js";
 
 document
   .querySelector<HTMLElement>(".buttonHelp")
@@ -46,11 +47,17 @@ const mapping3: dtstr.Mapping = new Map([
   ["size", "mpg"],
 ]);
 
+const mapping4: dtstr.Mapping = new Map([
+  ["x", "mpg"],
+  ["y", "wt"],
+]);
+
 const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
 const plot2 = new BubblePlot(data1, mapping3, marker1);
 const plot3 = new BarPlot(data1, mapping2, marker1);
+//const plot4 = new HistoPlot(data1, mapping4, marker1);
 
 // class Marker2 {
 //   n: number;
@@ -99,14 +106,5 @@ const plot3 = new BarPlot(data1, mapping2, marker1);
 // const plot2 = new BarPlot(data1, mapping2, marker1);
 
 // const arr1 = Array.from(Array(100), (e) => Math.floor(100 * Math.random()));
-
-// const bin = (x: number[], n = 20) => {
-//   const range = Math.max(...x) - Math.min(...x);
-//   const width = range / n;
-//   return Array.from(Array(n), (e, i) => Math.min(...x) + i * width);
-// };
-
-const arr1 = Array.from(Array(200), (e, i) => i);
-console.log(arr1.map((e) => e.toString(16)));
 
 export {};
