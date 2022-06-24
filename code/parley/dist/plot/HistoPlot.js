@@ -11,18 +11,17 @@ export class HistoPlot extends Plot {
             summary: new Wrangler(data, mapping, marker)
                 .splitBy("x")
                 .splitWhat("y")
-                .doOn(funs.bin)
-                .doWithin(funs.length),
+                .doAcross("by", funs.bin, 10)
+                .doWithin("by", funs.unique)
+                .doWithin("what", funs.length)
+                .assignIndices(),
         };
         this.scales = {
-            x: new scls.XYScaleDiscrete(this.width),
+            x: new scls.XYScaleContinuous(this.width),
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, {
-                width: this.width,
-                height: this.height,
-            }),
+            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 1),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

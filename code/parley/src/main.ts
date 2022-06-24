@@ -57,7 +57,7 @@ const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
 const plot2 = new BubblePlot(data1, mapping3, marker1);
 const plot3 = new BarPlot(data1, mapping2, marker1);
-//const plot4 = new HistoPlot(data1, mapping4, marker1);
+const plot4 = new HistoPlot(data1, mapping4, marker1);
 
 // class Marker2 {
 //   n: number;
@@ -102,8 +102,14 @@ const plot3 = new BarPlot(data1, mapping2, marker1);
 //   ["y", "year"],
 // ]);
 
+// const mapping3: dtstr.Mapping = new Map([
+//   ["x", "gdpPercap"],
+//   ["y", "year"],
+// ]);
+
 // const plot1 = new ScatterPlot(data1, mapping1, marker1);
 // const plot2 = new BarPlot(data1, mapping2, marker1);
+// const plot3 = new HistoPlot(data1, mapping3, marker1);
 
 // const arr1 = Array.from(Array(100), (e) => Math.floor(100 * Math.random()));
 

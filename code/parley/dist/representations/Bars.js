@@ -2,15 +2,20 @@ import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 export class Bars extends Representation {
-    width;
-    constructor(wrangler, handler, plotDims) {
-        super(wrangler, handler, plotDims);
-        this.width =
-            plotDims.width / (3 * funs.unique(wrangler.x.extract()).length);
+    widthMultiplier;
+    constructor(wrangler, handler, widthMultiplier) {
+        super(wrangler, handler);
+        this.sizeMultiplier = 1;
         this.alphaMultiplier = 1;
+        this.widthMultiplier = widthMultiplier * this.sizeMultiplier;
     }
     get y0() {
         return this.scales.y.plotMin;
+    }
+    get width() {
+        return (this.widthMultiplier *
+            this.sizeMultiplier *
+            (this.getMapping("x").sort()[1] - this.getMapping("x").sort()[0]));
     }
     getMappings = (type) => {
         return ["x", "y"].map((mapping) => this.getMapping(mapping, type));

@@ -15,14 +15,9 @@ export class Representation {
   sizeMultiplier: number;
   alphaMultiplier: number;
 
-  constructor(
-    wrangler: Wrangler,
-    handler: Handler,
-    plotDims: { width: number; height: number }
-  ) {
+  constructor(wrangler: Wrangler, handler: Handler) {
     this.wrangler = wrangler;
     this.handler = handler;
-    this.plotDims = plotDims;
   }
 
   getMapping = (mapping: dtstr.ValidMappings, type?: "selected") => {

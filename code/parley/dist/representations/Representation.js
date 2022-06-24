@@ -9,10 +9,9 @@ export class Representation {
     radius;
     sizeMultiplier;
     alphaMultiplier;
-    constructor(wrangler, handler, plotDims) {
+    constructor(wrangler, handler) {
         this.wrangler = wrangler;
         this.handler = handler;
-        this.plotDims = plotDims;
     }
     getMapping = (mapping, type) => {
         let res = this.wrangler[mapping]?.extract(type);

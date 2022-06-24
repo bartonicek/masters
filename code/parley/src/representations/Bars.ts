@@ -6,21 +6,25 @@ import * as dtstr from "../datastructures.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 
 export class Bars extends Representation {
-  width: number;
+  widthMultiplier: number;
 
-  constructor(
-    wrangler: Wrangler,
-    handler: Handler,
-    plotDims: { width: number; height: number }
-  ) {
-    super(wrangler, handler, plotDims);
-    this.width =
-      plotDims.width / (3 * funs.unique(wrangler.x.extract()).length);
+  constructor(wrangler: Wrangler, handler: Handler, widthMultiplier: number) {
+    super(wrangler, handler);
+    this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
+    this.widthMultiplier = widthMultiplier * this.sizeMultiplier;
   }
 
   get y0() {
     return this.scales.y.plotMin;
+  }
+
+  get width() {
+    return (
+      this.widthMultiplier *
+      this.sizeMultiplier *
+      (this.getMapping("x").sort()[1] - this.getMapping("x").sort()[0])
+    );
   }
 
   getMappings = (type?: "selected") => {

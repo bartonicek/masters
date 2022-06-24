@@ -16,8 +16,9 @@ export class BarPlot extends Plot {
       summary: new Wrangler(data, mapping, marker)
         .splitBy("x")
         .splitWhat("y")
-        .doOn(funs.unique)
-        .doWithin(funs.length),
+        .doWithin("by", funs.unique)
+        .doWithin("what", funs.length)
+        .assignIndices(),
     };
 
     this.scales = {
@@ -26,10 +27,7 @@ export class BarPlot extends Plot {
     };
 
     this.representations = {
-      bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, {
-        width: this.width,
-        height: this.height,
-      }),
+      bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 0.8
     };
 
     this.auxiliaries = {

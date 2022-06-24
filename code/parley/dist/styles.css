@@ -13,8 +13,8 @@
 .graphicContainer {
   position: relative;
   display: inline-block;
-  width: 800px;
-  height:800px;
+  width: 600px;
+  height: 600px;
   padding: 0px;
   margin: 10px;
   box-shadow: 5px 5px 3px #00000025;

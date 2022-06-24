@@ -56,23 +56,63 @@ export class Wrangler {
     return this;
   };
 
-  doOn = (fun: Function, ...args: any[]) => {
-    Array.from(this.by).forEach((mapping) =>
-      this[mapping].registerFun(fun, ...args)
-    );
-    const splittingVars = Array.from(this.by).map((e) => this[e].vector);
+  // doOn = (fun: Function, ...args: any[]) => {
+  //   Array.from(this.by).forEach((mapping) =>
+  //     this[mapping].registerFun(fun, ...args)
+  //   );
+  //   const splittingVars = Array.from(this.by).map((e) => this[e].vector);
+  //   this.indices = funs.uniqueRowIds(splittingVars);
 
-    this.indices = funs.uniqueRowIds(splittingVars);
-    Array.from(this.by).forEach((mapping) => {
-      this[mapping].indices = this.indices;
-    });
+  //   Array.from(this.by).forEach((mapping) => {
+  //     this[mapping].indices = this.indices;
+  //   });
+  //   return this;
+  // };
+
+  // doWithin = (fun: Function, ...args: any[]) => {
+  //   Array.from(this.what).forEach((mapping) => {
+  //     this[mapping].registerFun(fun, ...args);
+  //     this[mapping].indices = this.indices;
+  //   });
+  //   return this;
+  // };
+
+  doAcross = (
+    target: dtstr.ValidMappings | "by" | "what",
+    fun: Function,
+    ...args: any[]
+  ) => {
+    if (target === "by" || target === "what") {
+      Array.from(this[target]).forEach((mapping) => {
+        this[mapping].registerAcross(fun, ...args);
+      });
+      return this;
+    }
+    this[target].registerAcross(fun, ...args);
     return this;
   };
 
-  doWithin = (fun: Function, ...args: any[]) => {
-    Array.from(this.what).forEach((mapping) => {
-      this[mapping].registerFun(fun, ...args);
-      this[mapping].indices = this.indices;
+  doWithin = (
+    target: dtstr.ValidMappings | "by" | "what",
+    fun: Function,
+    ...args: any[]
+  ) => {
+    if (target === "by" || target === "what") {
+      Array.from(this[target]).forEach((mapping) => {
+        this[mapping].registerWithin(fun, ...args);
+      });
+      return this;
+    }
+    this[target].registerWithin(fun, ...args);
+    return this;
+  };
+
+  assignIndices = () => {
+    const { what, by } = this;
+    const splittingVars = Array.from(by).map((e) => this[e].acrossVec);
+    this.indices = funs.uniqueRowIds(splittingVars);
+    Array.from([...by, ...what]).map((e) => {
+      this[e].indices = this.indices;
     });
     return this;
   };
