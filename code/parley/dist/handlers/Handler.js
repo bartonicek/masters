@@ -2,16 +2,19 @@ export class Handler {
     actions;
     consequences;
     callbacks;
-    // registerCallback = (callback: () => void) => {
-    //   this.callbacks.push(callback);
-    //   return this;
-    // };
-    registerCallbacks = (...callbacks) => {
+    when;
+    constructor() {
+        this.callbacks = [];
+        this.when = [];
+    }
+    registerCallbacks = (callbacks, when) => {
         this.callbacks.push(...callbacks);
+        this.when.push(...when);
         return this;
     };
-    notifyAll = () => {
-        this.callbacks.forEach((callback) => callback());
+    notifyAll = (when) => {
+        this.callbacks
+            .filter((e, i) => this.when[i] === when)
+            .forEach((callback) => callback());
     };
-    reportKey = (event) => { };
 }

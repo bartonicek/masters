@@ -6,24 +6,26 @@ export class RectDragBox extends Auxiliary {
         this.handlers = handlers;
         this.bgDrawn = false;
     }
+    draw = (context, points) => {
+        context.drawWindow([points[0][0], points[0][1]], [points[1][0], points[1][1]]);
+    };
     drawUser = (context) => {
-        const { dragging, selectionPoints: points } = this.handlers.drag;
-        const { current } = this.handlers.keypress;
-        if (!this.bgDrawn) {
+        const { dragging, selectionPoints, selectionArray, modeOR } = this.handlers.drag;
+        if (dragging && modeOR) {
+            context.drawClear();
             context.drawDim();
-            this.bgDrawn = true;
-        }
-        if (dragging && current === "ShiftLeft") {
-            context.drawWindow([points[0][0], points[0][1]], [points[1][0], points[1][1]]);
+            selectionArray.forEach((points) => {
+                this.draw(context, points);
+            });
+            this.draw(context, selectionPoints);
         }
         else if (dragging) {
             context.drawClear();
             context.drawDim();
-            context.drawWindow([points[0][0], points[0][1]], [points[1][0], points[1][1]]);
+            this.draw(context, selectionPoints);
         }
         else {
             context.drawClear();
-            this.bgDrawn = false;
         }
     };
 }

@@ -65,8 +65,20 @@ export class Plot extends GraphicStack {
     onKeypress = () => {
         const { handlers, callChildren } = this;
         this.freeze = handlers.keypress.current === "ShiftLeft" ? true : false;
-        if (this.active)
+        if (this.active) {
             callChildren("representations", "onKeypress", handlers.keypress.current);
+        }
+        callChildren("handlers", "onKeyPress", handlers.keypress.last);
+    };
+    onKeyRelease = () => {
+        const { handlers, callChildren } = this;
+        if (this.active) {
+            callChildren("representations", "onKeyRelease", handlers.keypress.last);
+        }
+        callChildren("handlers", "onKeyRelease", handlers.keypress.last);
+    };
+    onDoubleClick = () => {
+        this.callChildren("handlers", "onDoubleClick");
     };
     draw = (context, ...args) => {
         const { representations, auxiliaries, callChildren } = this;
@@ -89,14 +101,14 @@ export class Plot extends GraphicStack {
         graphicContainers.forEach((e) => e.classList.remove("active"));
     };
     initialize = () => {
-        const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
+        const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, onKeyRelease, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
         Object.keys(scales).forEach((mapping) => {
             scales[mapping]?.registerData(this.getUnique(mapping));
         });
         callChildren("representations", "registerScales", scales);
         callChildren("auxiliaries", "registerScales", scales);
-        handlers.drag.registerCallbacks(onSelection);
-        handlers.keypress.registerCallbacks(onKeypress, drawBase, drawHighlight);
+        handlers.drag.registerCallbacks([onSelection], ["whileDrag"]);
+        handlers.keypress.registerCallbacks([onKeypress, onKeyRelease, drawBase, drawHighlight], ["keyPressed", "keyReleased", "keyPressed", "keyPressed"]);
         marker.registerCallbacks(drawHighlight, drawUser);
         // For each handler, register event listeners for actions
         // and corresponding consequences on the graphiContainer
@@ -116,6 +128,7 @@ export class Plot extends GraphicStack {
         graphicDiv.addEventListener("dblclick", (event) => {
             this.activateAll();
             marker.unSelect();
+            this.onDoubleClick();
             this.deactivateAll();
         });
         graphicContainer.addEventListener("mousedown", (event) => {

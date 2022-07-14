@@ -1,10 +1,15 @@
+import { MembershipArray } from "./MembershipArray.js";
 export class Marker {
     n;
     selected;
+    transientMembership;
+    persistentMembership;
     callbacks;
     constructor(n) {
         this.n = n;
-        this.selected = Array.from(Array(n), (e) => false);
+        this.transientMembership = new MembershipArray(n);
+        this.persistentMembership = new MembershipArray(n);
+        this.selected = new Array(n).fill(false);
         this.callbacks = [];
     }
     hardReceive = (points) => {
@@ -13,6 +18,22 @@ export class Marker {
     };
     softReceive = (points) => {
         this.selected = this.selected.map((e, i) => e || points[i]);
+        this.notifyAll();
+    };
+    replaceTransient = (points, group) => {
+        this.transientMembership.receiveReplace(points, group);
+        this.notifyAll();
+    };
+    addPersistent = (points, group) => {
+        this.persistentMembership.receiveAdd(points, group);
+        this.notifyAll();
+    };
+    clearTransient = () => {
+        this.transientMembership.clear();
+        this.notifyAll();
+    };
+    clearPersistent = () => {
+        this.persistentMembership.clear();
         this.notifyAll();
     };
     unSelect = () => {

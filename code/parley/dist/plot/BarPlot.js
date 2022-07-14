@@ -20,7 +20,7 @@ export class BarPlot extends Plot {
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 0.8)
+            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 0.8),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

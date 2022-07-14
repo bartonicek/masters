@@ -1,11 +1,17 @@
+import { MembershipArray } from "./MembershipArray.js";
+
 export class Marker {
   n: number;
   selected: boolean[];
+  transientMembership: MembershipArray;
+  persistentMembership: MembershipArray;
   callbacks: (() => void)[];
 
   constructor(n: number) {
     this.n = n;
-    this.selected = Array.from(Array(n), (e) => false);
+    this.transientMembership = new MembershipArray(n);
+    this.persistentMembership = new MembershipArray(n);
+    this.selected = new Array(n).fill(false);
     this.callbacks = [];
   }
 
@@ -16,6 +22,26 @@ export class Marker {
 
   softReceive = (points: boolean[]) => {
     this.selected = this.selected.map((e, i) => e || points[i]);
+    this.notifyAll();
+  };
+
+  replaceTransient = (points: number[], group: 1 | 2 | 3) => {
+    this.transientMembership.receiveReplace(points, group);
+    this.notifyAll();
+  };
+
+  addPersistent = (points: number[], group: 1 | 2 | 3) => {
+    this.persistentMembership.receiveAdd(points, group);
+    this.notifyAll();
+  };
+
+  clearTransient = () => {
+    this.transientMembership.clear();
+    this.notifyAll();
+  };
+
+  clearPersistent = () => {
+    this.persistentMembership.clear();
     this.notifyAll();
   };
 

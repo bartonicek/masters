@@ -6,12 +6,8 @@ import * as dtstr from "../datastructures.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 
 export class Points extends Representation {
-  constructor(
-    wrangler: Wrangler,
-    handler: Handler,
-    plotDims: { width: number; height: number }
-  ) {
-    super(wrangler, handler, plotDims);
+  constructor(wrangler: Wrangler, handler: Handler) {
+    super(wrangler, handler);
     this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
   }
@@ -44,7 +40,7 @@ export class Points extends Representation {
     const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
     const { alphaMultiplier } = this;
     context.drawClear();
-    x ? context.drawPoints(x, y, col, strokeCol, size, alphaMultiplier) : null;
+    x ? context.drawPoints(x, y, col, strokeCol, size, 1) : null;
   };
 
   get boundingRects() {

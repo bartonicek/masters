@@ -26,12 +26,12 @@ export class KeypressHandler extends Handler {
     if (this.validKeys.includes(event.code)) {
       this.current = event.code;
       this.last = event.code;
-      this.notifyAll();
+      this.notifyAll("keyPressed");
     }
   };
 
   keyReleased = (event: { code: string }) => {
     this.current = "";
-    this.notifyAll();
+    this.notifyAll("keyReleased");
   };
 }

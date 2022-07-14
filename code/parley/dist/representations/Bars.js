@@ -33,9 +33,7 @@ export class Bars extends Representation {
         const { y0, width, alphaMultiplier } = this;
         const { col, strokeCol } = gpars.reps.highlight;
         context.drawClear();
-        x
-            ? context.drawBarsV(x, y, y0, col, alphaMultiplier, strokeCol, width)
-            : null;
+        x ? context.drawBarsV(x, y, y0, col, 1, strokeCol, width) : null;
     };
     get boundingRects() {
         const [x, y] = this.getMappings();

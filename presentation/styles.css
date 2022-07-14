@@ -1,0 +1,49 @@
+.remark-slide-content {
+    font-size: 20pt;
+    background-color: antiquewhite;
+}
+
+body {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    color: #423E3B;
+}
+
+.inverse {
+    background-color:steelblue;
+    color:antiquewhite;
+    text-shadow: 1px 1px 2px #00000050
+}
+
+.inverse h1, .inverse h2, .inverse h3 {
+    color: antiquewhite;
+}
+
+h1, h2, h3 {
+    font-family: 'Times New Roman', Times, serif;
+    color: steelblue;
+}
+
+.title {
+    background-color:  antiquewhite;
+}
+
+.title h1 {
+    background-color:  steelblue;
+    padding-left: 2.5%;
+    padding-right: 2.5%;
+    padding-bottom: 5%;
+    padding-top: 5%;
+    font-weight: bolder;
+    margin-bottom: 5%;
+    box-shadow: 2px 2px 5px #00000025;
+}
+
+.title h3 {
+    text-align: center;
+    color: #423E3B;
+    font-size: 15pt;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin-top: 0px;
+    margin-bottom: 0.5%;
+    text-shadow: none;
+}

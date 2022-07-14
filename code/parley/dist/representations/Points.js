@@ -2,8 +2,8 @@ import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 export class Points extends Representation {
-    constructor(wrangler, handler, plotDims) {
-        super(wrangler, handler, plotDims);
+    constructor(wrangler, handler) {
+        super(wrangler, handler);
         this.sizeMultiplier = 1;
         this.alphaMultiplier = 1;
     }
@@ -27,7 +27,7 @@ export class Points extends Representation {
         const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
         const { alphaMultiplier } = this;
         context.drawClear();
-        x ? context.drawPoints(x, y, col, strokeCol, size, alphaMultiplier) : null;
+        x ? context.drawPoints(x, y, col, strokeCol, size, 1) : null;
     };
     get boundingRects() {
         const [x, y, size] = this.getMappings();

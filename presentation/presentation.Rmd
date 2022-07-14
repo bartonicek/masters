@@ -1,0 +1,85 @@
+---
+title: "Principled and Efficient <br> Interactive Data Visualization"
+author: "Adam Bartonicek"
+institute: "University of Auckland, Department of Statistics"
+date: "Last updated: `r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default", "default-fonts", "styles.css"]
+    lib_dir: libs
+    nature:
+      titleSlideClass: [top, left, middle, inverse, title]
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+class: center, middle
+
+# Some inspiring quote by Tukey
+
+---
+
+class: middle, inverse
+
+# Current options for <br> interactive viz in R
+
+---
+
+class: middle
+
+- <b> Older generation</b>: iPlots, Acinonyx, RGGobi/GGobi
+  - Good but may not work with newer R installations
+- <b> Newer generation</b>: ggplotly, ggiraph, ggvis, RJSplot,... 
+  - Many more based on D3.js and plotly (many specialized)
+  - Popular but have some problems/shortcomings
+
+---
+
+class: inverse, center, middle
+
+# Problems
+
+---
+
+class: middle
+
+- <b> Built for static viz first, interactive second </b>
+  - Difficult to achieve "interesting" interactivity (e.g. linking multiple plots) 
+- <b> Designed for presentation, not EDA </b>
+  - i.e. made for dashboards
+  - Long set up time: not ideal for EDA
+  - SVG-based: looks pretty but slow at high data volumes
+- <b> Lack of adherence to data viz principles </b> 
+  - Chartjunk (Tufte, 1983)
+  - Interactive chartjunk: useless interactivity that distracts from the data
+
+---
+
+class: inverse, center, middle
+
+# Solution
+
+---
+
+class: middle
+
+- <b>Project</b>: Lay foundations for a general-purpose interactive viz library/package, designed with interactivity-first & principled data viz mindset
+- <b>Back-end written in TypeScript</b> (a fancier version of JavaScript)
+  - Portable: should run anywhere
+- <b>Uses HTML canvas element</b>
+  - Bitmap: a lot faster than SVG
+
+---
+
+class: inverse, center, middle
+
+# Show (don't tell)
+
+---
+
+class: center, middle
+
+<b>Thank you for attention! </b>
+
+If you have any thoughts/features you'd like to see, please email me at: bartonicek@gmail.com
