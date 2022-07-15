@@ -1,16 +1,15 @@
-export class MembershipArray {
-    n;
-    array;
-    constructor(n) {
-        this.n = n;
-        this.array = new Array(n).fill(0);
+export class MembershipArray extends Array {
+    put(val) {
+        this.push(val);
     }
-    clear = () => (this.array = new Array(this.n).fill(0));
-    receiveAdd = (points, group) => {
-        points.forEach((e) => (this.array[e] = group));
+    clear = () => {
+        this.fill(0);
     };
-    receiveReplace = (points, group) => {
+    recieveReplace = (at, membership) => {
+        at.forEach((e) => (this[e] = membership));
+    };
+    receiveClearReplace = (at, membership) => {
         this.clear();
-        points.forEach((e) => (this.array[e] = group));
+        at.forEach((e) => (this[e] = membership));
     };
 }

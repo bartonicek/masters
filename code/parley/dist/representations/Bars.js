@@ -1,5 +1,4 @@
 import { Representation } from "./Representation.js";
-import * as funs from "../functions.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 export class Bars extends Representation {
     widthMultiplier;
@@ -17,8 +16,8 @@ export class Bars extends Representation {
             this.sizeMultiplier *
             (this.getMapping("x").sort()[1] - this.getMapping("x").sort()[0]));
     }
-    getMappings = (type) => {
-        return ["x", "y"].map((mapping) => this.getMapping(mapping, type));
+    getMappings = (membership) => {
+        return ["x", "y"].map((mapping) => this.getMapping(mapping, membership));
     };
     drawBase = (context) => {
         const [x, y] = this.getMappings();
@@ -29,7 +28,7 @@ export class Bars extends Representation {
         context.drawBarsV(x, y, y0, col, alphaMultiplier, strokeCol, width);
     };
     drawHighlight = (context) => {
-        const [x, y] = this.getMappings("selected");
+        const [x, y] = this.getMappings(1);
         const { y0, width, alphaMultiplier } = this;
         const { col, strokeCol } = gpars.reps.highlight;
         context.drawClear();
@@ -40,13 +39,7 @@ export class Bars extends Representation {
         const [wh, y0] = [this.width / 2, this.scales.y.plotMin];
         return x.map((xi, i) => [
             [xi - wh, y0],
-            [xi + wh, y0],
-            [xi - wh, y[i]],
             [xi + wh, y[i]],
         ]);
     }
-    inSelection = (selectionPoints) => {
-        const selected = this.boundingRects.map((rect) => funs.polyOverlap(rect, selectionPoints));
-        return this.wrangler.indices.map((index) => selected[index]);
-    };
 }

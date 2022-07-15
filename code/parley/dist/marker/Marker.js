@@ -20,19 +20,16 @@ export class Marker {
         this.selected = this.selected.map((e, i) => e || points[i]);
         this.notifyAll();
     };
-    replaceTransient = (points, group) => {
-        this.transientMembership.receiveReplace(points, group);
+    replaceTransient = (at, membership) => {
+        this.transientMembership.receiveClearReplace(at, membership);
         this.notifyAll();
     };
-    addPersistent = (points, group) => {
-        this.persistentMembership.receiveAdd(points, group);
+    addPersistent = (at, membership) => {
+        this.persistentMembership.recieveReplace(at, membership);
         this.notifyAll();
     };
-    clearTransient = () => {
+    clear = () => {
         this.transientMembership.clear();
-        this.notifyAll();
-    };
-    clearPersistent = () => {
         this.persistentMembership.clear();
         this.notifyAll();
     };

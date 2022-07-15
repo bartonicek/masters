@@ -1,3 +1,4 @@
+import * as dtstr from "../datastructures.js";
 import { MembershipArray } from "./MembershipArray.js";
 
 export class Marker {
@@ -25,22 +26,18 @@ export class Marker {
     this.notifyAll();
   };
 
-  replaceTransient = (points: number[], group: 1 | 2 | 3) => {
-    this.transientMembership.receiveReplace(points, group);
+  replaceTransient = (at: number[], membership: dtstr.ValidMemberships) => {
+    this.transientMembership.receiveClearReplace(at, membership);
     this.notifyAll();
   };
 
-  addPersistent = (points: number[], group: 1 | 2 | 3) => {
-    this.persistentMembership.receiveAdd(points, group);
+  addPersistent = (at: number[], membership: dtstr.ValidMemberships) => {
+    this.persistentMembership.recieveReplace(at, membership);
     this.notifyAll();
   };
 
-  clearTransient = () => {
+  clear = () => {
     this.transientMembership.clear();
-    this.notifyAll();
-  };
-
-  clearPersistent = () => {
     this.persistentMembership.clear();
     this.notifyAll();
   };

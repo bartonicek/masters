@@ -1,3 +1,4 @@
+import * as funs from "../functions.js";
 export class Representation {
     wrangler;
     handler;
@@ -14,7 +15,7 @@ export class Representation {
         this.handler = handler;
     }
     getMapping = (mapping, type) => {
-        let res = this.wrangler[mapping]?.extract(type);
+        let res = this.wrangler[mapping]?.extract2(type);
         res = this.scales[mapping]?.dataToPlot(res);
         return res;
     };
@@ -32,7 +33,18 @@ export class Representation {
         this.sizeMultiplier = 1;
     };
     incrementSizeMultiplier = () => { };
-    inSelection = (selectionPoints) => { };
+    // Checks which bounding rects overlap with a rectangular selection region
+    //E.g. [[0, 0], [Width, Height]] should include all bound. rects.
+    inSelection = (selectionRect) => {
+        const selected = this.boundingRects.map((rect) => funs.rectOverlap(rect, selectionRect));
+        return this.wrangler.indices.map((index) => selected[index]);
+    };
+    inSelection2 = (selectionRect) => {
+        const selectedReps = this.boundingRects.map((rect) => funs.rectOverlap(rect, selectionRect));
+        const selectedDatapoints = this.wrangler.indices.flatMap((e, i) => selectedReps[e] ? i : []);
+        return selectedDatapoints;
+    };
+    // Handle generic keypress actions
     onKeypress = (key) => {
         if (key === "KeyR")
             this.defaultize();

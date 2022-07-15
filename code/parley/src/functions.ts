@@ -142,9 +142,12 @@ const pointInRect = (
   );
 };
 
-const polyOverlap = (poly1: [number, number][], poly2: [number, number][]) => {
-  const [p1x, p1y] = [0, 1].map((e) => poly1.map((f) => f[e]));
-  const [p2x, p2y] = [0, 1].map((e) => poly2.map((f) => f[e]));
+const rectOverlap = (
+  rect1: [[number, number], [number, number]],
+  rect2: [[number, number], [number, number]]
+) => {
+  const [p1x, p1y] = [0, 1].map((e) => rect1.map((f) => f[e]));
+  const [p2x, p2y] = [0, 1].map((e) => rect2.map((f) => f[e]));
   return !(
     Math.max(...p1x) < Math.min(...p2x) ||
     Math.min(...p1x) > Math.max(...p2x) ||
@@ -220,6 +223,6 @@ export {
   uniqueRows,
   uniqueRowIds,
   pointInRect,
-  polyOverlap,
+  rectOverlap,
   timeExecution,
 };

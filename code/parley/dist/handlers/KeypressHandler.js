@@ -20,6 +20,7 @@ export class KeypressHandler extends Handler {
         this.consequences = ["keyPressed", "keyReleased"];
     }
     keyPressed = (event) => {
+        this.notifyAll("keyPressed");
         if (this.validKeys.includes(event.code)) {
             this.current = event.code;
             this.last = event.code;

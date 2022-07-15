@@ -17,7 +17,8 @@ export class RectDragHandler extends Handler {
         this.consequences = ["startDrag", "whileDrag", "endDrag"];
     }
     startDrag = (event) => {
-        const { modeOR, selectionPoints, selectionArray } = this;
+        const { modeOR, selectionPoints, selectionArray, notifyAll } = this;
+        notifyAll("startDrag");
         if (modeOR)
             selectionArray.push([selectionPoints[0], selectionPoints[1]]);
         this.dragging = true;
@@ -31,8 +32,8 @@ export class RectDragHandler extends Handler {
         }
     };
     endDrag = () => {
-        this.notifyAll("endDrag");
         this.dragging = false;
+        this.notifyAll("endDrag");
     };
     onKeyPress = (key) => {
         const { dragging, selectionArray, selectionPoints } = this;

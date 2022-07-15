@@ -10,26 +10,24 @@ export class HistoPlot extends Plot {
         this.wranglers = {
             summary: new Wrangler(data, mapping, marker)
                 .splitBy("x")
-                .splitWhat("x")
-                .doOn(funs.bin)
-                .doWithin(funs.length),
+                .splitWhat("y")
+                .doAcross("by", funs.bin, 10)
+                .doWithin("by", funs.unique)
+                .doWithin("what", funs.length)
+                .assignIndices(),
         };
         this.scales = {
-            x: new scls.XYScaleDiscrete(this.width),
+            x: new scls.XYScaleContinuous(this.width),
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, {
-                width: this.width,
-                height: this.height,
-            }),
+            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 1),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),
             axistextx: new auxs.AxisText("x"),
             axistexy: new auxs.AxisText("y"),
             axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
-            //axistitley: new auxs.AxisTitle("y", mapping.get("y")),
             rectdragbox: new auxs.RectDragBox(this.handlers),
         };
         this.initialize();

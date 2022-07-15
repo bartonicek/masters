@@ -12,12 +12,11 @@ export class Points extends Representation {
     this.alphaMultiplier = 1;
   }
 
-  getMappings = (type?: "selected") => {
+  getMappings = (type?: dtstr.ValidMemberships) => {
     let [x, y, size] = ["x", "y", "size"].map((mapping: dtstr.ValidMappings) =>
       this.getMapping(mapping, type)
     );
-    const { radius } =
-      type === "selected" ? gpars.reps.highlight : gpars.reps.base;
+    const { radius } = type === 1 ? gpars.reps.highlight : gpars.reps.base;
 
     size = size
       ? size.map((e) => radius * e * this.sizeMultiplier)
@@ -36,7 +35,7 @@ export class Points extends Representation {
   };
 
   drawHighlight = (context: any) => {
-    const [x, y, size] = this.getMappings("selected");
+    const [x, y, size] = this.getMappings(1);
     const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
     const { alphaMultiplier } = this;
     context.drawClear();
@@ -48,16 +47,7 @@ export class Points extends Representation {
     const c = 1 / Math.sqrt(2);
     return x.map((xi, i) => [
       [xi - c * size[i], y[i] - c * size[i]],
-      [xi + c * size[i], y[i] - c * size[i]],
-      [xi - c * size[i], y[i] + c * size[i]],
       [xi + c * size[i], y[i] + c * size[i]],
     ]);
   }
-
-  inSelection = (selectionPoints: [[number, number], [number, number]]) => {
-    const selected = this.boundingRects.map((rect) =>
-      funs.polyOverlap(rect, selectionPoints)
-    );
-    return this.wrangler.indices.map((index) => selected[index]);
-  };
 }

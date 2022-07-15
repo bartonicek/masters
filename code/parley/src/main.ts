@@ -108,4 +108,16 @@ const plot4 = new HistoPlot(data1, mapping4, marker1);
 // const plot1 = new ScatterPlot(data1, mapping1, marker1);
 // const plot3 = new BubblePlot(data1, mapping3, marker1);
 
+// const mm1 = [0, 0, 0, 0, 1, 1, 1, 0, 1];
+
+// console.log(
+//   plot2.inSelection2([
+//     [0, 0],
+//     [400, 200],
+//   ])
+// );
+
+// plot1.marker.replaceTransient([1, 2, 3, 10, 11], 1);
+// console.log(plot1.wranglers.identity.x.extract2(1));
+
 export {};

@@ -23,7 +23,7 @@ export class Wrangler {
     extractAsIs = (...mappings) => {
         this.indices = Array.from(Array(this.marker.n), (e, i) => i);
         mappings.forEach((mapping) => {
-            this[mapping] = new Cast(this.getMapping(mapping)).registerFun(funs.identity);
+            this[mapping] = new Cast(this.getMapping(mapping));
             this[mapping].marker = this.marker;
             this[mapping].allUnique = true;
         });
@@ -45,24 +45,6 @@ export class Wrangler {
         });
         return this;
     };
-    // doOn = (fun: Function, ...args: any[]) => {
-    //   Array.from(this.by).forEach((mapping) =>
-    //     this[mapping].registerFun(fun, ...args)
-    //   );
-    //   const splittingVars = Array.from(this.by).map((e) => this[e].vector);
-    //   this.indices = funs.uniqueRowIds(splittingVars);
-    //   Array.from(this.by).forEach((mapping) => {
-    //     this[mapping].indices = this.indices;
-    //   });
-    //   return this;
-    // };
-    // doWithin = (fun: Function, ...args: any[]) => {
-    //   Array.from(this.what).forEach((mapping) => {
-    //     this[mapping].registerFun(fun, ...args);
-    //     this[mapping].indices = this.indices;
-    //   });
-    //   return this;
-    // };
     doAcross = (target, fun, ...args) => {
         if (target === "by" || target === "what") {
             Array.from(this[target]).forEach((mapping) => {

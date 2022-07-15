@@ -38,8 +38,19 @@ export class Cast {
         const res = uniqueIndices.map((uniqueIndex) => indices.flatMap((index, i) => index === uniqueIndex && marker.selected[i] ? acrossVec[i] : []));
         return res;
     }
+    // No argument: default split, across all memberships
+    getSplitOf = (membership) => {
+        const { acrossVec, indices, uniqueIndices, marker } = this;
+        const res = uniqueIndices.map((uniqueIndex) => indices.flatMap((index, i) => index === uniqueIndex &&
+            (!membership ||
+                marker.transientMembership[i] === membership ||
+                marker.persistentMembership[i] === membership)
+            ? acrossVec[i]
+            : []));
+        return res;
+    };
     extract = (type) => {
-        const { allUnique } = this;
+        const { marker, allUnique } = this;
         if (type === "selected") {
             // Skip data-splitting if every datapoint has a unique representation
             if (allUnique)
@@ -50,11 +61,32 @@ export class Cast {
             return res;
         }
         if (allUnique)
-            return this.vector; // Ditto: skip data-splitting
+            return this.acrossVec; // Ditto: skip data-splitting
         const res = this.defaultSplit
             .filter((e) => e.length > 0)
             .flatMap((e) => this.withinFun(e, ...this.withinArgs));
         return res;
+    };
+    extract2 = (membership) => {
+        const { marker, allUnique, withinFun, withinArgs, acrossVec, getSplitOf } = this;
+        if (membership) {
+            // Members + no split + across trans.
+            if (allUnique) {
+                return acrossVec.filter((_, i) => marker.transientMembership[i] === membership ||
+                    marker.persistentMembership[i] === membership);
+            }
+            // Members + split + across trans. + within trans.
+            return getSplitOf(membership)
+                .filter((e) => e.length > 0)
+                .flatMap((e) => withinFun(e, ...withinArgs));
+        }
+        // All + no split + across trans. only
+        if (allUnique)
+            return acrossVec;
+        // All + split + across trans. + within trans.
+        return getSplitOf()
+            .filter((e) => e.length > 0)
+            .flatMap((e) => withinFun(e, ...withinArgs));
     };
     registerAcross = (fun, ...args) => {
         this.acrossFun = fun;
@@ -64,11 +96,6 @@ export class Cast {
     registerWithin = (fun, ...args) => {
         this.withinFun = fun;
         this.withinArgs = args;
-        return this;
-    };
-    registerFun = (fun, ...args) => {
-        this.fun = fun;
-        this.args = args;
         return this;
     };
 }

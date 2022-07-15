@@ -21,7 +21,8 @@ export class RectDragHandler extends Handler {
   }
 
   startDrag = (event: { offsetX: number; offsetY: number }) => {
-    const { modeOR, selectionPoints, selectionArray } = this;
+    const { modeOR, selectionPoints, selectionArray, notifyAll } = this;
+    notifyAll("startDrag");
     if (modeOR) selectionArray.push([selectionPoints[0], selectionPoints[1]]);
     this.dragging = true;
     selectionPoints[0] = [event.offsetX, event.offsetY];
@@ -36,8 +37,8 @@ export class RectDragHandler extends Handler {
   };
 
   endDrag = () => {
-    this.notifyAll("endDrag");
     this.dragging = false;
+    this.notifyAll("endDrag");
   };
 
   onKeyPress = (key: string) => {

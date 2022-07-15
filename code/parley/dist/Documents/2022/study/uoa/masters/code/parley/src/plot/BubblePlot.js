@@ -11,7 +11,9 @@ export class BubblePlot extends Plot {
             identity: new Wrangler(data, mapping, marker)
                 .splitBy("x", "y")
                 .splitWhat("size")
-                .doWithin(funs.length),
+                .doWithin("by", funs.unique)
+                .doWithin("what", funs.length)
+                .assignIndices(),
         };
         this.scales = {
             x: new scls.XYScaleDiscrete(this.width),
@@ -19,10 +21,7 @@ export class BubblePlot extends Plot {
             size: new scls.AreaScaleContinuous(this.width / 5),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.drag, {
-                width: this.width,
-                height: this.height,
-            }),
+            points: new reps.Points(this.wranglers.identity, this.handlers.drag),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

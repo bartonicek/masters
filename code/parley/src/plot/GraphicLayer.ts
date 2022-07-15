@@ -39,7 +39,6 @@ export class GraphicLayer {
       .toString(16)
       .toUpperCase();
     const colString = alpha16.length < 2 ? col + "0" + alpha16 : col + alpha16;
-    console.log(colString);
     return colString;
   };
 

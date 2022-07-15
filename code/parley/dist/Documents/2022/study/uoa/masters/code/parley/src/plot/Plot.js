@@ -3,6 +3,7 @@ import * as funs from "../functions.js";
 import * as hndl from "../handlers/handlers.js";
 export class Plot extends GraphicStack {
     marker;
+    modes;
     scales;
     representations;
     auxiliaries;
@@ -12,6 +13,9 @@ export class Plot extends GraphicStack {
     constructor(marker) {
         super();
         this.marker = marker;
+        this.modes = {
+            OR: false,
+        };
         this.representations = {};
         this.auxiliaries = {};
         this.wranglers = {};
@@ -20,7 +24,7 @@ export class Plot extends GraphicStack {
             drag: new hndl.RectDragHandler(),
             keypress: new hndl.KeypressHandler(),
         };
-        this.freeze = false;
+        //this.freeze = false;
     }
     get active() {
         return this.graphicContainer.classList.contains("active");
@@ -53,6 +57,11 @@ export class Plot extends GraphicStack {
         const allPoints = mapChildren("representations", "inSelection", selPoints);
         return allPoints[0].map((_, i) => allPoints.some((points) => points[i]));
     };
+    inSelection2 = (selPoints) => {
+        const { mapChildren } = this;
+        const allPoints = mapChildren("representations", "inSelection2", selPoints);
+        return Array.from(new Set([].concat.apply([], allPoints)));
+    };
     onSelection = () => {
         const { marker, handlers, inSelection } = this;
         if (handlers.keypress.current === "ShiftLeft") {
@@ -62,11 +71,34 @@ export class Plot extends GraphicStack {
             marker.hardReceive(inSelection(handlers.drag.selectionPoints));
         }
     };
+    onSelectionTransient = () => {
+        const { marker, handlers, inSelection2 } = this;
+        marker.replaceTransient(inSelection2(handlers.drag.selectionPoints), 1);
+    };
+    onSelectionPersistent = () => {
+        const { marker, handlers, inSelection2 } = this;
+        marker.addPersistent(inSelection2(handlers.drag.selectionPoints), 1);
+    };
     onKeypress = () => {
-        const { handlers, callChildren } = this;
-        this.freeze = handlers.keypress.current === "ShiftLeft" ? true : false;
-        if (this.active)
+        const { handlers, modes, callChildren } = this;
+        if (handlers.keypress.last === "ShiftLeft")
+            modes.OR = true;
+        callChildren("handlers", "onKeyPress", handlers.keypress.last);
+        if (this.active) {
             callChildren("representations", "onKeypress", handlers.keypress.current);
+        }
+    };
+    onKeyRelease = () => {
+        const { handlers, modes, callChildren } = this;
+        if (handlers.keypress.last === "ShiftLeft")
+            modes.OR = false;
+        callChildren("handlers", "onKeyRelease", handlers.keypress.last);
+        if (this.active) {
+            callChildren("representations", "onKeyRelease", handlers.keypress.last);
+        }
+    };
+    onDoubleClick = () => {
+        this.callChildren("handlers", "onDoubleClick");
     };
     draw = (context, ...args) => {
         const { representations, auxiliaries, callChildren } = this;
@@ -74,6 +106,8 @@ export class Plot extends GraphicStack {
         const where = "graphic" + funs.capitalize(context);
         callChildren("representations", what, this[where], ...args);
         callChildren("auxiliaries", what, this[where], ...args);
+        // if (this.modes.OR)
+        // this.graphicHighlight.drawPoints([400], [100], "green", null, 10);
     };
     drawBase = () => this.draw("base");
     drawHighlight = () => this.draw("highlight");
@@ -89,14 +123,15 @@ export class Plot extends GraphicStack {
         graphicContainers.forEach((e) => e.classList.remove("active"));
     };
     initialize = () => {
-        const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
+        const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, onKeyRelease, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
         Object.keys(scales).forEach((mapping) => {
             scales[mapping]?.registerData(this.getUnique(mapping));
         });
         callChildren("representations", "registerScales", scales);
         callChildren("auxiliaries", "registerScales", scales);
-        handlers.drag.registerCallbacks(onSelection);
-        handlers.keypress.registerCallbacks(onKeypress, drawBase, drawHighlight);
+        handlers.drag.registerCallbacks([onSelection], ["whileDrag"]);
+        handlers.drag.registerCallbacks([this.onSelectionTransient, this.onSelectionPersistent], ["whileDrag", "startDrag"]);
+        handlers.keypress.registerCallbacks([onKeypress, onKeyRelease, drawBase, drawHighlight], ["keyPressed", "keyReleased", "keyPressed", "keyPressed"]);
         marker.registerCallbacks(drawHighlight, drawUser);
         // For each handler, register event listeners for actions
         // and corresponding consequences on the graphiContainer
@@ -116,6 +151,7 @@ export class Plot extends GraphicStack {
         graphicDiv.addEventListener("dblclick", (event) => {
             this.activateAll();
             marker.unSelect();
+            this.onDoubleClick();
             this.deactivateAll();
         });
         graphicContainer.addEventListener("mousedown", (event) => {

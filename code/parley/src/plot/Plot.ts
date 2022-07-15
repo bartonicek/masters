@@ -10,6 +10,7 @@ import { Marker } from "../marker/Marker.js";
 
 export class Plot extends GraphicStack {
   marker: Marker;
+  modes: { OR: boolean };
   scales: { [key: string]: scls.Scale };
   representations: { [key: string]: reps.Representation };
   auxiliaries: { [key: string]: auxs.Auxiliary };
@@ -20,6 +21,9 @@ export class Plot extends GraphicStack {
   constructor(marker: Marker) {
     super();
     this.marker = marker;
+    this.modes = {
+      OR: false,
+    };
     this.representations = {};
     this.auxiliaries = {};
     this.wranglers = {};
@@ -28,7 +32,7 @@ export class Plot extends GraphicStack {
       drag: new hndl.RectDragHandler(),
       keypress: new hndl.KeypressHandler(),
     };
-    this.freeze = false;
+    //this.freeze = false;
   }
 
   get active() {
@@ -69,6 +73,12 @@ export class Plot extends GraphicStack {
     return allPoints[0].map((_, i) => allPoints.some((points) => points[i]));
   };
 
+  inSelection2 = (selPoints: [number, number][]): number[] => {
+    const { mapChildren } = this;
+    const allPoints = mapChildren("representations", "inSelection2", selPoints);
+    return Array.from(new Set([].concat.apply([], allPoints))) as number[];
+  };
+
   onSelection = () => {
     const { marker, handlers, inSelection } = this;
 
@@ -79,27 +89,41 @@ export class Plot extends GraphicStack {
     }
   };
 
-  onKeypress = () => {
-    const { handlers, callChildren } = this;
+  onSelectionTransient = () => {
+    const { marker, handlers, inSelection2 } = this;
+    marker.replaceTransient(inSelection2(handlers.drag.selectionPoints), 1);
+  };
 
-    this.freeze = handlers.keypress.current === "ShiftLeft" ? true : false;
+  onSelectionPersistent = () => {
+    const { marker, handlers, inSelection2 } = this;
+    if (this.modes.OR) {
+      marker.addPersistent(inSelection2(handlers.drag.selectionPoints), 1);
+    }
+  };
+
+  onKeypress = () => {
+    const { handlers, modes, callChildren } = this;
+
+    if (handlers.keypress.last === "ShiftLeft") modes.OR = true;
+    callChildren("handlers", "onKeyPress", handlers.keypress.last);
     if (this.active) {
       callChildren("representations", "onKeypress", handlers.keypress.current);
     }
-    callChildren("handlers", "onKeyPress", handlers.keypress.last);
   };
 
   onKeyRelease = () => {
-    const { handlers, callChildren } = this;
+    const { handlers, modes, callChildren } = this;
 
+    if (handlers.keypress.last === "ShiftLeft") modes.OR = false;
+    callChildren("handlers", "onKeyRelease", handlers.keypress.last);
     if (this.active) {
       callChildren("representations", "onKeyRelease", handlers.keypress.last);
     }
-    callChildren("handlers", "onKeyRelease", handlers.keypress.last);
   };
 
   onDoubleClick = () => {
     this.callChildren("handlers", "onDoubleClick");
+    this.marker.clear();
   };
 
   draw = (context: "base" | "highlight" | "user", ...args: any[]) => {
@@ -108,6 +132,8 @@ export class Plot extends GraphicStack {
     const where = "graphic" + funs.capitalize(context);
     callChildren("representations", what, this[where], ...args);
     callChildren("auxiliaries", what, this[where], ...args);
+    // if (this.modes.OR)
+    // this.graphicHighlight.drawPoints([400], [100], "green", null, 10);
   };
 
   drawBase = () => this.draw("base");
@@ -150,6 +176,10 @@ export class Plot extends GraphicStack {
     callChildren("representations", "registerScales", scales);
     callChildren("auxiliaries", "registerScales", scales);
     handlers.drag.registerCallbacks([onSelection], ["whileDrag"]);
+    handlers.drag.registerCallbacks(
+      [this.onSelectionTransient, this.onSelectionPersistent],
+      ["whileDrag", "startDrag"]
+    );
     handlers.keypress.registerCallbacks(
       [onKeypress, onKeyRelease, drawBase, drawHighlight],
       ["keyPressed", "keyReleased", "keyPressed", "keyPressed"]

@@ -9,4 +9,16 @@ type DataFrame = {
 type ValidMappings = "x" | "y" | "z" | "size" | "col" | "shape";
 type Mapping = Map<ValidMappings, string>;
 
-export { VectorGeneric, DataFrame, ValidMappings, Mapping };
+type ValidMemberships = 1 | 2 | 3;
+
+// Rectangle defined by two [x, y] points
+type Rect2Points = [[number, number], [number, number]];
+
+export {
+  VectorGeneric,
+  DataFrame,
+  ValidMappings,
+  Mapping,
+  ValidMemberships,
+  Rect2Points,
+};

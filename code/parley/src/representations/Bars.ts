@@ -27,9 +27,9 @@ export class Bars extends Representation {
     );
   }
 
-  getMappings = (type?: "selected") => {
+  getMappings = (membership?: dtstr.ValidMemberships) => {
     return ["x", "y"].map((mapping: dtstr.ValidMappings) =>
-      this.getMapping(mapping, type)
+      this.getMapping(mapping, membership)
     );
   };
 
@@ -43,7 +43,7 @@ export class Bars extends Representation {
   };
 
   drawHighlight = (context: any) => {
-    const [x, y] = this.getMappings("selected");
+    const [x, y] = this.getMappings(1);
     const { y0, width, alphaMultiplier } = this;
     const { col, strokeCol } = gpars.reps.highlight;
     context.drawClear();
@@ -55,17 +55,7 @@ export class Bars extends Representation {
     const [wh, y0] = [this.width / 2, this.scales.y.plotMin];
     return x.map((xi, i) => [
       [xi - wh, y0],
-      [xi + wh, y0],
-      [xi - wh, y[i]],
       [xi + wh, y[i]],
     ]);
   }
-
-  inSelection = (selectionPoints: [[number, number], [number, number]]) => {
-    const selected = this.boundingRects.map((rect) =>
-      funs.polyOverlap(rect, selectionPoints)
-    );
-
-    return this.wrangler.indices.map((index) => selected[index]);
-  };
 }
