@@ -72,6 +72,19 @@ export class GraphicLayer {
         });
         context.restore();
     };
+    drawRectsHW = (x, y, h, w, col = gpars.reps.base.col, alpha = 1, stroke = null) => {
+        const context = this.context;
+        context.save();
+        context.fillStyle = this.toAlpha(col, alpha);
+        context.strokeStyle = stroke;
+        x.forEach((e, i) => {
+            col ? context.fillRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i]) : null;
+            stroke
+                ? context.strokeRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i])
+                : null;
+        });
+        context.restore();
+    };
     drawLine = (x, y, col = "black") => {
         const context = this.context;
         context.save();
@@ -100,7 +113,7 @@ export class GraphicLayer {
         });
         context.restore();
     };
-    drawDim = (col = "rgba(0, 0, 0, 0.1)") => {
+    drawDim = (col = "rgba(120, 120, 120, 0.1)") => {
         const context = this.context;
         context.fillStyle = col;
         context.fillRect(0, 0, this.width, this.height);

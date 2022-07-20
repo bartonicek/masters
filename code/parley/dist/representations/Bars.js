@@ -2,20 +2,24 @@ import { Representation } from "./Representation.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 export class Bars extends Representation {
     widthMultiplier;
-    constructor(wrangler, handler, widthMultiplier) {
-        super(wrangler, handler);
-        this.sizeMultiplier = 1;
+    constructor(wrangler, widthMultiplier) {
+        super(wrangler);
+        this.widthMultiplier = widthMultiplier;
+        this.sizeMultiplier = widthMultiplier;
+        this.sizeLimits = { min: 0.01, max: 1 };
         this.alphaMultiplier = 1;
-        this.widthMultiplier = widthMultiplier * this.sizeMultiplier;
     }
     get y0() {
         return this.scales.y.plotMin;
     }
     get width() {
-        return (this.widthMultiplier *
-            this.sizeMultiplier *
+        return (this.sizeMultiplier *
             (this.getMapping("x").sort()[1] - this.getMapping("x").sort()[0]));
     }
+    defaultize = () => {
+        this.sizeMultiplier = this.widthMultiplier;
+        this.alphaMultiplier = 1;
+    };
     getMappings = (membership) => {
         return ["x", "y"].map((mapping) => this.getMapping(mapping, membership));
     };

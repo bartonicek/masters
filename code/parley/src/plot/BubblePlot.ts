@@ -28,7 +28,7 @@ export class BubblePlot extends Plot {
     };
 
     this.representations = {
-      points: new reps.Points(this.wranglers.identity, this.handlers.drag),
+      points: new reps.Points(this.wranglers.identity),
     };
 
     this.auxiliaries = {

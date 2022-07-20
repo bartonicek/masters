@@ -8,6 +8,10 @@ export class MembershipArray extends Array<number> {
     this.fill(0);
   };
 
+  merge = (arr: number[]) => {
+    arr.forEach((e, i) => (e !== 0 ? (this[i] = e) : null));
+  };
+
   recieveReplace = (at: number[], membership: dtstr.ValidMemberships) => {
     at.forEach((e) => (this[e] = membership));
   };

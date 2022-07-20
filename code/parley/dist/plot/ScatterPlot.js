@@ -16,7 +16,7 @@ export class ScatterPlot extends Plot {
             y: new scls.XYScaleContinuous(this.height, -1),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.drag),
+            points: new reps.Points(this.wranglers.identity),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

@@ -40,6 +40,13 @@ const quantile = (x, q) => {
         return pos.map((e, i) => sorted[lwr[i]] + (e % 1) * (sorted[uppr[i]] - sorted[lwr[i]]));
     }
 };
+const gatedMultiply = (a, b, limits) => {
+    if (a * b < limits.min)
+        return limits.min;
+    if (a * b > limits.max)
+        return limits.max;
+    return a * b;
+};
 const which = (x, value) => {
     return x.map((e, i) => (e === value ? i : NaN)).filter((e) => !isNaN(e));
 };
@@ -155,4 +162,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, identity, length, sum, mean, min, max, capitalize, bin, quantile, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, rectOverlap, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, bin, quantile, gatedMultiply, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, rectOverlap, timeExecution, };

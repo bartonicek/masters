@@ -4,7 +4,7 @@ import * as auxs from "../auxiliaries/auxiliaries.js";
 import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
-export class BubblePlot extends Plot {
+export class SquarePlot extends Plot {
     constructor(data, mapping, marker) {
         super(marker);
         this.wranglers = {
@@ -21,7 +21,7 @@ export class BubblePlot extends Plot {
             size: new scls.AreaScaleContinuous(this.width / 5),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity),
+            points: new reps.Squares(this.wranglers.identity),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

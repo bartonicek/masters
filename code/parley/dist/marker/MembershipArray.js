@@ -5,6 +5,9 @@ export class MembershipArray extends Array {
     clear = () => {
         this.fill(0);
     };
+    merge = (arr) => {
+        arr.forEach((e, i) => (e !== 0 ? (this[i] = e) : null));
+    };
     recieveReplace = (at, membership) => {
         at.forEach((e) => (this[e] = membership));
     };

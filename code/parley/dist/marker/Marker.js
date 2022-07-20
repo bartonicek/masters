@@ -5,42 +5,38 @@ export class Marker {
     transientMembership;
     persistentMembership;
     callbacks;
+    when;
     constructor(n) {
         this.n = n;
-        this.transientMembership = new MembershipArray(n);
-        this.persistentMembership = new MembershipArray(n);
-        this.selected = new Array(n).fill(false);
+        this.transientMembership = new MembershipArray(n).fill(0);
+        this.persistentMembership = new MembershipArray(n).fill(0);
         this.callbacks = [];
+        this.when = [];
     }
-    hardReceive = (points) => {
-        this.selected = points;
-        this.notifyAll();
-    };
-    softReceive = (points) => {
-        this.selected = this.selected.map((e, i) => e || points[i]);
-        this.notifyAll();
-    };
     replaceTransient = (at, membership) => {
         this.transientMembership.receiveClearReplace(at, membership);
-        this.notifyAll();
+        this.notifyAll("replaceTransient");
     };
-    addPersistent = (at, membership) => {
-        this.persistentMembership.recieveReplace(at, membership);
-        this.notifyAll();
+    mergeTransient = () => {
+        this.persistentMembership.merge(this.transientMembership);
+        this.notifyAll("mergeTransient");
     };
+    // addPersistent = (at: number[], membership: dtstr.ValidMemberships) => {
+    //   this.persistentMembership.recieveReplace(at, membership);
+    //   this.notifyAll("addPersistent");
+    // };
     clear = () => {
         this.transientMembership.clear();
         this.persistentMembership.clear();
-        this.notifyAll();
     };
-    unSelect = () => {
-        this.selected = Array.from(Array(this.n), (e) => false);
-        this.notifyAll();
-    };
-    registerCallbacks = (...callbacks) => {
+    registerCallbacks = (callbacks, when) => {
         this.callbacks.push(...callbacks);
+        this.when.push(...when);
+        return this;
     };
-    notifyAll() {
-        this.callbacks.forEach((fun) => fun());
-    }
+    notifyAll = (when) => {
+        this.callbacks
+            .filter((e, i) => this.when[i] === when)
+            .forEach((callback) => callback());
+    };
 }

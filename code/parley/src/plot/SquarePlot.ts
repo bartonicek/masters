@@ -8,27 +8,27 @@ import { Marker } from "../marker/Marker.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 
-export class HistoPlot extends Plot {
+export class SquarePlot extends Plot {
   constructor(data: dtstr.DataFrame, mapping: dtstr.Mapping, marker: Marker) {
     super(marker);
 
     this.wranglers = {
-      summary: new Wrangler(data, mapping, marker)
-        .splitBy("x")
-        .splitWhat("y")
-        .doAcross("by", funs.bin, 10)
+      identity: new Wrangler(data, mapping, marker)
+        .splitBy("x", "y")
+        .splitWhat("size")
         .doWithin("by", funs.unique)
         .doWithin("what", funs.length)
         .assignIndices(),
     };
 
     this.scales = {
-      x: new scls.XYScaleContinuous(this.width),
-      y: new scls.XYScaleContinuous(this.height, -1, true),
+      x: new scls.XYScaleDiscrete(this.width),
+      y: new scls.XYScaleDiscrete(this.height, -1),
+      size: new scls.AreaScaleContinuous(this.width / 5),
     };
 
     this.representations = {
-      bars: new reps.Bars(this.wranglers.summary, 1),
+      points: new reps.Squares(this.wranglers.identity),
     };
 
     this.auxiliaries = {
@@ -36,6 +36,7 @@ export class HistoPlot extends Plot {
       axistextx: new auxs.AxisText("x"),
       axistexy: new auxs.AxisText("y"),
       axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
+      axistitley: new auxs.AxisTitle("y", mapping.get("y")),
       rectdragbox: new auxs.RectDragBox(this.handlers),
     };
 

@@ -1,6 +1,6 @@
 ---
 title: "Principled and Efficient <br> Interactive Data Visualization"
-author: "Adam Bartonicek"
+author: "Adam Bartonicek (supervisor: Simon Urbanek)"
 institute: "University of Auckland, Department of Statistics"
 date: "Last updated: `r Sys.Date()`"
 output:
@@ -45,13 +45,13 @@ class: inverse, center, middle
 class: middle
 
 - <b> Built for static viz first, interactive second </b>
-  - Difficult to achieve "interesting" interactivity (e.g. linking multiple plots) 
+  - A lot of "interactivity" happens within one plot, linking several plots together is convoluted 
 - <b> Designed for presentation, not EDA </b>
   - i.e. made for dashboards
   - Long set up time: not ideal for EDA
   - SVG-based: looks pretty but slow at high data volumes
 - <b> Lack of adherence to data viz principles </b> 
-  - Chartjunk (Tufte, 1983)
+  - Chartjunk: redundant elements of plot that distract from the data (Tufte, 1983)
   - Interactive chartjunk: useless interactivity that distracts from the data
 
 ---
@@ -64,9 +64,12 @@ class: inverse, center, middle
 
 class: middle
 
-- <b>Project</b>: Lay foundations for a general-purpose interactive viz library/package, designed with interactivity-first & principled data viz mindset
-- <b>Back-end written in TypeScript</b> (a fancier version of JavaScript)
+- <b>Master's project</b>
+  - Lay foundations for a general-purpose interactive viz library/package, designed with interactivity-first & principled data viz mindset
+- <b>Back-end written in TypeScript</b> 
+  - (a fancier, typed version of JavaScript)
   - Portable: should run anywhere
+  - Should be better maintainable than plain Javascript
 - <b>Uses HTML canvas element</b>
   - Bitmap: a lot faster than SVG
 

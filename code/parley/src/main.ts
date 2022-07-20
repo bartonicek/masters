@@ -14,6 +14,8 @@ import { Cast } from "./wrangler/Cast.js";
 import { AxisText } from "./auxiliaries/AxisText.js";
 import { BubblePlot } from "./plot/BubblePlot.js";
 import { HistoPlot } from "./plot/HistoPlot.js";
+import { MembershipArray } from "./marker/MembershipArray.js";
+import { SquarePlot } from "./plot/SquarePlot.js";
 
 document
   .querySelector<HTMLElement>(".buttonHelp")
@@ -55,7 +57,7 @@ const mapping4: dtstr.Mapping = new Map([
 const marker1 = new Marker(data1[Object.keys(data1)[0]].length);
 
 const plot1 = new ScatterPlot(data1, mapping1, marker1);
-const plot2 = new BubblePlot(data1, mapping3, marker1);
+const plot2 = new SquarePlot(data1, mapping3, marker1);
 const plot3 = new BarPlot(data1, mapping2, marker1);
 const plot4 = new HistoPlot(data1, mapping4, marker1);
 

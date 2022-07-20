@@ -8,11 +8,12 @@ import { globalParameters as gpars } from "../globalparameters.js";
 export class Bars extends Representation {
   widthMultiplier: number;
 
-  constructor(wrangler: Wrangler, handler: Handler, widthMultiplier: number) {
-    super(wrangler, handler);
-    this.sizeMultiplier = 1;
+  constructor(wrangler: Wrangler, widthMultiplier: number) {
+    super(wrangler);
+    this.widthMultiplier = widthMultiplier;
+    this.sizeMultiplier = widthMultiplier;
+    this.sizeLimits = { min: 0.01, max: 1 };
     this.alphaMultiplier = 1;
-    this.widthMultiplier = widthMultiplier * this.sizeMultiplier;
   }
 
   get y0() {
@@ -21,11 +22,15 @@ export class Bars extends Representation {
 
   get width() {
     return (
-      this.widthMultiplier *
       this.sizeMultiplier *
       (this.getMapping("x").sort()[1] - this.getMapping("x").sort()[0])
     );
   }
+
+  defaultize = () => {
+    this.sizeMultiplier = this.widthMultiplier;
+    this.alphaMultiplier = 1;
+  };
 
   getMappings = (membership?: dtstr.ValidMemberships) => {
     return ["x", "y"].map((mapping: dtstr.ValidMappings) =>

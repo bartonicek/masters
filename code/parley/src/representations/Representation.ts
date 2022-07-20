@@ -1,12 +1,10 @@
 import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
-import { Handler } from "../handlers/Handler.js";
 import { Scale } from "../scales/Scale.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 
 export class Representation {
   wrangler: Wrangler;
-  handler: Handler;
   plotDims: { width: number; height: number };
   scales: { [key: string]: any };
   alpha: number;
@@ -14,11 +12,22 @@ export class Representation {
   stroke: string;
   radius: number;
   sizeMultiplier: number;
+  sizeLimits: { min: number; max: number };
   alphaMultiplier: number;
+  alphaLimits: { min: number; max: number };
 
-  constructor(wrangler: Wrangler, handler: Handler) {
+  constructor(wrangler: Wrangler) {
     this.wrangler = wrangler;
-    this.handler = handler;
+    this.sizeMultiplier = 1;
+    this.alphaMultiplier = 1;
+    this.sizeLimits = {
+      min: 0.001,
+      max: 10,
+    };
+    this.alphaLimits = {
+      min: 0.01,
+      max: 1,
+    };
   }
 
   getMapping = (mapping: dtstr.ValidMappings, type?: 1 | 2 | 3) => {
@@ -44,18 +53,9 @@ export class Representation {
     this.sizeMultiplier = 1;
   };
 
-  incrementSizeMultiplier = () => {};
-
   // Checks which bounding rects overlap with a rectangular selection region
-  //E.g. [[0, 0], [Width, Height]] should include all bound. rects.
+  //E.g. [[0, 0], [Width, Height]] should include all bound. rects
   inSelection = (selectionRect: dtstr.Rect2Points) => {
-    const selected = this.boundingRects.map((rect: dtstr.Rect2Points) =>
-      funs.rectOverlap(rect, selectionRect)
-    );
-    return this.wrangler.indices.map((index) => selected[index]);
-  };
-
-  inSelection2 = (selectionRect: dtstr.Rect2Points) => {
     const selectedReps = this.boundingRects.map((rect: dtstr.Rect2Points) =>
       funs.rectOverlap(rect, selectionRect)
     );
@@ -67,17 +67,30 @@ export class Representation {
 
   // Handle generic keypress actions
   onKeypress = (key: string) => {
+    const { sizeMultiplier, sizeLimits, alphaMultiplier, alphaLimits } = this;
+
     if (key === "KeyR") this.defaultize();
-    if (key === "Minus" && this.sizeMultiplier) this.sizeMultiplier *= 0.8;
-    if (key === "Equal" && this.sizeMultiplier) this.sizeMultiplier *= 1.2;
-    if (key === "BracketLeft" && this.alphaMultiplier) {
-      this.alphaMultiplier =
-        0.8 * this.alphaMultiplier < 0.01
-          ? 0.01
-          : (this.alphaMultiplier *= 0.8);
+
+    if (key === "Minus" && sizeMultiplier) {
+      this.sizeMultiplier = funs.gatedMultiply(sizeMultiplier, 0.8, sizeLimits);
     }
-    if (key === "BracketRight" && this.alphaMultiplier)
-      this.alphaMultiplier =
-        1.2 * this.alphaMultiplier > 1 ? 1 : (this.alphaMultiplier *= 1.2);
+
+    if (key === "Equal" && sizeMultiplier && sizeMultiplier < sizeLimits.max) {
+      this.sizeMultiplier = funs.gatedMultiply(sizeMultiplier, 1.2, sizeLimits);
+    }
+
+    if (key === "BracketLeft" && alphaMultiplier) {
+      this.alphaMultiplier = funs.gatedMultiply(
+        alphaMultiplier,
+        0.8,
+        alphaLimits
+      );
+    }
+    if (key === "BracketRight" && alphaMultiplier)
+      this.alphaMultiplier = funs.gatedMultiply(
+        alphaMultiplier,
+        1.2,
+        alphaLimits
+      );
   };
 }

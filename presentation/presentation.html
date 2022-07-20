@@ -3,7 +3,7 @@
   <head>
     <title>Principled and Efficient   Interactive Data Visualization</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Adam Bartonicek" />
+    <meta name="author" content="Adam Bartonicek (supervisor: Simon Urbanek)" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -17,13 +17,13 @@ class: top, left, middle, inverse, title, title-slide
 # Principled and Efficient <br> Interactive Data Visualization
 ]
 .author[
-### Adam Bartonicek
+### Adam Bartonicek (supervisor: Simon Urbanek)
 ]
 .institute[
 ### University of Auckland, Department of Statistics
 ]
 .date[
-### Last updated: 2022-07-13
+### Last updated: 2022-07-20
 ]
 
 ---
@@ -60,13 +60,13 @@ class: inverse, center, middle
 class: middle
 
 - &lt;b&gt; Built for static viz first, interactive second &lt;/b&gt;
-  - Difficult to achieve "interesting" interactivity (e.g. linking multiple plots) 
+  - A lot of "interactivity" happens within one plot, linking several plots together is convoluted 
 - &lt;b&gt; Designed for presentation, not EDA &lt;/b&gt;
   - i.e. made for dashboards
   - Long set up time: not ideal for EDA
   - SVG-based: looks pretty but slow at high data volumes
 - &lt;b&gt; Lack of adherence to data viz principles &lt;/b&gt; 
-  - Chartjunk (Tufte, 1983)
+  - Chartjunk: redundant elements of plot that distract from the data (Tufte, 1983)
   - Interactive chartjunk: useless interactivity that distracts from the data
 
 ---
@@ -79,9 +79,12 @@ class: inverse, center, middle
 
 class: middle
 
-- &lt;b&gt;Project&lt;/b&gt;: Lay foundations for a general-purpose interactive viz library/package, designed with interactivity-first &amp; principled data viz mindset
-- &lt;b&gt;Back-end written in TypeScript&lt;/b&gt; (a fancier version of JavaScript)
+- &lt;b&gt;Master's project&lt;/b&gt;
+  - Lay foundations for a general-purpose interactive viz library/package, designed with interactivity-first &amp; principled data viz mindset
+- &lt;b&gt;Back-end written in TypeScript&lt;/b&gt; 
+  - (a fancier, typed version of JavaScript)
   - Portable: should run anywhere
+  - Should be better maintainable than plain Javascript
 - &lt;b&gt;Uses HTML canvas element&lt;/b&gt;
   - Bitmap: a lot faster than SVG
 

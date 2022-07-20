@@ -1,7 +1,6 @@
 import * as funs from "../functions.js";
 export class Representation {
     wrangler;
-    handler;
     plotDims;
     scales;
     alpha;
@@ -9,10 +8,21 @@ export class Representation {
     stroke;
     radius;
     sizeMultiplier;
+    sizeLimits;
     alphaMultiplier;
-    constructor(wrangler, handler) {
+    alphaLimits;
+    constructor(wrangler) {
         this.wrangler = wrangler;
-        this.handler = handler;
+        this.sizeMultiplier = 1;
+        this.alphaMultiplier = 1;
+        this.sizeLimits = {
+            min: 0.001,
+            max: 10,
+        };
+        this.alphaLimits = {
+            min: 0.01,
+            max: 1,
+        };
     }
     getMapping = (mapping, type) => {
         let res = this.wrangler[mapping]?.extract2(type);
@@ -32,34 +42,28 @@ export class Representation {
         this.alphaMultiplier = 1;
         this.sizeMultiplier = 1;
     };
-    incrementSizeMultiplier = () => { };
     // Checks which bounding rects overlap with a rectangular selection region
-    //E.g. [[0, 0], [Width, Height]] should include all bound. rects.
+    //E.g. [[0, 0], [Width, Height]] should include all bound. rects
     inSelection = (selectionRect) => {
-        const selected = this.boundingRects.map((rect) => funs.rectOverlap(rect, selectionRect));
-        return this.wrangler.indices.map((index) => selected[index]);
-    };
-    inSelection2 = (selectionRect) => {
         const selectedReps = this.boundingRects.map((rect) => funs.rectOverlap(rect, selectionRect));
         const selectedDatapoints = this.wrangler.indices.flatMap((e, i) => selectedReps[e] ? i : []);
         return selectedDatapoints;
     };
     // Handle generic keypress actions
     onKeypress = (key) => {
+        const { sizeMultiplier, sizeLimits, alphaMultiplier, alphaLimits } = this;
         if (key === "KeyR")
             this.defaultize();
-        if (key === "Minus" && this.sizeMultiplier)
-            this.sizeMultiplier *= 0.8;
-        if (key === "Equal" && this.sizeMultiplier)
-            this.sizeMultiplier *= 1.2;
-        if (key === "BracketLeft" && this.alphaMultiplier) {
-            this.alphaMultiplier =
-                0.8 * this.alphaMultiplier < 0.01
-                    ? 0.01
-                    : (this.alphaMultiplier *= 0.8);
+        if (key === "Minus" && sizeMultiplier) {
+            this.sizeMultiplier = funs.gatedMultiply(sizeMultiplier, 0.8, sizeLimits);
         }
-        if (key === "BracketRight" && this.alphaMultiplier)
-            this.alphaMultiplier =
-                1.2 * this.alphaMultiplier > 1 ? 1 : (this.alphaMultiplier *= 1.2);
+        if (key === "Equal" && sizeMultiplier && sizeMultiplier < sizeLimits.max) {
+            this.sizeMultiplier = funs.gatedMultiply(sizeMultiplier, 1.2, sizeLimits);
+        }
+        if (key === "BracketLeft" && alphaMultiplier) {
+            this.alphaMultiplier = funs.gatedMultiply(alphaMultiplier, 0.8, alphaLimits);
+        }
+        if (key === "BracketRight" && alphaMultiplier)
+            this.alphaMultiplier = funs.gatedMultiply(alphaMultiplier, 1.2, alphaLimits);
     };
 }

@@ -48,6 +48,16 @@ const quantile = (x: number[], q: number | number[]) => {
   }
 };
 
+const gatedMultiply = (
+  a: number,
+  b: number,
+  limits: { min: number; max: number }
+): number => {
+  if (a * b < limits.min) return limits.min;
+  if (a * b > limits.max) return limits.max;
+  return a * b;
+};
+
 const which = (x: datastr.VectorGeneric, value: any) => {
   return x.map((e, i) => (e === value ? i : NaN)).filter((e) => !isNaN(e));
 };
@@ -213,6 +223,7 @@ export {
   capitalize,
   bin,
   quantile,
+  gatedMultiply,
   which,
   match,
   unique,

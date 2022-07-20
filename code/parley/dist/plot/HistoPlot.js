@@ -21,7 +21,7 @@ export class HistoPlot extends Plot {
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 1),
+            bars: new reps.Bars(this.wranglers.summary, 1),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

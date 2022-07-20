@@ -1,10 +1,11 @@
+import { Handler } from "../handlers/Handler.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
 import * as funs from "../functions.js";
 import * as dtstr from "../datastructures.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 
-export class Points extends Representation {
+export class Squares extends Representation {
   constructor(wrangler: Wrangler) {
     super(wrangler);
   }
@@ -28,7 +29,7 @@ export class Points extends Representation {
     const { col, strokeCol, strokeWidth } = gpars.reps.base;
     context.drawClear();
     context.drawBackground();
-    context.drawPoints(x, y, col, strokeCol, size, this.alphaMultiplier);
+    context.drawRectsHW(x, y, size, size, col, this.alpha);
   };
 
   drawHighlight = (context: any) => {
@@ -36,7 +37,7 @@ export class Points extends Representation {
     const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
     const { alphaMultiplier } = this;
     context.drawClear();
-    x ? context.drawPoints(x, y, col, strokeCol, size, 1) : null;
+    x ? context.drawRectsHW(x, y, size, size, col, this.alpha) : null;
   };
 
   get boundingRects() {

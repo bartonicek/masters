@@ -1,5 +1,6 @@
-import { Handler } from "../handlers/Handler.js";
+import * as funs from "../functions.js";
 import { GraphicLayer } from "../plot/GraphicLayer.js";
+import { Plot } from "../plot/Plot.js";
 import { Auxiliary } from "./Auxiliary.js";
 
 export class RectDragBox extends Auxiliary {
@@ -22,20 +23,19 @@ export class RectDragBox extends Auxiliary {
   };
 
   drawUser = (context: GraphicLayer) => {
-    const { dragging, selectionPoints, selectionArray, modeOR } =
-      this.handlers.drag;
+    const { dragging, selectionCurrent, selectionArray } = this.handlers.drag;
 
-    if (dragging && modeOR) {
+    if (dragging && Plot.globalModes.or) {
       context.drawClear();
       context.drawDim();
       selectionArray.forEach((points) => {
         this.draw(context, points);
       });
-      this.draw(context, selectionPoints);
+      this.draw(context, selectionCurrent);
     } else if (dragging) {
       context.drawClear();
       context.drawDim();
-      this.draw(context, selectionPoints);
+      this.draw(context, selectionCurrent);
     } else {
       context.drawClear();
     }
