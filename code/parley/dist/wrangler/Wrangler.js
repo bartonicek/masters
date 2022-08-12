@@ -17,13 +17,13 @@ export class Wrangler {
         this.by = new Set();
         this.what = new Set();
     }
-    getMapping = (mapping) => {
+    getVariable = (mapping) => {
         return this.data[this.mapping.get(mapping)];
     };
     extractAsIs = (...mappings) => {
         this.indices = Array.from(Array(this.marker.n), (e, i) => i);
         mappings.forEach((mapping) => {
-            this[mapping] = new Cast(this.getMapping(mapping));
+            this[mapping] = new Cast(this.getVariable(mapping));
             this[mapping].marker = this.marker;
             this[mapping].allUnique = true;
         });
@@ -32,7 +32,7 @@ export class Wrangler {
     splitBy = (...mappings) => {
         mappings.forEach((mapping, i) => {
             this.by.add(mapping);
-            this[mapping] = new Cast(this.getMapping(mapping));
+            this[mapping] = new Cast(this.getVariable(mapping));
             this[mapping].marker = this.marker;
         });
         return this;
@@ -40,7 +40,7 @@ export class Wrangler {
     splitWhat = (...mappings) => {
         mappings.forEach((mapping) => {
             this.what.add(mapping);
-            this[mapping] = new Cast(this.getMapping(mapping));
+            this[mapping] = new Cast(this.getVariable(mapping));
             this[mapping].marker = this.marker;
         });
         return this;

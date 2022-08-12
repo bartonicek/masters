@@ -1,9 +1,7 @@
-import { Handler } from "../handlers/Handler.js";
+import * as dtstr from "../datastructures.js";
+import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
-import * as funs from "../functions.js";
-import * as dtstr from "../datastructures.js";
-import { globalParameters as gpars } from "../globalparameters.js";
 
 export class Bars extends Representation {
   widthMultiplier: number;
@@ -32,27 +30,30 @@ export class Bars extends Representation {
     this.alphaMultiplier = 1;
   };
 
-  getMappings = (membership?: dtstr.ValidMemberships) => {
-    return ["x", "y"].map((mapping: dtstr.ValidMappings) =>
-      this.getMapping(mapping, membership)
-    );
+  getMappings = (type?: dtstr.ValidMemberships) => {
+    const mappings: dtstr.ValidMappings[] = ["x", "y"];
+    return mappings.map((e) => this.getMapping(e, type));
   };
 
   drawBase = (context: any) => {
     const [x, y] = this.getMappings();
     const { y0, width, alphaMultiplier } = this;
-    const { col, strokeCol } = gpars.reps.base;
+    const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+    const pars = { col, strokeCol, strokeWidth, alpha: alphaMultiplier, width };
+
     context.drawClear();
     context.drawBackground();
-    context.drawBarsV(x, y, y0, col, alphaMultiplier, strokeCol, width);
+    context.drawBarsV(x, y, y0, pars);
   };
 
   drawHighlight = (context: any) => {
     const [x, y] = this.getMappings(1);
-    const { y0, width, alphaMultiplier } = this;
-    const { col, strokeCol } = gpars.reps.highlight;
+    const { y0, width } = this;
+    const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
+    const pars = { col, strokeCol, strokeWidth, alpha: 1, width };
+
     context.drawClear();
-    x ? context.drawBarsV(x, y, y0, col, 1, strokeCol, width) : null;
+    x ? context.drawBarsV(x, y, y0, pars) : null;
   };
 
   get boundingRects() {

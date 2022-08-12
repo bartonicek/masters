@@ -5,18 +5,18 @@ import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 export class ScatterPlot extends Plot {
     mapping;
-    constructor(data, mapping, marker) {
-        super(marker);
+    constructor(id, data, mapping, handlers) {
+        super(id, handlers);
         this.mapping = mapping;
         this.wranglers = {
-            identity: new Wrangler(data, mapping, marker).extractAsIs("x", "y"),
+            identity: new Wrangler(data, mapping, handlers.marker).extractAsIs("x", "y"),
         };
         this.scales = {
             x: new scls.XYScaleContinuous(this.width),
             y: new scls.XYScaleContinuous(this.height, -1),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.drag),
+            points: new reps.Points(this.wranglers.identity),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

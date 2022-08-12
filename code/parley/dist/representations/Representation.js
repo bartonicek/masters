@@ -1,18 +1,17 @@
 import * as funs from "../functions.js";
+import { globalParameters } from "../globalparameters.js";
 export class Representation {
     wrangler;
     plotDims;
     scales;
-    alpha;
-    col;
-    stroke;
-    radius;
+    pars;
     sizeMultiplier;
     sizeLimits;
     alphaMultiplier;
     alphaLimits;
     constructor(wrangler) {
         this.wrangler = wrangler;
+        this.pars = globalParameters.reps;
         this.sizeMultiplier = 1;
         this.alphaMultiplier = 1;
         this.sizeLimits = {
@@ -24,8 +23,8 @@ export class Representation {
             max: 1,
         };
     }
-    getMapping = (mapping, type) => {
-        let res = this.wrangler[mapping]?.extract2(type);
+    getMapping = (mapping, membership = 0) => {
+        let res = this.wrangler[mapping]?.extract(membership);
         res = this.scales[mapping]?.dataToPlot(res);
         return res;
     };
@@ -45,8 +44,23 @@ export class Representation {
     // Checks which bounding rects overlap with a rectangular selection region
     //E.g. [[0, 0], [Width, Height]] should include all bound. rects
     inSelection = (selectionRect) => {
-        const selectedReps = this.boundingRects.map((rect) => funs.rectOverlap(rect, selectionRect));
-        const selectedDatapoints = this.wrangler.indices.flatMap((e, i) => selectedReps[e] ? i : []);
+        const { wrangler, boundingRects } = this;
+        const selectedReps = boundingRects.map((rect) => {
+            return funs.rectOverlap(selectionRect, rect);
+        });
+        const selectedDatapoints = wrangler.indices.flatMap((e, i) => {
+            return selectedReps[e] ? i : [];
+        });
+        return selectedDatapoints;
+    };
+    atClick = (clickPoint) => {
+        const { wrangler, boundingRects } = this;
+        const selectedReps = boundingRects.map((rect) => {
+            return funs.pointInRect(clickPoint, rect);
+        });
+        const selectedDatapoints = wrangler.indices.flatMap((e, i) => {
+            return selectedReps[e] ? i : [];
+        });
         return selectedDatapoints;
     };
     // Handle generic keypress actions

@@ -17,6 +17,8 @@ export class AxisTitle extends Auxiliary {
   };
 
   draw = (context: any) => {
+    if (this.label === "_indicator") return;
+
     const labelWidth = this.getLabelMetrics(context).width;
     const labelHeight = this.getLabelMetrics(context).actualBoundingBoxAscent;
 

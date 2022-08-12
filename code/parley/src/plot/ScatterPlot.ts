@@ -3,20 +3,31 @@ import * as hndl from "../handlers/handlers.js";
 import * as scls from "../scales/scales.js";
 import * as reps from "../representations/representations.js";
 import * as auxs from "../auxiliaries/auxiliaries.js";
-import { Marker } from "../marker/Marker.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
+import { DataFrame } from "../DataFrame.js";
 
 export class ScatterPlot extends Plot {
   mapping: dtstr.Mapping;
 
-  constructor(data: dtstr.DataFrame, mapping: dtstr.Mapping, marker: Marker) {
-    super(marker);
-
+  constructor(
+    id: string,
+    data: DataFrame,
+    mapping: dtstr.Mapping,
+    handlers: {
+      marker: hndl.MarkerHandler;
+      keypress: hndl.KeypressHandler;
+      state: hndl.StateHandler;
+    }
+  ) {
+    super(id, data, mapping, handlers);
     this.mapping = mapping;
 
     this.wranglers = {
-      identity: new Wrangler(data, mapping, marker).extractAsIs("x", "y"),
+      identity: new Wrangler(data, mapping, handlers.marker).extractAsIs(
+        "x",
+        "y"
+      ),
     };
 
     this.scales = {
@@ -26,15 +37,6 @@ export class ScatterPlot extends Plot {
 
     this.representations = {
       points: new reps.Points(this.wranglers.identity),
-    };
-
-    this.auxiliaries = {
-      axisbox: new auxs.AxisBox(),
-      axistextx: new auxs.AxisText("x"),
-      axistexy: new auxs.AxisText("y"),
-      axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
-      axistitley: new auxs.AxisTitle("y", mapping.get("y")),
-      rectdragbox: new auxs.RectDragBox(this.handlers),
     };
 
     this.initialize();

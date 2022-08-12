@@ -1,17 +1,22 @@
+import * as funs from "./functions.js";
 export const globalParameters = {
-    bgCol: `#FAEBD7`,
+    // Method to access deeply nested properties or their
+    // fallback values up to n layers above if they can't be found
+    accessUnpeel: function (...props) {
+        return funs.accessUnpeel(this, ...props);
+    },
+    // Access indexed properties from property arrays, e.g.
+    // all first elements
+    accessIndexed: function (index, ...props) {
+        const vals = this.accessUnpeel(this, ...props);
+        const res = Object.keys(vals).map((e) => [e, vals[e][index]]);
+        return Object.fromEntries(res);
+    },
+    bgCol: `ivory`,
     reps: {
-        base: {
-            col: `#016FB9`,
-            strokeCol: null,
-            strokeWidth: null,
-            radius: 5,
-        },
-        highlight: {
-            col: `#B33F62`,
-            strokeCol: null,
-            strokeWidth: null,
-            radius: 5,
-        },
+        col: [`#cccccc`, `#1b9e77`],
+        strokeCol: [null, null],
+        strokeWidth: [null, null],
+        radius: [5, 5],
     },
 };

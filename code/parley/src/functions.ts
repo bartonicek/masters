@@ -72,6 +72,26 @@ const unique = <Type>(x: Type[]): Type | Type[] | null => {
   //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
 
+const accessDeep = (obj: Object, ...props: string[]) => {
+  return props.reduce((a, b) => a && a[b], obj);
+};
+
+const accessUnpeel = (obj: Object, ...props: string[]) => {
+  const destination = props.pop();
+  let result;
+  for (let i = props.length; i >= 0; i--) {
+    result = accessDeep(obj, ...props, destination) ?? null;
+    if (result) break;
+    props.pop();
+  }
+  return result;
+};
+
+const accessIndexed = (obj: Object, index: number) => {
+  const res = Object.keys(obj).map((e) => [e, obj[e][index]]);
+  return Object.fromEntries(res);
+};
+
 const throttle = (fun: Function, delay: number) => {
   let lastTime = 0;
   return (...args) => {
@@ -82,7 +102,7 @@ const throttle = (fun: Function, delay: number) => {
   };
 };
 
-// Function to construct "pretty" breaks, a basic version of R's pretty()
+// Function to construct "pretty" breaks, inspired by R's pretty()
 const prettyBreaks = (x: number[], n = 4) => {
   const [min, max] = [Math.min(...x), Math.max(...x)];
   const range = max - min;
@@ -93,13 +113,19 @@ const prettyBreaks = (x: number[], n = 4) => {
   );
   const unitNeat =
     10 ** base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
-  const minNeat = Math.round(min / unitNeat) * unitNeat;
 
-  return Array.from(Array(n + 1), (e, i) => {
-    return Math.abs(base) > 4
-      ? (minNeat + unitNeat * i).toExponential()
-      : minNeat + unitNeat * i;
-  });
+  const big = Math.abs(base) > 4;
+  const minNeat = Math.round(min / unitNeat) * unitNeat;
+  const maxNeat = Math.round(max / unitNeat) * unitNeat;
+  const middle = Array.from(
+    Array((maxNeat - minNeat) / unitNeat - 1),
+    (e, i) => minNeat + (i + 1) * unitNeat
+  );
+
+  const breaks = [minNeat, ...middle, maxNeat].map((e) =>
+    parseFloat(e.toFixed(4))
+  );
+  return big ? breaks.map((e) => e.toExponential()) : breaks;
 };
 
 // arrEqual: Checks if two arrays are deeply equal
@@ -228,6 +254,9 @@ export {
   match,
   unique,
   throttle,
+  accessDeep,
+  accessUnpeel,
+  accessIndexed,
   prettyBreaks,
   arrEqual,
   arrTranspose,

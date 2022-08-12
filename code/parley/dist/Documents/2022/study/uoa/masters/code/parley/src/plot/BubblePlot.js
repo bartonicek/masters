@@ -5,10 +5,10 @@ import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 export class BubblePlot extends Plot {
-    constructor(data, mapping, marker) {
-        super(marker);
+    constructor(id, data, mapping, handlers) {
+        super(id, handlers);
         this.wranglers = {
-            identity: new Wrangler(data, mapping, marker)
+            identity: new Wrangler(data, mapping, handlers.marker)
                 .splitBy("x", "y")
                 .splitWhat("size")
                 .doWithin("by", funs.unique)
@@ -18,10 +18,10 @@ export class BubblePlot extends Plot {
         this.scales = {
             x: new scls.XYScaleDiscrete(this.width),
             y: new scls.XYScaleDiscrete(this.height, -1),
-            size: new scls.AreaScaleContinuous(this.width / 5),
+            size: new scls.AreaScaleContinuous(this.width),
         };
         this.representations = {
-            points: new reps.Points(this.wranglers.identity, this.handlers.drag),
+            points: new reps.Points(this.wranglers.identity),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

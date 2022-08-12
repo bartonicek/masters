@@ -1,10 +1,10 @@
 import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
-import { Marker } from "../marker/Marker.js";
+import { MarkerHandler } from "../handlers/MarkerHandler.js";
 
 export class Cast {
   vector: dtstr.VectorGeneric;
-  marker: Marker;
+  marker: MarkerHandler;
   indices: number[];
   allUnique: boolean;
   selected: number[];
@@ -46,17 +46,6 @@ export class Cast {
     return res;
   }
 
-  get selectedSplit() {
-    const { acrossVec, indices, uniqueIndices, marker } = this;
-
-    const res = uniqueIndices.map((uniqueIndex) =>
-      indices.flatMap((index, i) =>
-        index === uniqueIndex && marker.selected[i] ? acrossVec[i] : []
-      )
-    );
-    return res;
-  }
-
   // No argument: default split, across all memberships
   getSplitOf = (membership?: dtstr.ValidMemberships) => {
     const { acrossVec, indices, uniqueIndices, marker } = this;
@@ -73,30 +62,7 @@ export class Cast {
     return res;
   };
 
-  extract = (type?: "selected") => {
-    const { marker, allUnique } = this;
-
-    if (type === "selected") {
-      // Skip data-splitting if every datapoint has a unique representation
-      if (allUnique)
-        return this.acrossVec.filter((_, i) => this.marker.selected[i]);
-
-      const res = this.selectedSplit
-        .filter((e) => e.length > 0)
-        .flatMap((e) => this.withinFun(e, ...this.withinArgs));
-      return res;
-    }
-
-    if (allUnique) return this.acrossVec; // Ditto: skip data-splitting
-
-    const res = this.defaultSplit
-      .filter((e) => e.length > 0)
-      .flatMap((e) => this.withinFun(e, ...this.withinArgs));
-
-    return res;
-  };
-
-  extract2 = (membership?: dtstr.ValidMemberships) => {
+  extract = (membership: dtstr.ValidMemberships = 0) => {
     const { marker, allUnique, withinFun, withinArgs, acrossVec, getSplitOf } =
       this;
 
@@ -135,10 +101,4 @@ export class Cast {
     this.withinArgs = args;
     return this;
   };
-
-  // registerFun = (fun: Function, ...args: any[]) => {
-  //   this.fun = fun;
-  //   this.args = args;
-  //   return this;
-  // };
 }

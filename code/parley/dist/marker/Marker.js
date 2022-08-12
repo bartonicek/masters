@@ -1,3 +1,4 @@
+import { Plot } from "../plot/Plot.js";
 import { MembershipArray } from "./MembershipArray.js";
 export class Marker {
     n;
@@ -28,6 +29,12 @@ export class Marker {
     clear = () => {
         this.transientMembership.clear();
         this.persistentMembership.clear();
+    };
+    clearIfNOr = () => {
+        if (!Plot.globalModes.or) {
+            this.transientMembership.clear();
+            this.persistentMembership.clear();
+        }
     };
     registerCallbacks = (callbacks, when) => {
         this.callbacks.push(...callbacks);

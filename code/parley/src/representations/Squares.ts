@@ -10,11 +10,10 @@ export class Squares extends Representation {
     super(wrangler);
   }
 
-  getMappings = (type?: dtstr.ValidMemberships) => {
-    let [x, y, size] = ["x", "y", "size"].map((mapping: dtstr.ValidMappings) =>
-      this.getMapping(mapping, type)
-    );
-    const { radius } = type === 1 ? gpars.reps.highlight : gpars.reps.base;
+  getMappings = (membership: dtstr.ValidMemberships = 0) => {
+    const mappings: dtstr.ValidMappings[] = ["x", "y", "size"];
+    let [x, y, size] = mappings.map((e) => this.getMapping(e, membership));
+    const radius = gpars.reps.radius[membership];
 
     size = size
       ? size.map((e) => radius * e * this.sizeMultiplier)
@@ -26,26 +25,28 @@ export class Squares extends Representation {
 
   drawBase = (context: any) => {
     const [x, y, size] = this.getMappings();
-    const { col, strokeCol, strokeWidth } = gpars.reps.base;
+    const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+    const pars = { col, strokeCol, strokeWidth, alpha: this.alphaMultiplier };
+
     context.drawClear();
     context.drawBackground();
-    context.drawRectsHW(x, y, size, size, col, this.alpha);
+    context.drawRectsHW(x, y, size, size, pars);
   };
 
   drawHighlight = (context: any) => {
     const [x, y, size] = this.getMappings(1);
-    const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
-    const { alphaMultiplier } = this;
+    const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
+    const pars = { col, strokeCol, strokeWidth, alpha: 1 };
+
     context.drawClear();
-    x ? context.drawRectsHW(x, y, size, size, col, this.alpha) : null;
+    x ? context.drawRectsHW(x, y, size, size, pars) : null;
   };
 
   get boundingRects() {
     const [x, y, size] = this.getMappings();
-    const c = 1 / Math.sqrt(2);
     return x.map((xi, i) => [
-      [xi - c * size[i], y[i] - c * size[i]],
-      [xi + c * size[i], y[i] + c * size[i]],
+      [xi - size[i] / 2, y[i] - size[i] / 2],
+      [xi + size[i] / 2, y[i] + size[i] / 2],
     ]);
   }
 }

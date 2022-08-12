@@ -28,7 +28,6 @@ export class GraphicLayer {
             .toString(16)
             .toUpperCase();
         const colString = alpha16.length < 2 ? col + "0" + alpha16 : col + alpha16;
-        console.log(colString);
         return colString;
     };
     drawClear = () => {
@@ -57,8 +56,9 @@ export class GraphicLayer {
         });
         context.restore();
     };
-    drawPoints = (x, y, col = gpars.reps.base.col, stroke = null, radius = 5, alpha = 1) => {
+    drawPoints = (x, y, opts = { col: gpars.reps.base.col, stroke: null, radius: 5, alpha: 1 }) => {
         const context = this.context;
+        const { col, stroke, radius, alpha } = opts;
         const rs = typeof radius === "number"
             ? Array.from(Array(x.length), (e) => radius)
             : radius;
@@ -70,6 +70,19 @@ export class GraphicLayer {
             context.arc(e, y[i], rs[i], 0, Math.PI * 2);
             stroke ? context.stroke() : null;
             col ? context.fill() : null;
+        });
+        context.restore();
+    };
+    drawRectsHW = (x, y, h, w, col = gpars.reps.base.col, alpha = 1, stroke = null) => {
+        const context = this.context;
+        context.save();
+        context.fillStyle = this.toAlpha(col, alpha);
+        context.strokeStyle = stroke;
+        x.forEach((e, i) => {
+            col ? context.fillRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i]) : null;
+            stroke
+                ? context.strokeRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i])
+                : null;
         });
         context.restore();
     };
@@ -101,7 +114,7 @@ export class GraphicLayer {
         });
         context.restore();
     };
-    drawDim = (col = "rgba(0, 0, 0, 0.1)") => {
+    drawDim = (col = "rgba(120, 120, 120, 0.1)") => {
         const context = this.context;
         context.fillStyle = col;
         context.fillRect(0, 0, this.width, this.height);

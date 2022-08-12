@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-0.9.598">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Adam Bartonicek">
+<meta name="dcterms.date" content="2022-08-08">
+
+<title>Draft</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="draft_files/libs/clipboard/clipboard.min.js"></script>
+<script src="draft_files/libs/quarto-html/quarto.js"></script>
+<script src="draft_files/libs/quarto-html/popper.min.js"></script>
+<script src="draft_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="draft_files/libs/quarto-html/anchor.min.js"></script>
+<link href="draft_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="draft_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="draft_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="draft_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="draft_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Draft</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Adam Bartonicek </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 8, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<p>Interactive visualization is mainly used for communication, not exploration <span class="citation" data-cites="batch2017interactive">(<a href="#ref-batch2017interactive" role="doc-biblioref">Batch and Elmqvist 2017</a>)</span></p>
+<section id="what-even-is-interactivity" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="what-even-is-interactivity">What even is interactivity?</h2>
+<p>Despite the popularity of interactive data visualization in data exploration and communication, there is great ambiguity as to what researchers actually mean by the terms “interaction” and “interactive”. For example, Pike et al. <span class="citation" data-cites="pike2009science">(<a href="#ref-pike2009science" role="doc-biblioref">2009</a>)</span> note that “interaction” is an overloaded term that can refer to either the concrete set of controls that a user has at their disposal to manipulate a visual display or to the more abstract “human interaction with information”, i.e.&nbsp;the process of engaging with the information presented by the visual display. For others, the key measure of interactivity is the time it takes for the user’s input to produce a change in the visual display, with less time meaning more interactivity <span class="citation" data-cites="becker1987brushing">(<a href="#ref-becker1987brushing" role="doc-biblioref">Becker and Cleveland 1987</a>)</span>, and some make the distinction between “interactive” and “dynamic” manipulation, where interactive manipulation induces change discretely, such as by pressing a button or selecting an item from a menu to render a new display, whereas dynamic manipulation induces a real-time, continuous change, such as that which tends to be tied to moving a slider or clicking-and-dragging <span class="citation" data-cites="rheingans2002we jankun2007model">(<a href="#ref-rheingans2002we" role="doc-biblioref">Rheingans 2002</a>; <a href="#ref-jankun2007model" role="doc-biblioref">Jankun-Kelly, Ma, and Gertz 2007</a>)</span>. Yet for others, the defining feature of interactive data visualization is that the user’s interaction with one plot propagates to other plots, such as via linked brushing <span class="citation" data-cites="kehrer2012generic">(<a href="#ref-kehrer2012generic" role="doc-biblioref">Kehrer et al. 2012</a>)</span>. Finally, in many cases, researchers fail to define or even hint at what they mean by “interactivity” altogether. Put simply, the terms “interaction” and “interactive” mean a lot of different things to a lot of different people.</p>
+<p>Below, I have attempted to summarize the main notions and definitions of interactivity as it refers to interactive data visualizations:</p>
+<ul>
+<li><strong>Essential</strong>: the basic ability of the user to manipulate some graphical aspects of the visual display</li>
+<li><strong>Temporal</strong>: the time between the user’s input and change to the visual display, less lag means more interactivity, real-time change is called “dynamic”</li>
+<li><strong>Change propagation</strong>: one plot changes something in other plots (e.g.&nbsp;linked brushing), requires an underlying data structure and communication between the plots</li>
+<li>(<strong>Cognitive</strong>: the process of the user engaging with visual information and the effect it has on the user’s perception, cognition, the generation of insights, etc…)</li>
+</ul>
+<p>Under the many different definitions of interactivity, it is not clear how to classify most visualizations. For example, under the essential definition, where a plot is interactive if the user is able to change it in any way, even the process of writing code to produce a new or altered plot could be considered interactive visualization. In contrast, by the change propagation definition, where the user’s interaction has to propagate between plots, the bulk of what are nowadays considered “interactive” visualizations would not meet the definition, since many confine the interactivity within a single plot.</p>
+<p>The conceptual ambiguity about what is interactivity propagates to the software implementations. For example, the <a href="https://r-graph-gallery.com/interactive-charts.html">R Graph Gallery of Interactive charts</a> features several example plots which allow for user interactions such zooming, panning, hovering, 3D rotation, and node repositioning within a network graph. Importantly, in all of the examples, the interaction and its results take place within a single plot and do not propagate anywhere, and so do not meet the change propagation definition of interactivity.</p>
+<p>In contrast, the plotly Dash documentation page on Interactive Visualizations (https://dash.plotly.com/interactive-graphing) features examples of linked hovering and cross-filtering, where the user’s interaction within one plot propagates into another plot (e.g.&nbsp;selecting few points within a scatterplot highlights the same data rows in another). These two sets of examples represent fundamentally different types of interactivity. The first – interaction within a single isolated plot – requires only access to the data and manipulation of either the graphical attributes of the plot or the scales/coordinate system. The second – interaction which propagates between plots – requires an additional data structure that keeps track of which rows are currently selected. Furthemore, when there isn’t a one-to-one relationship between the rows of the data and their graphical representation shown on screen – when, for example, the height of a bar in a barplot represents a number of cases with the identical x-value – then whatever statistical transformation underlies the graphical representation also needs to be recomputed every time new rows of data are selected.</p>
+<div class="column-page-inset">
+<table class="table">
+<caption>Table 1: Interactive visualization types and their features</caption>
+<colgroup>
+<col style="width: 22%">
+<col style="width: 16%">
+<col style="width: 14%">
+<col style="width: 13%">
+<col style="width: 22%">
+<col style="width: 9%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Type</th>
+<th>Representation</th>
+<th>Typical tasks</th>
+<th>Compute statistics</th>
+<th>Requires</th>
+<th>Complexity</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Truly interactive/ Communicating</td>
+<td><ul>
+<li>One-to-one</li>
+<li>Many-to-one</li>
+</ul></td>
+<td><ul>
+<li>Brushing</li>
+<li>Linking</li>
+<li>Cross-filtering</li>
+</ul></td>
+<td>Often</td>
+<td><ul>
+<li>Data</li>
+<li>Graphical attributes</li>
+<li>Selected cases</li>
+<li>Statistical transformations</li>
+</ul></td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td>Embarassingly interactive</td>
+<td><ul>
+<li>Strictly one-to-one</li>
+</ul></td>
+<td><ul>
+<li>Brushing</li>
+<li>Linking</li>
+<li>Cross-filtering</li>
+</ul></td>
+<td>Never</td>
+<td><ul>
+<li>Data</li>
+<li>Graphical attributes</li>
+<li>Selected cases</li>
+</ul></td>
+<td>Intermediate</td>
+</tr>
+<tr class="odd">
+<td>Dynamic</td>
+<td><ul>
+<li>One-to-one</li>
+<li>Many-to-one</li>
+</ul></td>
+<td><ul>
+<li>Zooming</li>
+<li>Panning</li>
+<li>Hovering</li>
+</ul></td>
+<td>Once</td>
+<td><ul>
+<li>Data</li>
+<li>Graphical attributes</li>
+</ul></td>
+<td>Low</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The term “interactive” is very loaded. Clearly, it would not be possible to disambiguate the many different definitions. However, to clear up at least some of the confusion, I propose to use the term <em>communicating</em> to refer to visualizations that meet the change propagation definition outlined above. A <em>communicating visualization</em> is one whose plots share an underlying representation of the data and communicate together in response to the user’s interaction (here used in the essential sense).</p>
+</section>
+<section id="principled-interactivity" class="level2">
+<h2 class="anchored" data-anchor-id="principled-interactivity">Principled interactivity</h2>
+<p>In his seminal work, Tufte <span class="citation" data-cites="tufte2001visual">(<a href="#ref-tufte2001visual" role="doc-biblioref">2001</a>)</span> laid out his principles for effective data visualization.</p>
+<p>Tufte <span class="citation" data-cites="tufte2001visual">(<a href="#ref-tufte2001visual" role="doc-biblioref">2001</a>)</span> introduced the term <em>chartjunk</em> to refer to redundant elements of a plot that do not add anything to the user’s ability to extract meaningful patterns from the data, or worse may even outright distract, confuse, or create visual clutter. Tufte went on to document many different types of chartjunk, such as overly aggressive grid-lines, superfluous 3D perspectives, and unintended optical illusions. He also used the term <em>ducks</em> to refer to cases when the informative function of a visualization is forcefully subordinated to the aesthetic form. In other words, to cases where the artistics design, real or imagined, is elevated and the data takes a back-seat.</p>
+<p>There is even greater potential for ducks and chartjunk to appear in interactive visualizations. First of all, user’s interaction can produce abrupt changes to the visual scene and these can be even more attention-grabbing and distracting than any element of a static plot. In cognitive research, it is well-known that visual stimuli are initially perceived pre-attentively and compete for attention <span class="citation" data-cites="carrasco2011visual treue2003visual">(see e.g. <a href="#ref-carrasco2011visual" role="doc-biblioref">Carrasco 2011</a>; <a href="#ref-treue2003visual" role="doc-biblioref">Treue 2003</a>)</span>. Whichever stimulus is found to be the most salient is then perceived consciously. As such, rapid changes to the visual stimulus can compete for the user’s attention and become distracting, especially if they were not committed intentionally.</p>
+<p>A specific example of an interactive chartjunk or <em>interactjunk</em> may be the overuse of a pop-up tooltips that appears whenever user hovers over a points on a scatterplot. Dragging a cursor over a part of the plot where many such points are located close together will make many tooltips pop in and out of existence and produce a distracting visual clutter. The value of this feature for graphical inference is questionable. Querying individual points <em>can</em> be valuable, such as when learning about outliers and otherwise unusual datapoints, however, these are, by definition, few and far apart. Most datapoints do not need to be queried, since they reveal information jointly, as part of a larger pattern. Put simply, we seldom need information about a specific Joe who is average, but information about the Average Joe may be interesting. Conversely, information about a specific Exceptional Steve may be interesting too, but there are few Exceptional Steves, otherwise they would not be exceptional. For these reasons, having a tooltip appear on hover by default seems like a bad feature design. Instead, the appearance of the tooltip should result from an intentional action by the user, such as by clicking the queried point while simultaneously holding down a specific key.</p>
+<p>Moreover, tooltip-on-hover also has the hallmarks of an interactive duck: it is immediate, attention-grabbing, and unavoidable. It signals to the user “this is an interactive plot alright”.</p>
+<p>Finally, a question immediately presents itself: <em>“does interaction allow the user to see some patterns in the data clearer or faster?”</em> If not, there is no advantage over static visualization.</p>
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-batch2017interactive" class="csl-entry" role="doc-biblioentry">
+Batch, Andrea, and Niklas Elmqvist. 2017. <span>“The Interactive Visualization Gap in Initial Exploratory Data Analysis.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 24 (1): 278–87.
+</div>
+<div id="ref-becker1987brushing" class="csl-entry" role="doc-biblioentry">
+Becker, Richard A, and William S Cleveland. 1987. <span>“Brushing Scatterplots.”</span> <em>Technometrics</em> 29 (2): 127–42.
+</div>
+<div id="ref-carrasco2011visual" class="csl-entry" role="doc-biblioentry">
+Carrasco, Marisa. 2011. <span>“Visual Attention: The Past 25 Years.”</span> <em>Vision Research</em> 51 (13): 1484–1525.
+</div>
+<div id="ref-jankun2007model" class="csl-entry" role="doc-biblioentry">
+Jankun-Kelly, TJ, Kwan-Liu Ma, and Michael Gertz. 2007. <span>“A Model and Framework for Visualization Exploration.”</span> <em>IEEE Transactions on Visualization and Computer Graphics</em> 13 (2): 357–69.
+</div>
+<div id="ref-kehrer2012generic" class="csl-entry" role="doc-biblioentry">
+Kehrer, Johannes, Roland N Boubela, Peter Filzmoser, and Harald Piringer. 2012. <span>“A Generic Model for the Integration of Interactive Visualization and Statistical Computing Using r.”</span> In <em>2012 IEEE Conference on Visual Analytics Science and Technology (VAST)</em>, 233–34. IEEE.
+</div>
+<div id="ref-pike2009science" class="csl-entry" role="doc-biblioentry">
+Pike, William A, John Stasko, Remco Chang, and Theresa A O’connell. 2009. <span>“The Science of Interaction.”</span> <em>Information Visualization</em> 8 (4): 263–74.
+</div>
+<div id="ref-rheingans2002we" class="csl-entry" role="doc-biblioentry">
+Rheingans, Penny. 2002. <span>“Are We There yet? Exploring with Dynamic Visualization.”</span> <em>IEEE Computer Graphics and Applications</em> 22 (1): 6–10.
+</div>
+<div id="ref-treue2003visual" class="csl-entry" role="doc-biblioentry">
+Treue, Stefan. 2003. <span>“Visual Attention: The Where, What, How and Why of Saliency.”</span> <em>Current Opinion in Neurobiology</em> 13 (4): 428–32.
+</div>
+<div id="ref-tufte2001visual" class="csl-entry" role="doc-biblioentry">
+Tufte, Edward R. 2001. <em>The Visual Display of Quantitative Information</em>. Cheshire, Connecticut: Graphics Press LLC.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

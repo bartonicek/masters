@@ -5,10 +5,10 @@ import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 export class HistoPlot extends Plot {
-    constructor(data, mapping, marker) {
-        super(marker);
+    constructor(id, data, mapping, handlers) {
+        super(id, handlers);
         this.wranglers = {
-            summary: new Wrangler(data, mapping, marker)
+            summary: new Wrangler(data, mapping, handlers.marker)
                 .splitBy("x")
                 .splitWhat("y")
                 .doAcross("by", funs.bin, 10)
@@ -21,7 +21,7 @@ export class HistoPlot extends Plot {
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 1),
+            bars: new reps.Bars(this.wranglers.summary, 1),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

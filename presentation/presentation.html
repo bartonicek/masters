@@ -3,7 +3,7 @@
   <head>
     <title>Principled and Efficient   Interactive Data Visualization</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Adam Bartonicek (supervisor: Simon Urbanek)" />
+    <meta name="author" content="Adam Bartonicek (supervisor: Dr. Simon Urbanek)" />
     <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -11,27 +11,29 @@
   </head>
   <body>
     <textarea id="source">
-class: top, left, middle, inverse, title, title-slide
+class: top, left, middle, title, title-slide
 
 .title[
 # Principled and Efficient <br> Interactive Data Visualization
 ]
 .author[
-### Adam Bartonicek (supervisor: Simon Urbanek)
+### Adam Bartonicek (supervisor: Dr. Simon Urbanek)
 ]
 .institute[
 ### University of Auckland, Department of Statistics
 ]
 .date[
-### Last updated: 2022-07-20
+### Last updated: 2022-07-21
 ]
 
 ---
 
 
-class: center, middle
+class: middle
 
-# Some inspiring quote by Tukey
+## "Plot and eye" is the most diverse channel to the human mind. Not that it transmits more bits per second, but rather it transmits greater variety of messages on unexpected topics easily and rapidly. There really is no substitute for "looking at the data".
+
+.right[John W. Tukey, 1969]
 
 ---
 
@@ -47,7 +49,7 @@ class: middle
   - Good but may not work with newer R installations
 - &lt;b&gt; Newer generation&lt;/b&gt;: ggplotly, ggiraph, ggvis, RJSplot,... 
   - Many more based on D3.js and plotly (many specialized)
-  - Popular but have some problems/shortcomings
+  - Popular but have some shortcomings
 
 ---
 
@@ -84,7 +86,7 @@ class: middle
 - &lt;b&gt;Back-end written in TypeScript&lt;/b&gt; 
   - (a fancier, typed version of JavaScript)
   - Portable: should run anywhere
-  - Should be better maintainable than plain Javascript
+  - Written from scratch: minimize dependencies 
 - &lt;b&gt;Uses HTML canvas element&lt;/b&gt;
   - Bitmap: a lot faster than SVG
 

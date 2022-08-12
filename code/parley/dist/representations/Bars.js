@@ -1,5 +1,5 @@
+import * as funs from "../functions.js";
 import { Representation } from "./Representation.js";
-import { globalParameters as gpars } from "../globalparameters.js";
 export class Bars extends Representation {
     widthMultiplier;
     constructor(wrangler, widthMultiplier) {
@@ -20,23 +20,26 @@ export class Bars extends Representation {
         this.sizeMultiplier = this.widthMultiplier;
         this.alphaMultiplier = 1;
     };
-    getMappings = (membership) => {
-        return ["x", "y"].map((mapping) => this.getMapping(mapping, membership));
+    getMappings = (type) => {
+        const mappings = ["x", "y"];
+        return mappings.map((e) => this.getMapping(e, type));
     };
     drawBase = (context) => {
         const [x, y] = this.getMappings();
         const { y0, width, alphaMultiplier } = this;
-        const { col, strokeCol } = gpars.reps.base;
+        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+        const pars = { col, strokeCol, strokeWidth, alpha: alphaMultiplier, width };
         context.drawClear();
         context.drawBackground();
-        context.drawBarsV(x, y, y0, col, alphaMultiplier, strokeCol, width);
+        context.drawBarsV(x, y, y0, pars);
     };
     drawHighlight = (context) => {
         const [x, y] = this.getMappings(1);
-        const { y0, width, alphaMultiplier } = this;
-        const { col, strokeCol } = gpars.reps.highlight;
+        const { y0, width } = this;
+        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
+        const pars = { col, strokeCol, strokeWidth, alpha: 1, width };
         context.drawClear();
-        x ? context.drawBarsV(x, y, y0, col, 1, strokeCol, width) : null;
+        x ? context.drawBarsV(x, y, y0, pars) : null;
     };
     get boundingRects() {
         const [x, y] = this.getMappings();

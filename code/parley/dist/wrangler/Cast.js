@@ -33,11 +33,6 @@ export class Cast {
         const res = uniqueIndices.map((uniqueIndex) => indices.flatMap((index, i) => (index === uniqueIndex ? acrossVec[i] : [])));
         return res;
     }
-    get selectedSplit() {
-        const { acrossVec, indices, uniqueIndices, marker } = this;
-        const res = uniqueIndices.map((uniqueIndex) => indices.flatMap((index, i) => index === uniqueIndex && marker.selected[i] ? acrossVec[i] : []));
-        return res;
-    }
     // No argument: default split, across all memberships
     getSplitOf = (membership) => {
         const { acrossVec, indices, uniqueIndices, marker } = this;
@@ -49,25 +44,7 @@ export class Cast {
             : []));
         return res;
     };
-    extract = (type) => {
-        const { marker, allUnique } = this;
-        if (type === "selected") {
-            // Skip data-splitting if every datapoint has a unique representation
-            if (allUnique)
-                return this.acrossVec.filter((_, i) => this.marker.selected[i]);
-            const res = this.selectedSplit
-                .filter((e) => e.length > 0)
-                .flatMap((e) => this.withinFun(e, ...this.withinArgs));
-            return res;
-        }
-        if (allUnique)
-            return this.acrossVec; // Ditto: skip data-splitting
-        const res = this.defaultSplit
-            .filter((e) => e.length > 0)
-            .flatMap((e) => this.withinFun(e, ...this.withinArgs));
-        return res;
-    };
-    extract2 = (membership) => {
+    extract = (membership = 0) => {
         const { marker, allUnique, withinFun, withinArgs, acrossVec, getSplitOf } = this;
         if (membership) {
             // Members + no split + across trans.

@@ -1,21 +1,30 @@
+import * as funs from "../functions.js";
+import { globalParameters } from "../globalparameters.js";
 export class Representation {
     wrangler;
-    handler;
     plotDims;
     scales;
-    alpha;
-    col;
-    stroke;
-    radius;
+    pars;
     sizeMultiplier;
+    sizeLimits;
     alphaMultiplier;
-    constructor(wrangler, handler, plotDims) {
+    alphaLimits;
+    constructor(wrangler) {
         this.wrangler = wrangler;
-        this.handler = handler;
-        this.plotDims = plotDims;
+        this.pars = globalParameters.reps;
+        this.sizeMultiplier = 1;
+        this.alphaMultiplier = 1;
+        this.sizeLimits = {
+            min: 0.001,
+            max: 10,
+        };
+        this.alphaLimits = {
+            min: 0.01,
+            max: 1,
+        };
     }
-    getMapping = (mapping, type) => {
-        let res = this.wrangler[mapping]?.extract(type);
+    getMapping = (mapping, membership = 0) => {
+        let res = this.wrangler[mapping]?.extract(membership);
         res = this.scales[mapping]?.dataToPlot(res);
         return res;
     };
@@ -32,23 +41,43 @@ export class Representation {
         this.alphaMultiplier = 1;
         this.sizeMultiplier = 1;
     };
-    incrementSizeMultiplier = () => { };
-    inSelection = (selectionPoints) => { };
+    // Checks which bounding rects overlap with a rectangular selection region
+    //E.g. [[0, 0], [Width, Height]] should include all bound. rects
+    inSelection = (selectionRect) => {
+        const { wrangler, boundingRects } = this;
+        const selectedReps = boundingRects.map((rect) => {
+            return funs.rectOverlap(selectionRect, rect);
+        });
+        const selectedDatapoints = wrangler.indices.flatMap((e, i) => {
+            return selectedReps[e] ? i : [];
+        });
+        return selectedDatapoints;
+    };
+    atClick = (clickPoint) => {
+        const { wrangler, boundingRects } = this;
+        const selectedReps = boundingRects.map((rect) => {
+            return funs.pointInRect(clickPoint, rect);
+        });
+        const selectedDatapoints = wrangler.indices.flatMap((e, i) => {
+            return selectedReps[e] ? i : [];
+        });
+        return selectedDatapoints;
+    };
+    // Handle generic keypress actions
     onKeypress = (key) => {
+        const { sizeMultiplier, sizeLimits, alphaMultiplier, alphaLimits } = this;
         if (key === "KeyR")
             this.defaultize();
-        if (key === "Minus" && this.sizeMultiplier)
-            this.sizeMultiplier *= 0.8;
-        if (key === "Equal" && this.sizeMultiplier)
-            this.sizeMultiplier *= 1.2;
-        if (key === "BracketLeft" && this.alphaMultiplier) {
-            this.alphaMultiplier =
-                0.8 * this.alphaMultiplier < 0.01
-                    ? 0.01
-                    : (this.alphaMultiplier *= 0.8);
+        if (key === "Minus" && sizeMultiplier) {
+            this.sizeMultiplier = funs.gatedMultiply(sizeMultiplier, 0.8, sizeLimits);
         }
-        if (key === "BracketRight" && this.alphaMultiplier)
-            this.alphaMultiplier =
-                1.2 * this.alphaMultiplier > 1 ? 1 : (this.alphaMultiplier *= 1.2);
+        if (key === "Equal" && sizeMultiplier && sizeMultiplier < sizeLimits.max) {
+            this.sizeMultiplier = funs.gatedMultiply(sizeMultiplier, 1.2, sizeLimits);
+        }
+        if (key === "BracketLeft" && alphaMultiplier) {
+            this.alphaMultiplier = funs.gatedMultiply(alphaMultiplier, 0.8, alphaLimits);
+        }
+        if (key === "BracketRight" && alphaMultiplier)
+            this.alphaMultiplier = funs.gatedMultiply(alphaMultiplier, 1.2, alphaLimits);
     };
 }

@@ -1,19 +1,20 @@
 import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
-import { Marker } from "../marker/Marker.js";
+import { DataFrame } from "../DataFrame.js";
+import { MarkerHandler } from "../handlers/MarkerHandler.js";
 import { Cast } from "./Cast.js";
 
 export class Wrangler {
-  data: dtstr.DataFrame;
+  data: DataFrame;
   mapping: dtstr.Mapping;
-  marker: Marker;
+  marker: MarkerHandler;
   by: Set<string>;
   what: Set<string>;
   indices: number[];
   x: Cast;
   y: Cast;
 
-  constructor(data: dtstr.DataFrame, mapping: dtstr.Mapping, marker: Marker) {
+  constructor(data: DataFrame, mapping: dtstr.Mapping, marker: MarkerHandler) {
     this.data = data;
     this.mapping = mapping;
     this.marker = marker;
@@ -22,14 +23,14 @@ export class Wrangler {
     this.what = new Set();
   }
 
-  getMapping = (mapping: dtstr.ValidMappings) => {
+  getVariable = (mapping: dtstr.ValidMappings) => {
     return this.data[this.mapping.get(mapping)];
   };
 
   extractAsIs = (...mappings: dtstr.ValidMappings[]) => {
     this.indices = Array.from(Array(this.marker.n), (e, i) => i);
     mappings.forEach((mapping) => {
-      this[mapping] = new Cast(this.getMapping(mapping));
+      this[mapping] = new Cast(this.getVariable(mapping));
       this[mapping].marker = this.marker;
       this[mapping].allUnique = true;
     });
@@ -39,7 +40,7 @@ export class Wrangler {
   splitBy = (...mappings: dtstr.ValidMappings[]) => {
     mappings.forEach((mapping, i) => {
       this.by.add(mapping);
-      this[mapping] = new Cast(this.getMapping(mapping));
+      this[mapping] = new Cast(this.getVariable(mapping));
       this[mapping].marker = this.marker;
     });
     return this;
@@ -48,7 +49,7 @@ export class Wrangler {
   splitWhat = (...mappings: dtstr.ValidMappings[]) => {
     mappings.forEach((mapping) => {
       this.what.add(mapping);
-      this[mapping] = new Cast(this.getMapping(mapping));
+      this[mapping] = new Cast(this.getVariable(mapping));
       this[mapping].marker = this.marker;
     });
     return this;

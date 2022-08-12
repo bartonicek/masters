@@ -1,4 +1,3 @@
-import * as funs from "../functions.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 
 export class GraphicLayer {
@@ -61,18 +60,22 @@ export class GraphicLayer {
     x: number[],
     y: number[],
     y0: number,
-    col = gpars.reps.base.col,
-    alpha = 1,
-    stroke = null,
-    width = 50
+    pars = {
+      col: gpars.reps.col[0],
+      strokeCol: null,
+      strokeWidth: null,
+      alpha: 1,
+      width: 50,
+    }
   ) => {
     const [xs, ys] = this.dropMissing(x, y);
+    const { col, strokeCol, strokeWidth, alpha, width } = pars;
     const context = this.context;
     context.save();
     context.fillStyle = this.toAlpha(col, alpha);
     xs.forEach((e, i) => {
       col ? context.fillRect(e - width / 2, ys[i], width, y0 - ys[i]) : null;
-      stroke
+      strokeCol
         ? context.strokeRect(e - width / 2, ys[i], width, y0 - ys[i])
         : null;
     });
@@ -82,23 +85,27 @@ export class GraphicLayer {
   drawPoints = (
     x: number[],
     y: number[],
-    col = gpars.reps.base.col,
-    stroke = null,
-    radius = 5,
-    alpha = 1
+    pars = {
+      col: gpars.reps.col[0],
+      radius: 5,
+      strokeCol: null,
+      strokeWidth: null,
+      alpha: 1,
+    }
   ) => {
     const context = this.context;
+    const { col, radius, strokeCol, strokeWidth, alpha } = pars;
     const rs =
       typeof radius === "number"
         ? Array.from(Array(x.length), (e) => radius)
         : radius;
     context.save();
     context.fillStyle = this.toAlpha(col, alpha);
-    context.strokeStyle = stroke;
+    context.strokeStyle = strokeCol;
     x.forEach((e, i) => {
       context.beginPath();
       context.arc(e, y[i], rs[i], 0, Math.PI * 2);
-      stroke ? context.stroke() : null;
+      strokeCol ? context.stroke() : null;
       col ? context.fill() : null;
     });
     context.restore();
@@ -109,17 +116,21 @@ export class GraphicLayer {
     y: number[],
     h: number[],
     w: number[],
-    col = gpars.reps.base.col,
-    alpha = 1,
-    stroke = null
+    pars = {
+      col: gpars.reps.col[0],
+      strokeCol: null,
+      strokeWidth: null,
+      alpha: 1,
+    }
   ) => {
     const context = this.context;
+    const { col, strokeCol, strokeWidth, alpha } = pars;
     context.save();
     context.fillStyle = this.toAlpha(col, alpha);
-    context.strokeStyle = stroke;
+    context.strokeStyle = strokeCol;
     x.forEach((e, i) => {
       col ? context.fillRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i]) : null;
-      stroke
+      strokeCol
         ? context.strokeRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i])
         : null;
     });

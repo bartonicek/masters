@@ -2,23 +2,26 @@
 // and .filter() don't work
 type VectorGeneric = (number | string | boolean)[];
 
-type DataFrame = {
-  [index: string]: VectorGeneric;
-};
-
-type ValidMappings = "x" | "y" | "z" | "size" | "col" | "shape";
+type ValidMappings = "x" | "y" | "size" | "col" | "shape" | "_indicator";
 type Mapping = Map<ValidMappings, string>;
 
-type ValidMemberships = 1 | 2 | 3;
+type ValidMemberships = 0 | 1 | 2 | 3;
+
+type Point = [number, number];
 
 // Rectangle defined by two [x, y] points
 type Rect2Points = [[number, number], [number, number]];
 
+const plotTypeArray = ["scatter", "bubble", "bar", "histo", "square"];
+type PlotTypes = typeof plotTypeArray[number];
+
 export {
   VectorGeneric,
-  DataFrame,
   ValidMappings,
   Mapping,
   ValidMemberships,
+  Point,
   Rect2Points,
+  plotTypeArray,
+  PlotTypes,
 };

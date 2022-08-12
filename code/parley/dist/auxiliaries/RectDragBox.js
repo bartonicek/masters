@@ -1,6 +1,5 @@
-import { Plot } from "../plot/Plot.js";
 import { Auxiliary } from "./Auxiliary.js";
-export class RectDragBox extends Auxiliary {
+export class HighlightRect extends Auxiliary {
     bgDrawn;
     constructor(handlers) {
         super();
@@ -11,19 +10,19 @@ export class RectDragBox extends Auxiliary {
         context.drawWindow([points[0][0], points[0][1]], [points[1][0], points[1][1]]);
     };
     drawUser = (context) => {
-        const { dragging, selectionCurrent, selectionArray } = this.handlers.drag;
-        if (dragging && Plot.globalModes.or) {
+        const { drag, state } = this.handlers;
+        if (!drag.empty && drag.dragging && state.inMode("or")) {
             context.drawClear();
             context.drawDim();
-            selectionArray.forEach((points) => {
+            drag.selectionArray.forEach((points) => {
                 this.draw(context, points);
             });
-            this.draw(context, selectionCurrent);
+            this.draw(context, drag.selectionLast);
         }
-        else if (dragging) {
+        else if (!drag.empty && drag.dragging) {
             context.drawClear();
             context.drawDim();
-            this.draw(context, selectionCurrent);
+            this.draw(context, drag.selectionLast);
         }
         else {
             context.drawClear();

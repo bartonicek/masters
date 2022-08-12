@@ -1,19 +1,17 @@
+import * as dtstr from "../datastructures.js";
+import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Representation } from "./Representation.js";
-import * as funs from "../functions.js";
-import * as dtstr from "../datastructures.js";
-import { globalParameters as gpars } from "../globalparameters.js";
 
 export class Points extends Representation {
   constructor(wrangler: Wrangler) {
     super(wrangler);
   }
 
-  getMappings = (type?: dtstr.ValidMemberships) => {
-    let [x, y, size] = ["x", "y", "size"].map((mapping: dtstr.ValidMappings) =>
-      this.getMapping(mapping, type)
-    );
-    const { radius } = type === 1 ? gpars.reps.highlight : gpars.reps.base;
+  getMappings = (membership: dtstr.ValidMemberships = 0) => {
+    const mappings: dtstr.ValidMappings[] = ["x", "y", "size"];
+    let [x, y, size] = mappings.map((e) => this.getMapping(e, membership));
+    const radius = this.pars.radius[membership];
 
     size = size
       ? size.map((e) => radius * e * this.sizeMultiplier)
@@ -25,18 +23,33 @@ export class Points extends Representation {
 
   drawBase = (context: any) => {
     const [x, y, size] = this.getMappings();
-    const { col, strokeCol, strokeWidth } = gpars.reps.base;
+    const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+    const pars = {
+      col,
+      radius: size,
+      strokeCol,
+      strokeWidth,
+      alpha: this.alphaMultiplier,
+    };
+
     context.drawClear();
     context.drawBackground();
-    context.drawPoints(x, y, col, strokeCol, size, this.alphaMultiplier);
+    context.drawPoints(x, y, pars);
   };
 
   drawHighlight = (context: any) => {
     const [x, y, size] = this.getMappings(1);
-    const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
-    const { alphaMultiplier } = this;
+    const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
+    const pars = {
+      col,
+      radius: size,
+      strokeCol,
+      strokeWidth,
+      alpha: 1,
+    };
+
     context.drawClear();
-    x ? context.drawPoints(x, y, col, strokeCol, size, 1) : null;
+    x ? context.drawPoints(x, y, pars) : null;
   };
 
   get boundingRects() {

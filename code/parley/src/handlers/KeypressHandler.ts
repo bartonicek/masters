@@ -1,3 +1,4 @@
+import * as funs from "../functions.js";
 import { Handler } from "./Handler.js";
 
 export class KeypressHandler extends Handler {
@@ -15,29 +16,38 @@ export class KeypressHandler extends Handler {
       "BracketRight",
       "ShiftLeft",
       "KeyR",
+      "Digit1",
+      "Digit2",
     ];
     this.lastPressed = "";
     this.currentlyPressed = Array(this.validKeys.length).fill(false);
     this.actions = ["keydown", "keyup"];
     this.consequences = ["keyPressed", "keyReleased"];
+
+    // Register key press/release behavior on the document body
+    this.actions.forEach((action, i) => {
+      document.body.addEventListener(action, (event) =>
+        this[this.consequences[i]](event)
+      );
+    });
   }
 
   keyPressed = (event: { code: string }) => {
     if (this.validKeys.includes(event.code)) {
       this.lastPressed = event.code;
-      this.currentlyPressed[event.code] = true;
+      this.currentlyPressed[this.validKeys.indexOf(event.code)] = true;
       this.notifyAll("keyPressed");
     }
   };
 
   keyReleased = (event: { code: string }) => {
     if (this.validKeys.includes(event.code)) {
-      this.currentlyPressed[event.code] = false;
+      this.currentlyPressed[this.validKeys.indexOf(event.code)] = false;
       this.notifyAll("keyReleased");
     }
   };
 
   isPressed = (key: string) => {
-    return !!this.currentlyPressed.filter((_, i) => this.validKeys[i] === key);
+    return this.currentlyPressed.filter((_, i) => this.validKeys[i] === key)[0];
   };
 }

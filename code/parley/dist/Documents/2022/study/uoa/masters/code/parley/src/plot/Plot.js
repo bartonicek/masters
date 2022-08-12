@@ -1,35 +1,36 @@
-import { GraphicStack } from "./GraphicStack.js";
 import * as funs from "../functions.js";
 import * as hndl from "../handlers/handlers.js";
+import { GraphicStack } from "./GraphicStack.js";
 export class Plot extends GraphicStack {
-    marker;
-    modes;
+    id;
     scales;
     representations;
     auxiliaries;
     wranglers;
     handlers;
-    freeze;
-    constructor(marker) {
+    constructor(id, handlers) {
         super();
-        this.marker = marker;
-        this.modes = {
-            OR: false,
-        };
+        this.id = id;
         this.representations = {};
         this.auxiliaries = {};
         this.wranglers = {};
         this.scales = {};
         this.handlers = {
-            drag: new hndl.RectDragHandler(),
-            keypress: new hndl.KeypressHandler(),
+            marker: handlers.marker,
+            keypress: handlers.keypress,
+            state: handlers.state,
+            drag: new hndl.RectDragHandler(this.graphicContainer),
+            click: new hndl.ClickHandler(this.graphicContainer),
         };
-        //this.freeze = false;
     }
     get active() {
-        return this.graphicContainer.classList.contains("active");
+        return this.handlers.state.isActive(this.id);
     }
-    // Calls a method [string] on each child of a property [string]
+    activate = () => {
+        this.handlers.state.deactivateAll();
+        this.handlers.state.activate(this.id);
+    };
+    // Calls a method (string) on each child of a property (string)
     // e.g. call method "drawBase" on each child of "representations"
     callChildren = (object, fun, ...args) => {
         const obj = this[object];
@@ -55,50 +56,70 @@ export class Plot extends GraphicStack {
     inSelection = (selPoints) => {
         const { mapChildren } = this;
         const allPoints = mapChildren("representations", "inSelection", selPoints);
-        return allPoints[0].map((_, i) => allPoints.some((points) => points[i]));
+        return Array.from(new Set(allPoints.flat()));
     };
-    inSelection2 = (selPoints) => {
+    atClick = (clickPoint) => {
         const { mapChildren } = this;
-        const allPoints = mapChildren("representations", "inSelection2", selPoints);
-        return Array.from(new Set([].concat.apply([], allPoints)));
+        const allPoints = mapChildren("representations", "atClick", clickPoint);
+        return Array.from(new Set(allPoints.flat()));
     };
-    onSelection = () => {
-        const { marker, handlers, inSelection } = this;
-        if (handlers.keypress.current === "ShiftLeft") {
-            marker.softReceive(inSelection(handlers.drag.selectionPoints));
-        }
-        else {
-            marker.hardReceive(inSelection(handlers.drag.selectionPoints));
+    startDrag = () => {
+        if (this.handlers.state.inMode("or")) {
+            this.handlers.marker.mergeTransient();
         }
     };
-    onSelectionTransient = () => {
-        const { marker, handlers, inSelection2 } = this;
-        marker.replaceTransient(inSelection2(handlers.drag.selectionPoints), 1);
+    whileDrag = () => {
+        const { marker, drag, state } = this.handlers;
+        if (!state.inMode("or"))
+            marker.persistentMembership.clear();
+        marker.replaceTransient(this.inSelection(drag.selectionCurrent), 1);
     };
-    onSelectionPersistent = () => {
-        const { marker, handlers, inSelection2 } = this;
-        marker.addPersistent(inSelection2(handlers.drag.selectionPoints), 1);
+    endDrag = () => {
+        this.handlers.marker.mergeTransient();
     };
     onKeypress = () => {
-        const { handlers, modes, callChildren } = this;
-        if (handlers.keypress.last === "ShiftLeft")
-            modes.OR = true;
-        callChildren("handlers", "onKeyPress", handlers.keypress.last);
+        const { callChildren } = this;
+        const { keypress, state } = this.handlers;
+        callChildren("handlers", "onKeyPress", keypress.lastPressed);
         if (this.active) {
-            callChildren("representations", "onKeypress", handlers.keypress.current);
+            callChildren("representations", "onKeypress", keypress.lastPressed);
         }
     };
     onKeyRelease = () => {
-        const { handlers, modes, callChildren } = this;
-        if (handlers.keypress.last === "ShiftLeft")
-            modes.OR = false;
-        callChildren("handlers", "onKeyRelease", handlers.keypress.last);
+        const { handlers, callChildren } = this;
+        callChildren("handlers", "onKeyRelease", handlers.keypress.lastPressed);
         if (this.active) {
-            callChildren("representations", "onKeyRelease", handlers.keypress.last);
+            callChildren("representations", "onKeyRelease", handlers.keypress.lastPressed);
         }
     };
+    onMouseDownAnywhere = () => {
+        const { marker, drag, state } = this.handlers;
+        if (!state.inMode("or")) {
+            drag.clear();
+            marker.clear();
+            this.drawUser();
+        }
+    };
+    onMouseDownHere = () => {
+        const { marker, click, drag, state } = this.handlers;
+        if (state.inMode("or"))
+            marker.mergeTransient();
+        if (!state.inMode("or")) {
+            drag.clear();
+            marker.clear();
+        }
+        state.deactivateAll();
+        this.activate();
+        marker.replaceTransient(this.atClick(click.clickLast), 1);
+    };
     onDoubleClick = () => {
-        this.callChildren("handlers", "onDoubleClick");
+        const { marker, drag, state } = this.handlers;
+        marker.clear();
+        drag.clear();
+        state.activateAll();
+        this.drawHighlight();
+        this.drawUser();
+        state.deactivateAll();
     };
     draw = (context, ...args) => {
         const { representations, auxiliaries, callChildren } = this;
@@ -106,58 +127,28 @@ export class Plot extends GraphicStack {
         const where = "graphic" + funs.capitalize(context);
         callChildren("representations", what, this[where], ...args);
         callChildren("auxiliaries", what, this[where], ...args);
-        // if (this.modes.OR)
-        // this.graphicHighlight.drawPoints([400], [100], "green", null, 10);
     };
     drawBase = () => this.draw("base");
     drawHighlight = () => this.draw("highlight");
     drawUser = () => {
-        this.active || !this.freeze ? this.draw("user") : null;
-    };
-    activateAll = () => {
-        const graphicContainers = document.querySelectorAll(".graphicContainer");
-        graphicContainers.forEach((e) => e.classList.add("active"));
-    };
-    deactivateAll = () => {
-        const graphicContainers = document.querySelectorAll(".graphicContainer");
-        graphicContainers.forEach((e) => e.classList.remove("active"));
+        if (this.active || !this.handlers.state.inMode("or"))
+            this.draw("user");
     };
     initialize = () => {
-        const { marker, handlers, scales, auxiliaries, representations, callChildren, onSelection, onKeypress, onKeyRelease, drawBase, drawHighlight, drawUser, graphicContainer, } = this;
+        const { handlers, scales, callChildren, onMouseDownHere, onMouseDownAnywhere, onDoubleClick, onKeypress, onKeyRelease, drawBase, drawHighlight, drawUser, startDrag, whileDrag, endDrag, graphicContainer, graphicDiv, } = this;
         Object.keys(scales).forEach((mapping) => {
             scales[mapping]?.registerData(this.getUnique(mapping));
         });
         callChildren("representations", "registerScales", scales);
         callChildren("auxiliaries", "registerScales", scales);
-        handlers.drag.registerCallbacks([onSelection], ["whileDrag"]);
-        handlers.drag.registerCallbacks([this.onSelectionTransient, this.onSelectionPersistent], ["whileDrag", "startDrag"]);
+        this.handlers.drag.state = this.handlers.state;
+        graphicDiv.addEventListener("dblclick", onDoubleClick);
+        graphicDiv.addEventListener("mousedown", onMouseDownAnywhere);
+        graphicContainer.addEventListener("mousedown", onMouseDownHere);
+        handlers.marker.registerCallbacks([drawHighlight], ["replaceTransient"]);
+        handlers.state.registerCallbacks([drawUser], ["deactivateAll"]);
+        handlers.drag.registerCallbacks([startDrag, whileDrag, endDrag, drawUser], ["startDrag", "whileDrag", "endDrag", "whileDrag"]);
         handlers.keypress.registerCallbacks([onKeypress, onKeyRelease, drawBase, drawHighlight], ["keyPressed", "keyReleased", "keyPressed", "keyPressed"]);
-        marker.registerCallbacks(drawHighlight, drawUser);
-        // For each handler, register event listeners for actions
-        // and corresponding consequences on the graphiContainer
-        Object.keys(handlers).forEach((name) => {
-            const handler = handlers[name];
-            handler?.actions?.forEach((action, index) => {
-                graphicContainer.addEventListener(action, funs.throttle(handler[handler.consequences[index]], 50));
-            });
-        });
-        handlers.keypress.actions.forEach((action, index) => {
-            document.body.addEventListener(action, (event) => {
-                handlers.keypress[handlers.keypress.consequences[index]](event);
-            });
-        });
-        const graphicContainers = document.querySelectorAll(".graphicContainer");
-        const graphicDiv = document.querySelector(".graphicDiv");
-        graphicDiv.addEventListener("dblclick", (event) => {
-            this.activateAll();
-            marker.unSelect();
-            this.onDoubleClick();
-            this.deactivateAll();
-        });
-        graphicContainer.addEventListener("mousedown", (event) => {
-            this.deactivateAll();
-            event.currentTarget.classList.add("active");
-        });
         drawBase();
     };
 }

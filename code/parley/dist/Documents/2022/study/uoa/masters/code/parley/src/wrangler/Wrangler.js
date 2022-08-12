@@ -23,43 +23,55 @@ export class Wrangler {
     extractAsIs = (...mappings) => {
         this.indices = Array.from(Array(this.marker.n), (e, i) => i);
         mappings.forEach((mapping) => {
-            this[mapping] = new Cast(this.getMapping(mapping), this).registerFun(funs.identity);
+            this[mapping] = new Cast(this.getMapping(mapping));
+            this[mapping].marker = this.marker;
             this[mapping].allUnique = true;
         });
         return this;
     };
     splitBy = (...mappings) => {
-        // mappings.forEach((mapping) => this.by.add(mapping));
-        // const splittingVars = Array.from(this.by).map((e: dtstr.ValidMappings) =>
-        //   this.getMapping(e)
-        // );
-        // this.indices = funs.uniqueRowIds(splittingVars);
         mappings.forEach((mapping, i) => {
             this.by.add(mapping);
-            this[mapping] = new Cast(this.getMapping(mapping), this);
+            this[mapping] = new Cast(this.getMapping(mapping));
             this[mapping].marker = this.marker;
-            this[mapping].indices = this.indices;
-            console.log(this[mapping]);
         });
         return this;
     };
     splitWhat = (...mappings) => {
         mappings.forEach((mapping) => {
             this.what.add(mapping);
-            this[mapping] = new Cast(this.getMapping(mapping), this);
+            this[mapping] = new Cast(this.getMapping(mapping));
             this[mapping].marker = this.marker;
-            this[mapping].indices = this.indices;
         });
         return this;
     };
-    doOn = (fun, ...args) => {
-        Array.from(this.by).forEach((mapping) => this[mapping].registerFun(fun, ...args));
-        const splittingVars = Array.from(this.by).map((e) => this[e].vector);
-        this.indices = funs.uniqueRowIds(splittingVars);
+    doAcross = (target, fun, ...args) => {
+        if (target === "by" || target === "what") {
+            Array.from(this[target]).forEach((mapping) => {
+                this[mapping].registerAcross(fun, ...args);
+            });
+            return this;
+        }
+        this[target].registerAcross(fun, ...args);
         return this;
     };
-    doWithin = (fun, ...args) => {
-        Array.from(this.what).forEach((mapping) => this[mapping].registerFun(fun, ...args));
+    doWithin = (target, fun, ...args) => {
+        if (target === "by" || target === "what") {
+            Array.from(this[target]).forEach((mapping) => {
+                this[mapping].registerWithin(fun, ...args);
+            });
+            return this;
+        }
+        this[target].registerWithin(fun, ...args);
+        return this;
+    };
+    assignIndices = () => {
+        const { what, by } = this;
+        const splittingVars = Array.from(by).map((e) => this[e].acrossVec);
+        this.indices = funs.uniqueRowIds(splittingVars);
+        Array.from([...by, ...what]).map((e) => {
+            this[e].indices = this.indices;
+        });
         return this;
     };
 }

@@ -22,7 +22,7 @@ export class GraphicStack {
     this.width = parseInt(getComputedStyle(this.graphicContainer).width, 10);
     this.height = parseInt(getComputedStyle(this.graphicContainer).height, 10);
 
-    const graphicLayers = ["graphicBase", "graphicHighlight", "graphicUser"];
+    const graphicLayers = ["graphicBase", "graphicUser", "graphicHighlight"];
     graphicLayers.forEach((e) => {
       this[e] = new GraphicLayer(this.width, this.height);
       this.graphicContainer.appendChild(this[e].canvas);

@@ -5,10 +5,12 @@ import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
 export class BarPlot extends Plot {
-    constructor(data, mapping, marker) {
-        super(marker);
+    mapping;
+    constructor(id, data, mapping, handlers) {
+        super(id, handlers);
+        this.mapping = mapping;
         this.wranglers = {
-            summary: new Wrangler(data, mapping, marker)
+            summary: new Wrangler(data, mapping, handlers.marker)
                 .splitBy("x")
                 .splitWhat("y")
                 .doWithin("by", funs.unique)
@@ -20,7 +22,7 @@ export class BarPlot extends Plot {
             y: new scls.XYScaleContinuous(this.height, -1, true),
         };
         this.representations = {
-            bars: new reps.Bars(this.wranglers.summary, this.handlers.drag, 0.8),
+            bars: new reps.Bars(this.wranglers.summary, 0.8),
         };
         this.auxiliaries = {
             axisbox: new auxs.AxisBox(),

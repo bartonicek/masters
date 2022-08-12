@@ -1,12 +1,13 @@
+import * as funs from "../functions.js";
 import { Representation } from "./Representation.js";
-import { globalParameters as gpars } from "../globalparameters.js";
 export class Points extends Representation {
     constructor(wrangler) {
         super(wrangler);
     }
-    getMappings = (type) => {
-        let [x, y, size] = ["x", "y", "size"].map((mapping) => this.getMapping(mapping, type));
-        const { radius } = type === 1 ? gpars.reps.highlight : gpars.reps.base;
+    getMappings = (membership = 0) => {
+        const mappings = ["x", "y", "size"];
+        let [x, y, size] = mappings.map((e) => this.getMapping(e, membership));
+        const radius = this.pars.radius[membership];
         size = size
             ? size.map((e) => radius * e * this.sizeMultiplier)
             : Array.from(Array(x.length), (e) => radius).map((e) => e * this.sizeMultiplier);
@@ -14,17 +15,30 @@ export class Points extends Representation {
     };
     drawBase = (context) => {
         const [x, y, size] = this.getMappings();
-        const { col, strokeCol, strokeWidth } = gpars.reps.base;
+        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+        const pars = {
+            col,
+            radius: size,
+            strokeCol,
+            strokeWidth,
+            alpha: this.alphaMultiplier,
+        };
         context.drawClear();
         context.drawBackground();
-        context.drawPoints(x, y, col, strokeCol, size, this.alphaMultiplier);
+        context.drawPoints(x, y, pars);
     };
     drawHighlight = (context) => {
         const [x, y, size] = this.getMappings(1);
-        const { col, strokeCol, strokeWidth } = gpars.reps.highlight;
-        const { alphaMultiplier } = this;
+        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
+        const pars = {
+            col,
+            radius: size,
+            strokeCol,
+            strokeWidth,
+            alpha: 1,
+        };
         context.drawClear();
-        x ? context.drawPoints(x, y, col, strokeCol, size, 1) : null;
+        x ? context.drawPoints(x, y, pars) : null;
     };
     get boundingRects() {
         const [x, y, size] = this.getMappings();

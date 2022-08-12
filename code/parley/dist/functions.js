@@ -58,6 +58,24 @@ const unique = (x) => {
     return uniqueArray.length === 1 ? uniqueArray[0] : uniqueArray;
     //return x.filter((e, i) => x.indexOf(e) === i);    Slower
 };
+const accessDeep = (obj, ...props) => {
+    return props.reduce((a, b) => a && a[b], obj);
+};
+const accessUnpeel = (obj, ...props) => {
+    const destination = props.pop();
+    let result;
+    for (let i = props.length; i >= 0; i--) {
+        result = accessDeep(obj, ...props, destination) ?? null;
+        if (result)
+            break;
+        props.pop();
+    }
+    return result;
+};
+const accessIndexed = (obj, index) => {
+    const res = Object.keys(obj).map((e) => [e, obj[e][index]]);
+    return Object.fromEntries(res);
+};
 const throttle = (fun, delay) => {
     let lastTime = 0;
     return (...args) => {
@@ -68,7 +86,7 @@ const throttle = (fun, delay) => {
         fun(...args);
     };
 };
-// Function to construct "pretty" breaks, a basic version of R's pretty()
+// Function to construct "pretty" breaks, inspired by R's pretty()
 const prettyBreaks = (x, n = 4) => {
     const [min, max] = [Math.min(...x), Math.max(...x)];
     const range = max - min;
@@ -76,12 +94,12 @@ const prettyBreaks = (x, n = 4) => {
     const base = Math.floor(Math.log10(unitGross));
     const dists = [1, 2, 4, 5, 6, 8, 10].map((e) => (e - unitGross / 10 ** base) ** 2);
     const unitNeat = 10 ** base * [1, 2, 4, 5, 6, 8, 10][dists.indexOf(Math.min(...dists))];
+    const big = Math.abs(base) > 4;
     const minNeat = Math.round(min / unitNeat) * unitNeat;
-    return Array.from(Array(n + 1), (e, i) => {
-        return Math.abs(base) > 4
-            ? (minNeat + unitNeat * i).toExponential()
-            : minNeat + unitNeat * i;
-    });
+    const maxNeat = Math.round(max / unitNeat) * unitNeat;
+    const middle = Array.from(Array((maxNeat - minNeat) / unitNeat - 1), (e, i) => minNeat + (i + 1) * unitNeat);
+    const breaks = [minNeat, ...middle, maxNeat].map((e) => parseFloat(e.toFixed(4)));
+    return big ? breaks.map((e) => e.toExponential()) : breaks;
 };
 // arrEqual: Checks if two arrays are deeply equal
 const arrEqual = (array1, array2) => {
@@ -162,4 +180,4 @@ const timeExecution = (fun) => {
     const end = performance.now();
     return end - start;
 };
-export { isNumeric, identity, length, sum, mean, min, max, capitalize, bin, quantile, gatedMultiply, which, match, unique, throttle, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, rectOverlap, timeExecution, };
+export { isNumeric, identity, length, sum, mean, min, max, capitalize, bin, quantile, gatedMultiply, which, match, unique, throttle, accessDeep, accessUnpeel, accessIndexed, prettyBreaks, arrEqual, arrTranspose, uniqueRows, uniqueRowIds, pointInRect, rectOverlap, timeExecution, };

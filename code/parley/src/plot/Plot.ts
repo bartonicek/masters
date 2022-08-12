@@ -1,60 +1,67 @@
-import * as datastr from "./../datastructures.js";
-import { GraphicStack } from "./GraphicStack.js";
+import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
 import * as reps from "../representations/representations.js";
 import * as scls from "../scales/scales.js";
 import * as auxs from "../auxiliaries/auxiliaries.js";
 import * as hndl from "../handlers/handlers.js";
+import { GraphicStack } from "./GraphicStack.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
-import { Marker } from "../marker/Marker.js";
+import { StateHandler } from "../handlers/handlers.js";
+import { DataFrame } from "../DataFrame.js";
 
 export class Plot extends GraphicStack {
-  marker: Marker;
-  id: number;
+  id: string;
   scales: { [key: string]: scls.Scale };
   representations: { [key: string]: reps.Representation };
   auxiliaries: { [key: string]: auxs.Auxiliary };
   wranglers: { [key: string]: Wrangler };
-  handlers: { drag: hndl.RectDragHandler; keypress: hndl.KeypressHandler };
-
-  static containers = [];
-  static drawUserMethods = [];
-
-  static activateAll = () => {
-    Plot.containers.forEach((e) => e.classList.add("active"));
-  };
-  static deactivateAll = () => {
-    Plot.containers.forEach((e) => e.classList.remove("active"));
-  };
-  static drawUser = () => Plot.drawUserMethods.forEach((e) => e());
-
-  static globalModes = {
-    or: false,
-    not: false,
+  handlers: {
+    marker: hndl.MarkerHandler;
+    drag: hndl.DragHandler;
+    state: hndl.StateHandler;
+    click: hndl.ClickHandler;
+    keypress: hndl.KeypressHandler;
   };
 
-  constructor(marker: Marker) {
+  constructor(
+    id: string,
+    data: DataFrame,
+    mapping: dtstr.Mapping,
+    handlers: {
+      marker: hndl.MarkerHandler;
+      keypress: hndl.KeypressHandler;
+      state: hndl.StateHandler;
+    }
+  ) {
     super();
-    this.marker = marker;
+    this.id = id;
     this.representations = {};
-    this.auxiliaries = {};
     this.wranglers = {};
     this.scales = {};
     this.handlers = {
-      drag: new hndl.RectDragHandler(),
-      keypress: new hndl.KeypressHandler(),
+      marker: handlers.marker,
+      keypress: handlers.keypress,
+      state: handlers.state,
+      drag: new hndl.DragHandler(this.graphicContainer),
+      click: new hndl.ClickHandler(this.graphicContainer),
     };
-    Plot.containers.push(this.graphicContainer);
-    Plot.drawUserMethods.push(this.drawUser);
+    this.auxiliaries = {
+      axisbox: new auxs.AxisBox(),
+      axistextx: new auxs.AxisText("x"),
+      axistexy: new auxs.AxisText("y"),
+      axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
+      axistitley: new auxs.AxisTitle("y", mapping.get("y")),
+      highlightrects: new auxs.HighlightRects(this.handlers),
+    };
   }
 
   get active() {
-    return this.graphicContainer.classList.contains("active");
+    return this.handlers.state.isActive(this.id);
   }
 
   activate = () => {
-    Plot.deactivateAll();
-    this.graphicContainer.classList.add("active");
+    this.handlers.state.deactivateAll();
+    this.handlers.state.activate(this.id);
   };
 
   // Calls a method (string) on each child of a property (string)
@@ -88,42 +95,44 @@ export class Plot extends GraphicStack {
   inSelection = (selPoints: [number, number][]): number[] => {
     const { mapChildren } = this;
     const allPoints = mapChildren("representations", "inSelection", selPoints);
-    return Array.from(new Set([].concat.apply([], allPoints))) as number[];
+    return Array.from(new Set(allPoints.flat()));
+  };
+
+  atClick = (clickPoint: [number, number]): number[] => {
+    const { mapChildren } = this;
+    const allPoints = mapChildren("representations", "atClick", clickPoint);
+    return Array.from(new Set(allPoints.flat()));
   };
 
   startDrag = () => {
-    if (Plot.globalModes.or) this.marker.mergeTransient();
+    if (this.handlers.state.inMode("or")) {
+      this.handlers.marker.mergeTransient();
+    }
   };
 
   whileDrag = () => {
-    const { marker, handlers, inSelection } = this;
-    marker.replaceTransient(inSelection(handlers.drag.selectionCurrent), 1);
+    const { marker, drag, state } = this.handlers;
+    if (!state.inMode("or")) marker.persistentMembership.clear();
+    marker.replaceTransient(this.inSelection(drag.selectionCurrent), 1);
   };
 
   endDrag = () => {
-    this.marker.mergeTransient();
+    this.handlers.marker.mergeTransient();
   };
 
   onKeypress = () => {
-    const { handlers, callChildren } = this;
+    const { callChildren } = this;
+    const { keypress, state } = this.handlers;
 
-    if (handlers.keypress.lastPressed === "ShiftLeft")
-      Plot.globalModes.or = true;
-    callChildren("handlers", "onKeyPress", handlers.keypress.lastPressed);
+    callChildren("handlers", "onKeyPress", keypress.lastPressed);
     if (this.active) {
-      callChildren(
-        "representations",
-        "onKeypress",
-        handlers.keypress.lastPressed
-      );
+      callChildren("representations", "onKeypress", keypress.lastPressed);
     }
   };
 
   onKeyRelease = () => {
     const { handlers, callChildren } = this;
 
-    if (handlers.keypress.lastPressed === "ShiftLeft")
-      Plot.globalModes.or = false;
     callChildren("handlers", "onKeyRelease", handlers.keypress.lastPressed);
     if (this.active) {
       callChildren(
@@ -134,21 +143,35 @@ export class Plot extends GraphicStack {
     }
   };
 
-  onDoubleClick = () => {
-    this.marker.clear();
-    this.handlers.drag.clear();
-    Plot.activateAll();
-    this.drawHighlight();
-    this.drawUser();
-    Plot.deactivateAll();
+  onMouseDownAnywhere = () => {
+    const { marker, drag, state } = this.handlers;
+    if (!state.inMode("or")) {
+      drag.clear();
+      marker.clear();
+      this.drawUser();
+    }
   };
 
-  onMouseDown = () => {
-    const { marker, activate } = this;
-    activate();
-    if (!Plot.globalModes.or) {
+  onMouseDownHere = () => {
+    const { marker, click, drag, state } = this.handlers;
+    if (state.inMode("or")) marker.mergeTransient();
+    if (!state.inMode("or")) {
+      drag.clear();
       marker.clear();
     }
+    state.deactivateAll();
+    this.activate();
+    marker.replaceTransient(this.atClick(click.clickLast), 1);
+  };
+
+  onDoubleClick = () => {
+    const { marker, drag, state } = this.handlers;
+    marker.clear();
+    drag.clear();
+    state.activateAll();
+    this.drawHighlight();
+    this.drawUser();
+    state.deactivateAll();
   };
 
   draw = (context: "base" | "highlight" | "user", ...args: any[]) => {
@@ -162,15 +185,17 @@ export class Plot extends GraphicStack {
   drawBase = () => this.draw("base");
   drawHighlight = () => this.draw("highlight");
   drawUser = () => {
-    if (this.active || !Plot.globalModes.or) this.draw("user");
+    if (this.active || !this.handlers.state.inMode("or")) this.draw("user");
   };
 
   initialize = () => {
     const {
-      marker,
       handlers,
       scales,
       callChildren,
+      onMouseDownHere,
+      onMouseDownAnywhere,
+      onDoubleClick,
       onKeypress,
       onKeyRelease,
       drawBase,
@@ -180,6 +205,7 @@ export class Plot extends GraphicStack {
       whileDrag,
       endDrag,
       graphicContainer,
+      graphicDiv,
     } = this;
 
     Object.keys(scales).forEach((mapping) => {
@@ -188,48 +214,25 @@ export class Plot extends GraphicStack {
 
     callChildren("representations", "registerScales", scales);
     callChildren("auxiliaries", "registerScales", scales);
+
+    this.handlers.drag.state = this.handlers.state;
+
+    graphicDiv.addEventListener("dblclick", onDoubleClick);
+    graphicDiv.addEventListener("mousedown", onMouseDownAnywhere);
+    graphicContainer.addEventListener("mousedown", onMouseDownHere);
+
+    handlers.marker.registerCallbacks([drawHighlight], ["replaceTransient"]);
+    handlers.state.registerCallbacks([drawUser], ["deactivateAll"]);
+
     handlers.drag.registerCallbacks(
-      [startDrag, whileDrag, endDrag],
-      ["startDrag", "whileDrag", "endDrag"]
+      [startDrag, whileDrag, endDrag, drawUser],
+      ["startDrag", "whileDrag", "endDrag", "whileDrag"]
     );
+
     handlers.keypress.registerCallbacks(
       [onKeypress, onKeyRelease, drawBase, drawHighlight],
       ["keyPressed", "keyReleased", "keyPressed", "keyPressed"]
     );
-    marker.registerCallbacks(
-      [drawHighlight, drawUser],
-      ["replaceTransient", "replaceTransient"]
-    );
-
-    // For each handler, register event listeners for actions
-    // and corresponding consequences on the graphiContainer
-    Object.keys(handlers).forEach((name) => {
-      const handler = handlers[name];
-      handler?.actions?.forEach((action, index) => {
-        graphicContainer.addEventListener(
-          action,
-          funs.throttle(handler[handler.consequences[index]], 50)
-        );
-      });
-    });
-
-    handlers.keypress.actions.forEach((action, index) => {
-      document.body.addEventListener(action, (event) => {
-        handlers.keypress[handlers.keypress.consequences[index]](event);
-      });
-    });
-
-    const graphicContainers = document.querySelectorAll(".graphicContainer");
-    const graphicDiv = document.querySelector<HTMLElement>(".graphicDiv");
-
-    graphicDiv.addEventListener("dblclick", (event) => {
-      this.onDoubleClick();
-    });
-
-    graphicContainer.addEventListener("mousedown", (event) => {
-      this.onMouseDown();
-    });
-
     drawBase();
   };
 }

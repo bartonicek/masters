@@ -1,16 +1,18 @@
 import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
-import { Scale } from "../scales/Scale.js";
+import { globalParameters } from "../globalparameters.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 
 export class Representation {
   wrangler: Wrangler;
   plotDims: { width: number; height: number };
   scales: { [key: string]: any };
-  alpha: number;
-  col: string;
-  stroke: string;
-  radius: number;
+  pars: {
+    col: string[];
+    strokeCol: string[];
+    strokeWidth: number[];
+    radius: number[];
+  };
   sizeMultiplier: number;
   sizeLimits: { min: number; max: number };
   alphaMultiplier: number;
@@ -18,6 +20,7 @@ export class Representation {
 
   constructor(wrangler: Wrangler) {
     this.wrangler = wrangler;
+    this.pars = globalParameters.reps;
     this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
     this.sizeLimits = {
@@ -30,8 +33,11 @@ export class Representation {
     };
   }
 
-  getMapping = (mapping: dtstr.ValidMappings, type?: 1 | 2 | 3) => {
-    let res = this.wrangler[mapping]?.extract2(type);
+  getMapping = (
+    mapping: dtstr.ValidMappings,
+    membership: dtstr.ValidMemberships = 0
+  ) => {
+    let res = this.wrangler[mapping]?.extract(membership);
     res = this.scales[mapping]?.dataToPlot(res);
     return res;
   };
@@ -56,12 +62,24 @@ export class Representation {
   // Checks which bounding rects overlap with a rectangular selection region
   //E.g. [[0, 0], [Width, Height]] should include all bound. rects
   inSelection = (selectionRect: dtstr.Rect2Points) => {
-    const selectedReps = this.boundingRects.map((rect: dtstr.Rect2Points) =>
-      funs.rectOverlap(rect, selectionRect)
-    );
-    const selectedDatapoints = this.wrangler.indices.flatMap((e, i) =>
-      selectedReps[e] ? i : []
-    );
+    const { wrangler, boundingRects } = this;
+    const selectedReps = boundingRects.map((rect: dtstr.Rect2Points) => {
+      return funs.rectOverlap(selectionRect, rect);
+    });
+    const selectedDatapoints = wrangler.indices.flatMap((e, i) => {
+      return selectedReps[e] ? i : [];
+    });
+    return selectedDatapoints;
+  };
+
+  atClick = (clickPoint: [number, number]) => {
+    const { wrangler, boundingRects } = this;
+    const selectedReps = boundingRects.map((rect: dtstr.Rect2Points) => {
+      return funs.pointInRect(clickPoint, rect);
+    });
+    const selectedDatapoints = wrangler.indices.flatMap((e, i) => {
+      return selectedReps[e] ? i : [];
+    });
     return selectedDatapoints;
   };
 

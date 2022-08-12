@@ -1,6 +1,6 @@
 ---
 title: "Principled and Efficient <br> Interactive Data Visualization"
-author: "Adam Bartonicek (supervisor: Simon Urbanek)"
+author: "Adam Bartonicek (supervisor: Dr. Simon Urbanek)"
 institute: "University of Auckland, Department of Statistics"
 date: "Last updated: `r Sys.Date()`"
 output:
@@ -8,15 +8,17 @@ output:
     css: ["default", "default-fonts", "styles.css"]
     lib_dir: libs
     nature:
-      titleSlideClass: [top, left, middle, inverse, title]
+      titleSlideClass: [top, left, middle, title]
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
 ---
 
-class: center, middle
+class: middle
 
-# Some inspiring quote by Tukey
+## "Plot and eye" is the most diverse channel to the human mind. Not that it transmits more bits per second, but rather it transmits greater variety of messages on unexpected topics easily and rapidly. There really is no substitute for "looking at the data".
+
+.right[John W. Tukey, 1969]
 
 ---
 
@@ -32,7 +34,7 @@ class: middle
   - Good but may not work with newer R installations
 - <b> Newer generation</b>: ggplotly, ggiraph, ggvis, RJSplot,... 
   - Many more based on D3.js and plotly (many specialized)
-  - Popular but have some problems/shortcomings
+  - Popular but have some shortcomings
 
 ---
 
@@ -69,7 +71,7 @@ class: middle
 - <b>Back-end written in TypeScript</b> 
   - (a fancier, typed version of JavaScript)
   - Portable: should run anywhere
-  - Should be better maintainable than plain Javascript
+  - Written from scratch: minimize dependencies 
 - <b>Uses HTML canvas element</b>
   - Bitmap: a lot faster than SVG
 

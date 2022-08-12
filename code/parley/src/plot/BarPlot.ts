@@ -4,16 +4,28 @@ import * as scls from "../scales/scales.js";
 import * as reps from "../representations/representations.js";
 import * as auxs from "../auxiliaries/auxiliaries.js";
 import * as funs from "../functions.js";
-import { Marker } from "../marker/Marker.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
+import { DataFrame } from "../DataFrame.js";
 
 export class BarPlot extends Plot {
-  constructor(data: dtstr.DataFrame, mapping: dtstr.Mapping, marker: Marker) {
-    super(marker);
+  mapping: dtstr.Mapping;
+
+  constructor(
+    id: string,
+    data: DataFrame,
+    mapping: dtstr.Mapping,
+    handlers: {
+      marker: hndl.MarkerHandler;
+      keypress: hndl.KeypressHandler;
+      state: hndl.StateHandler;
+    }
+  ) {
+    super(id, data, mapping, handlers);
+    this.mapping = mapping;
 
     this.wranglers = {
-      summary: new Wrangler(data, mapping, marker)
+      summary: new Wrangler(data, mapping, handlers.marker)
         .splitBy("x")
         .splitWhat("y")
         .doWithin("by", funs.unique)
@@ -29,16 +41,6 @@ export class BarPlot extends Plot {
     this.representations = {
       bars: new reps.Bars(this.wranglers.summary, 0.8),
     };
-
-    this.auxiliaries = {
-      axisbox: new auxs.AxisBox(),
-      axistextx: new auxs.AxisText("x"),
-      axistexy: new auxs.AxisText("y"),
-      axistitlex: new auxs.AxisTitle("x", mapping.get("x")),
-      //axistitley: new auxs.AxisTitle("y", mapping.get("y")),
-      rectdragbox: new auxs.RectDragBox(this.handlers),
-    };
-
     this.initialize();
   }
 }

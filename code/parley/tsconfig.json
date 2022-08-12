@@ -5,6 +5,5 @@
         "watch": true,
         "outDir": "dist"
     },
-    "include": ["src"],
-    "exclude": ["src/statistics"]
+    "include": ["src"]
 }

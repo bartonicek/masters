@@ -7,7 +7,7 @@ export class Auxiliary {
         this.scales = scales;
         return this;
     };
-    draw = (context) => { };
-    drawBase = (context) => { };
-    drawUser = (context, handler) => { };
+    draw = (context, ...args) => { };
+    drawBase = (context, ...args) => { };
+    drawUser = (context, handler, ...args) => { };
 }
