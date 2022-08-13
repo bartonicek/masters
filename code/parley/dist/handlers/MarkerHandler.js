@@ -25,6 +25,10 @@ export class MarkerHandler extends Handler {
         this.persistentMembership.clear();
         this.notifyAll("clear");
     };
+    onKeypress = (key) => {
+        if (key === "ShiftLeft")
+            this.mergeTransient();
+    };
 }
 class MembershipArray extends Uint8Array {
     constructor(n) {

@@ -19,6 +19,7 @@ export class Scene {
   };
 
   constructor(data: DataFrame) {
+    
     this.data = data;
     this.nObs = data[Object.keys(data)[0]].length;
     this.nPlots = 0;

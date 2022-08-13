@@ -16,7 +16,6 @@
     <body>
 
         <div class="graphicDiv"></div>
-        <p class="testOutput"></p>
         
         <div class="sidePanelHelp">
             <p class="textHelp"><b><kbd>Click</kbd></b> a plot to activate it</p>
@@ -27,8 +26,7 @@
             <p class="textHelp"> <b> <kbd>R</kbd> </b> &nbsp; Reset graphical settings of the active plot</p>
             <p class="textHelp"> <b><kbd>LeftShift</kbd> + <kbd>Drag</kbd></b> &nbsp; Multiple selection</p>
         
-            <button class="buttonHelp" onclick="openHelp()">?</button>
-
+            <button class="buttonHelp" onclick="document.querySelectorAll('.sidePanelHelp').classList.toggle('sidePanelHelpActive')">?</button>
         
         </div>
         <script type="module" src="./main.js"></script>

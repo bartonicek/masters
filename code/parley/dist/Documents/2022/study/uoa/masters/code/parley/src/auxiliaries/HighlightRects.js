@@ -1,10 +1,11 @@
+import { boolean } from "../../../../../../../../../node_modules/mathjs/types/index.js";
 import { Auxiliary } from "./Auxiliary.js";
 export class HighlightRects extends Auxiliary {
     bgDrawn;
     current;
     last;
     past;
-    empty;
+    empty = boolean;
     constructor(handlers) {
         super();
         this.current = [
@@ -31,11 +32,9 @@ export class HighlightRects extends Auxiliary {
     };
     updateLast = () => {
         this.last = [this.current[0], this.current[1]];
-        this.empty = false;
     };
     pushLastToPast = () => {
         this.past.push([this.last[0], this.last[1]]);
-        this.empty = false;
     };
     clear = () => {
         this.last = [
@@ -43,25 +42,24 @@ export class HighlightRects extends Auxiliary {
             [null, null],
         ];
         this.past = [];
-        this.empty = true;
     };
     draw = (context, points) => {
         context.drawWindow([points[0][0], points[0][1]], [points[1][0], points[1][1]]);
     };
     drawUser = (context) => {
         const { drag, state } = this.handlers;
-        if (!this.empty && state.inMode("or")) {
+        if (!drag.empty && drag.dragging && state.inMode("or")) {
             context.drawClear();
             context.drawDim();
-            this.past.forEach((points) => {
+            drag.selectionArray.forEach((points) => {
                 this.draw(context, points);
             });
-            this.draw(context, this.last);
+            this.draw(context, drag.selectionLast);
         }
-        else if (!this.empty) {
+        else if (!drag.empty && drag.dragging) {
             context.drawClear();
             context.drawDim();
-            this.draw(context, this.last);
+            this.draw(context, drag.selectionLast);
         }
         else {
             context.drawClear();

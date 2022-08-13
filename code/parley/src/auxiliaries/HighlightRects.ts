@@ -6,7 +6,8 @@ export class HighlightRects extends Auxiliary {
   bgDrawn: boolean;
   current: dtstr.Rect2Points;
   last: dtstr.Rect2Points;
-  pastArray: dtstr.Rect2Points[];
+  past: dtstr.Rect2Points[];
+  empty: boolean;
 
   constructor(handlers: object) {
     super();
@@ -18,7 +19,8 @@ export class HighlightRects extends Auxiliary {
       [null, null],
       [null, null],
     ];
-    this.pastArray = [];
+    this.past = [];
+    this.empty = true;
     this.handlers = handlers;
     this.bgDrawn = false;
   }
@@ -37,10 +39,21 @@ export class HighlightRects extends Auxiliary {
 
   updateLast = () => {
     this.last = [this.current[0], this.current[1]];
+    this.empty = false;
   };
 
   pushLastToPast = () => {
-    this.pastArray.push([this.last[0], this.last[1]]);
+    this.past.push([this.last[0], this.last[1]]);
+    this.empty = false;
+  };
+
+  clear = () => {
+    this.last = [
+      [null, null],
+      [null, null],
+    ];
+    this.past = [];
+    this.empty = true;
   };
 
   draw = (
@@ -56,17 +69,17 @@ export class HighlightRects extends Auxiliary {
   drawUser = (context: GraphicLayer) => {
     const { drag, state } = this.handlers;
 
-    if (!drag.empty && drag.dragging && state.inMode("or")) {
+    if (!this.empty && state.inMode("or")) {
       context.drawClear();
       context.drawDim();
-      drag.selectionArray.forEach((points) => {
+      this.past.forEach((points) => {
         this.draw(context, points);
       });
-      this.draw(context, drag.selectionLast);
-    } else if (!drag.empty && drag.dragging) {
+      this.draw(context, this.last);
+    } else if (!this.empty) {
       context.drawClear();
       context.drawDim();
-      this.draw(context, drag.selectionLast);
+      this.draw(context, this.last);
     } else {
       context.drawClear();
     }

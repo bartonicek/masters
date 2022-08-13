@@ -6,14 +6,16 @@ import * as auxs from "../auxiliaries/auxiliaries.js";
 import * as hndl from "../handlers/handlers.js";
 import { GraphicStack } from "./GraphicStack.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
-import { StateHandler } from "../handlers/handlers.js";
 import { DataFrame } from "../DataFrame.js";
 
 export class Plot extends GraphicStack {
   id: string;
   scales: { [key: string]: scls.Scale };
   representations: { [key: string]: reps.Representation };
-  auxiliaries: { [key: string]: auxs.Auxiliary };
+  auxiliaries: {
+    [key: string]: auxs.Auxiliary;
+    highlightrects: auxs.HighlightRects;
+  };
   wranglers: { [key: string]: Wrangler };
   handlers: {
     marker: hndl.MarkerHandler;
@@ -98,35 +100,56 @@ export class Plot extends GraphicStack {
     return Array.from(new Set(allPoints.flat()));
   };
 
-  atClick = (clickPoint: [number, number]): number[] => {
+  inClickPosition = (clickPoint: [number, number]): number[] => {
     const { mapChildren } = this;
     const allPoints = mapChildren("representations", "atClick", clickPoint);
     return Array.from(new Set(allPoints.flat()));
   };
 
   startDrag = () => {
-    if (this.handlers.state.inMode("or")) {
-      this.handlers.marker.mergeTransient();
+    const { marker, state, drag } = this.handlers;
+    const { highlightrects } = this.auxiliaries;
+
+    if (state.inMode("or")) {
+      marker.mergeTransient();
+      if (highlightrects.lastComplete) {
+        highlightrects.pushLastToPast();
+      }
     }
+
+    highlightrects.updateCurrentOrigin(drag.start);
   };
 
   whileDrag = () => {
     const { marker, drag, state } = this.handlers;
+    const { highlightrects } = this.auxiliaries;
+
     if (!state.inMode("or")) marker.persistentMembership.clear();
-    marker.replaceTransient(this.inSelection(drag.selectionCurrent), 1);
+    marker.replaceTransient(this.inSelection([drag.start, drag.end]), 1);
+
+    highlightrects.updateCurrentEndpoint(drag.end);
+    highlightrects.updateLast();
+    this.drawUser();
   };
 
   endDrag = () => {
-    this.handlers.marker.mergeTransient();
+    const { marker, state } = this.handlers;
+    const { highlightrects } = this.auxiliaries;
+    marker.mergeTransient();
+    if (state.inMode("or") && highlightrects.lastComplete) {
+      highlightrects.pushLastToPast();
+    }
   };
 
   onKeypress = () => {
-    const { callChildren } = this;
-    const { keypress, state } = this.handlers;
+    const { callChildren, drawHighlight } = this;
+    const { keypress, marker } = this.handlers;
 
-    callChildren("handlers", "onKeyPress", keypress.lastPressed);
+    marker.mergeTransient();
+    callChildren("handlers", "onKeypress", keypress.lastPressed);
     if (this.active) {
       callChildren("representations", "onKeypress", keypress.lastPressed);
+      drawHighlight();
     }
   };
 
@@ -144,30 +167,30 @@ export class Plot extends GraphicStack {
   };
 
   onMouseDownAnywhere = () => {
-    const { marker, drag, state } = this.handlers;
+    const { marker, state } = this.handlers;
     if (!state.inMode("or")) {
-      drag.clear();
-      marker.clear();
+      this.auxiliaries.highlightrects.clear();
       this.drawUser();
     }
   };
 
   onMouseDownHere = () => {
     const { marker, click, drag, state } = this.handlers;
+    const { highlightrects } = this.auxiliaries;
     if (state.inMode("or")) marker.mergeTransient();
     if (!state.inMode("or")) {
-      drag.clear();
       marker.clear();
+      this.auxiliaries.highlightrects.clear();
     }
     state.deactivateAll();
     this.activate();
-    marker.replaceTransient(this.atClick(click.clickLast), 1);
+    marker.replaceTransient(this.inClickPosition(click.clickLast), 1);
   };
 
   onDoubleClick = () => {
     const { marker, drag, state } = this.handlers;
     marker.clear();
-    drag.clear();
+    this.auxiliaries.highlightrects.clear();
     state.activateAll();
     this.drawHighlight();
     this.drawUser();
@@ -225,13 +248,13 @@ export class Plot extends GraphicStack {
     handlers.state.registerCallbacks([drawUser], ["deactivateAll"]);
 
     handlers.drag.registerCallbacks(
-      [startDrag, whileDrag, endDrag, drawUser],
-      ["startDrag", "whileDrag", "endDrag", "whileDrag"]
+      [startDrag, whileDrag, endDrag],
+      ["startDrag", "whileDrag", "endDrag"]
     );
 
     handlers.keypress.registerCallbacks(
-      [onKeypress, onKeyRelease, drawBase, drawHighlight],
-      ["keyPressed", "keyReleased", "keyPressed", "keyPressed"]
+      [onKeypress, onKeyRelease, drawBase],
+      ["keyPressed", "keyReleased", "keyPressed"]
     );
     drawBase();
   };
