@@ -110,11 +110,8 @@ export class Plot extends GraphicStack {
     const { marker, state, drag } = this.handlers;
     const { highlightrects } = this.auxiliaries;
 
-    if (state.inMode("or")) {
-      marker.mergeTransient();
-      if (highlightrects.lastComplete) {
-        highlightrects.pushLastToPast();
-      }
+    if (!state.inState("none") && highlightrects.lastComplete) {
+      highlightrects.pushLastToPast();
     }
 
     highlightrects.updateCurrentOrigin(drag.start);
@@ -124,28 +121,27 @@ export class Plot extends GraphicStack {
     const { marker, drag, state } = this.handlers;
     const { highlightrects } = this.auxiliaries;
 
-    if (!state.inMode("or")) marker.persistentMembership.clear();
-    marker.replaceTransient(this.inSelection([drag.start, drag.end]), 1);
-
     highlightrects.updateCurrentEndpoint(drag.end);
     highlightrects.updateLast();
     this.drawUser();
+    marker.replaceTemporary(
+      this.inSelection([drag.start, drag.end]),
+      state.membership
+    );
   };
 
   endDrag = () => {
     const { marker, state } = this.handlers;
     const { highlightrects } = this.auxiliaries;
-    marker.mergeTransient();
-    if (state.inMode("or") && highlightrects.lastComplete) {
+    marker.mergeTemporary();
+    if (!state.inState("none") && highlightrects.lastComplete) {
       highlightrects.pushLastToPast();
     }
   };
 
   onKeypress = () => {
     const { callChildren, drawHighlight } = this;
-    const { keypress, marker } = this.handlers;
-
-    marker.mergeTransient();
+    const { keypress } = this.handlers;
     callChildren("handlers", "onKeypress", keypress.lastPressed);
     if (this.active) {
       callChildren("representations", "onKeypress", keypress.lastPressed);
@@ -155,7 +151,6 @@ export class Plot extends GraphicStack {
 
   onKeyRelease = () => {
     const { handlers, callChildren } = this;
-
     callChildren("handlers", "onKeyRelease", handlers.keypress.lastPressed);
     if (this.active) {
       callChildren(
@@ -168,7 +163,7 @@ export class Plot extends GraphicStack {
 
   onMouseDownAnywhere = () => {
     const { marker, state } = this.handlers;
-    if (!state.inMode("or")) {
+    if (state.inState("none")) {
       this.auxiliaries.highlightrects.clear();
       this.drawUser();
     }
@@ -177,21 +172,23 @@ export class Plot extends GraphicStack {
   onMouseDownHere = () => {
     const { marker, click, drag, state } = this.handlers;
     const { highlightrects } = this.auxiliaries;
-    if (state.inMode("or")) marker.mergeTransient();
-    if (!state.inMode("or")) {
-      marker.clear();
+    if (state.inState("none")) {
+      marker.clearTransient();
       this.auxiliaries.highlightrects.clear();
     }
     state.deactivateAll();
     this.activate();
-    marker.replaceTransient(this.inClickPosition(click.clickLast), 1);
+    marker.replaceTemporary(
+      this.inClickPosition(click.clickLast),
+      state.membership
+    );
   };
 
   onDoubleClick = () => {
     const { marker, drag, state } = this.handlers;
-    marker.clear();
-    this.auxiliaries.highlightrects.clear();
     state.activateAll();
+    marker.clearAll();
+    this.auxiliaries.highlightrects.clear();
     this.drawHighlight();
     this.drawUser();
     state.deactivateAll();
@@ -201,6 +198,8 @@ export class Plot extends GraphicStack {
     const { representations, auxiliaries, callChildren } = this;
     const what = "draw" + funs.capitalize(context);
     const where = "graphic" + funs.capitalize(context);
+    if (context !== "user") this[where].drawClear();
+    if (context === "base") this[where].drawBackground();
     callChildren("representations", what, this[where], ...args);
     callChildren("auxiliaries", what, this[where], ...args);
   };
@@ -208,7 +207,7 @@ export class Plot extends GraphicStack {
   drawBase = () => this.draw("base");
   drawHighlight = () => this.draw("highlight");
   drawUser = () => {
-    if (this.active || !this.handlers.state.inMode("or")) this.draw("user");
+    if (this.active || this.handlers.state.inState("none")) this.draw("user");
   };
 
   initialize = () => {
@@ -244,7 +243,10 @@ export class Plot extends GraphicStack {
     graphicDiv.addEventListener("mousedown", onMouseDownAnywhere);
     graphicContainer.addEventListener("mousedown", onMouseDownHere);
 
-    handlers.marker.registerCallbacks([drawHighlight], ["replaceTransient"]);
+    handlers.marker.registerCallbacks(
+      [drawHighlight, drawHighlight],
+      ["replaceTemporary", "clearAll"]
+    );
     handlers.state.registerCallbacks([drawUser], ["deactivateAll"]);
 
     handlers.drag.registerCallbacks(

@@ -1,5 +1,5 @@
 import { Representation } from "./Representation.js";
-import * as funs from "../functions.js";
+import * as dtstr from "../datastructures.js";
 import { globalParameters as gpars } from "../globalparameters.js";
 export class Squares extends Representation {
     constructor(wrangler) {
@@ -15,19 +15,20 @@ export class Squares extends Representation {
         return [x, y, size];
     };
     drawBase = (context) => {
-        const [x, y, size] = this.getMappings();
-        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+        const [x, y, size] = this.getMappings(0);
+        const { col, strokeCol, strokeWidth } = this.pars[0];
         const pars = { col, strokeCol, strokeWidth, alpha: this.alphaMultiplier };
-        context.drawClear();
-        context.drawBackground();
         context.drawRectsHW(x, y, size, size, pars);
     };
     drawHighlight = (context) => {
-        const [x, y, size] = this.getMappings(1);
-        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
-        const pars = { col, strokeCol, strokeWidth, alpha: 1 };
-        context.drawClear();
-        x ? context.drawRectsHW(x, y, size, size, pars) : null;
+        dtstr.highlightMembershipArray.forEach((e) => {
+            const [x, y, size] = this.getMappings(e);
+            if (!x)
+                return;
+            const { col, strokeCol, strokeWidth } = this.pars[e];
+            const pars = { col, strokeCol, strokeWidth, alpha: 1 };
+            context.drawRectsHW(x, y, size, size, pars);
+        });
     };
     get boundingRects() {
         const [x, y, size] = this.getMappings();

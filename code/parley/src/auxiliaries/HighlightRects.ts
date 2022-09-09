@@ -69,7 +69,7 @@ export class HighlightRects extends Auxiliary {
   drawUser = (context: GraphicLayer) => {
     const { drag, state } = this.handlers;
 
-    if (!this.empty && state.inMode("or")) {
+    if (!this.empty && !state.inState("none")) {
       context.drawClear();
       context.drawDim();
       this.past.forEach((points) => {

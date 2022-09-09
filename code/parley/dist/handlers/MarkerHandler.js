@@ -2,43 +2,63 @@ import { Handler } from "./Handler.js";
 export class MarkerHandler extends Handler {
     n;
     selected;
-    transientMembership;
-    persistentMembership;
+    currentTransient;
+    currentPersistent;
+    pastTransient;
+    pastPersistent;
+    // Membership values:
+    //  255: No membership, unchanged
+    //  0: No membership, changed (i.e. membership removed)
+    //  1: Basic highlighting
+    //  2-6: Group highlighting
     constructor(n) {
         super();
         this.n = n;
-        this.transientMembership = new MembershipArray(n).fill(0);
-        this.persistentMembership = new MembershipArray(n).fill(0);
+        this.currentTransient = new MembershipArray(n).fill(255);
+        this.currentPersistent = new MembershipArray(n).fill(255);
+        this.pastTransient = new MembershipArray(n).fill(255);
+        this.pastPersistent = new MembershipArray(n).fill(255);
         this.callbacks = [];
         this.when = [];
     }
-    replaceTransient = (at, membership) => {
-        this.transientMembership.receiveClearReplace(at, membership);
-        this.notifyAll("replaceTransient");
+    isOfLowerOrEqualMembership = (index, membership) => {
+        return membership > 1
+            ? this.currentPersistent[index] <= membership ||
+                this.pastPersistent[index] <= membership
+            : this.currentTransient[index] === 1 || this.pastTransient[index] === 1;
     };
-    mergeTransient = () => {
-        this.persistentMembership.merge(this.transientMembership);
-        this.notifyAll("mergeTransient");
+    getArray = (type, membership) => {
+        return this[type + ["Transient", "Persistent"][membership > 1 ? 1 : 0]];
     };
-    clear = () => {
-        this.transientMembership.clear();
-        this.persistentMembership.clear();
-        this.notifyAll("clear");
+    replaceTemporary = (at, membership) => {
+        this.getArray("current", membership).receiveClearReplace(at, membership);
+        this.notifyAll("replaceTemporary");
     };
-    onKeypress = (key) => {
-        if (key === "ShiftLeft")
-            this.mergeTransient();
+    mergeTemporary = () => {
+        this.pastTransient.merge(this.currentTransient);
+        this.pastPersistent.merge(this.currentPersistent);
+        this.notifyAll("mergeTemporary");
+    };
+    clearTransient = () => {
+        this.currentTransient.clear();
+        this.pastTransient.clear();
+    };
+    clearAll = () => {
+        this.currentTransient.clear();
+        this.currentPersistent.clear();
+        this.pastTransient.clear();
+        this.pastPersistent.clear();
     };
 }
-class MembershipArray extends Uint8Array {
+export class MembershipArray extends Uint8Array {
     constructor(n) {
         super(n);
     }
     clear = () => {
-        this.fill(0);
+        this.fill(255);
     };
     merge = (arr) => {
-        arr.forEach((e, i) => (e !== 0 ? (this[i] = e) : null));
+        arr.forEach((e, i) => (e !== 255 ? (this[i] = e) : null));
     };
     recieveReplace = (at, membership) => {
         at.forEach((e) => (this[e] = membership));

@@ -5,11 +5,11 @@ type VectorGeneric = (number | string | boolean)[];
 type ValidMappings = "x" | "y" | "size" | "col" | "shape" | "_indicator";
 type Mapping = Map<ValidMappings, string>;
 
-type ValidMemberships = 0 | 1 | 2 | 3;
+const validMembershipArray = [0, 1, 2, 3];
+type ValidMemberships = typeof validMembershipArray[number];
+const highlightMembershipArray: ValidMemberships[] = [3, 2, 1];
 
 type Point = [number, number];
-
-// Rectangle defined by two [x, y] points
 type Rect2Points = [[number, number], [number, number]];
 
 const plotTypeArray = ["scatter", "bubble", "bar", "histo", "square"];
@@ -19,6 +19,8 @@ export {
   VectorGeneric,
   ValidMappings,
   Mapping,
+  validMembershipArray,
+  highlightMembershipArray,
   ValidMemberships,
   Point,
   Rect2Points,

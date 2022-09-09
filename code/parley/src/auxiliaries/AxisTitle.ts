@@ -1,3 +1,4 @@
+import { GraphicLayer } from "../plot/GraphicLayer.js";
 import { Auxiliary } from "./Auxiliary.js";
 
 export class AxisTitle extends Auxiliary {
@@ -12,11 +13,11 @@ export class AxisTitle extends Auxiliary {
     this.label = label;
   }
 
-  getLabelMetrics = (context: any) => {
+  getLabelMetrics = (context: GraphicLayer) => {
     return context.context.measureText(this.label);
   };
 
-  draw = (context: any) => {
+  draw = (context: GraphicLayer) => {
     if (this.label === "_indicator") return;
 
     const labelWidth = this.getLabelMetrics(context).width;
@@ -37,7 +38,7 @@ export class AxisTitle extends Auxiliary {
     context.drawText([x], [y], [this.label], 30, rot);
   };
 
-  drawBase = (context: any) => {
+  drawBase = (context: GraphicLayer) => {
     this.draw(context);
   };
 }

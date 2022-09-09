@@ -11,6 +11,7 @@ export class KeypressHandler extends Handler {
             "Minus",
             "BracketLeft",
             "BracketRight",
+            "ControlLeft",
             "ShiftLeft",
             "KeyR",
             "Digit1",
@@ -24,6 +25,9 @@ export class KeypressHandler extends Handler {
         this.actions.forEach((action, i) => {
             document.body.addEventListener(action, (event) => this[this.consequences[i]](event));
         });
+    }
+    get currentlyPressedKeys() {
+        return this.validKeys.filter((_, i) => this.currentlyPressed[i]);
     }
     keyPressed = (event) => {
         if (this.validKeys.includes(event.code)) {

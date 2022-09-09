@@ -1,3 +1,4 @@
+import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
 import { globalParameters } from "../globalparameters.js";
 export class Representation {
@@ -11,7 +12,7 @@ export class Representation {
     alphaLimits;
     constructor(wrangler) {
         this.wrangler = wrangler;
-        this.pars = globalParameters.reps;
+        this.pars = dtstr.validMembershipArray.map((e) => funs.accessIndexed(globalParameters.reps, e));
         this.sizeMultiplier = 1;
         this.alphaMultiplier = 1;
         this.sizeLimits = {
@@ -25,6 +26,8 @@ export class Representation {
     }
     getMapping = (mapping, membership = 0) => {
         let res = this.wrangler[mapping]?.extract(membership);
+        if (res.length < 1)
+            return res;
         res = this.scales[mapping]?.dataToPlot(res);
         return res;
     };

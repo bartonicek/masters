@@ -2,7 +2,6 @@ import * as dtstr from "../datastructures.js";
 import * as hndl from "../handlers/handlers.js";
 import * as scls from "../scales/scales.js";
 import * as reps from "../representations/representations.js";
-import * as auxs from "../auxiliaries/auxiliaries.js";
 import * as funs from "../functions.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 import { Plot } from "./Plot.js";
@@ -29,7 +28,7 @@ export class BarPlot extends Plot {
         .splitBy("x")
         .splitWhat("y")
         .doWithin("by", funs.unique)
-        .doWithin("what", funs.length)
+        .doWithin("what", funs.sum)
         .assignIndices(),
     };
 

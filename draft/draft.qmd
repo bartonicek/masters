@@ -15,44 +15,49 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Interactive visualization is mainly used for communication, not exploration [@batch2017interactive]
 
+```{r}
+#| echo: false
+#| label: tbl-terms
+#| tbl-cap: "Definitions of terms used throughout the thesis"
+
+library(kableExtra)
+
+tab1 <- read.csv('tables/terms.csv')
+colnames(tab1) <- c("Term", "Definition", "Examples")
+ktab1 <- knitr::kable(tab1)
+ktab1 <- column_spec(ktab1, 1, width = "4cm", bold = TRUE)
+# ktab1 <- column_spec(ktab1, 2, width = "8cm")
+
+kable_styling(ktab1, bootstrap_options = c("striped"))
+
+```
+
 ## What even is interactivity?
 
-Despite the popularity of interactive data visualization in data exploration and communication, there is great ambiguity as to what researchers actually mean by the terms "interaction" and "interactive". For example, Pike et al. [-@pike2009science] note that "interaction" is an overloaded term that can refer to either the concrete set of controls that a user has at their disposal to manipulate a visual display or to the more abstract "human interaction with information", i.e. the process of engaging with the information presented by the visual display. For others, the key measure of interactivity is the time it takes for the user's input to produce a change in the visual display, with less time meaning more interactivity [@becker1987brushing], and some make the distinction between "interactive" and "dynamic" manipulation, where interactive manipulation induces change discretely, such as by pressing a button or selecting an item from a menu to render a new display, whereas dynamic manipulation induces a real-time, continuous change, such as that which tends to be tied to moving a slider or clicking-and-dragging [@rheingans2002we; @jankun2007model]. Yet for others, the defining feature of interactive data visualization is that the user's interaction with one plot propagates to other plots, such as via linked brushing [@kehrer2012generic]. Finally, in many cases, researchers fail to define or even hint at what they mean by "interactivity" altogether. Put simply, the terms "interaction" and "interactive" mean a lot of different things to a lot of different people. 
+Despite the popularity of interactive data visualization, researchers seem to have many different ideas as to what it means for a visualization to be "interactive". For example, Pike et al. [-@pike2009science] note that "interaction" is an overloaded term that can either refer to the concrete tools that users can use to manipulate the visualization, or to the more abstract "human interaction with information" - the back-and-forth between the user's cognition and the visual information presented to them [see also @yi2007toward]. For others, the key measure of interactivity is lag between the user's input and changes to the visualization, with less lag meaning more interactivity [@becker1987brushing; @buja1996interactive], and some make the distinction between "interactive" and "dynamic" manipulation, where interactive manipulation induces change discretely such as by pressing a button or selecting an item from a menu to render a new display, whereas dynamic manipulation induces a real-time, continuous change, for example by smoothly moving a slider or by clicking-and-dragging [@rheingans2002we; @jankun2007model]. Yet for others, the defining features are the ability to query different parts of the dataset (by e.g. zooming and filtering) and that the interactions propagate between "linked" parts of the visualization, for example by brushing points on a scatterplot within a linked scatterplot matrix [@kehrer2012generic; @buja1996interactive, @keim2002information]. Similarly, in Visual Analytics (VA) research, distinction is made between surface-level and parametric interactions, where surface-level interactions manipulate attributes of the visual domain only (e.g. zooming, panning, highlighting), whereas parametric interactions manipulate attributes of mathematical models underlying the visualization [@leman2013visual]. Put simply, the terms "interaction", "interactive", and "interactivity" mean a lot of different things to a lot of different people.
 
-Below, I have attempted to summarize the main notions and definitions of interactivity as it refers to interactive data visualizations:  
+Below, in @tbl-definitions, I have attempted to summarize the main types of interactivity in data visualizations. This list is not supposed to be exhaustive as many more complete and detailed taxonomies of interactive visualizations have been described [see @yi2007toward]. Instead, the point of this list is to provide a rough sketch of the space interactive visualizations live in:
 
-- **Essential**: the basic ability of the user to manipulate some graphical aspects of the visual display
-- **Temporal**: the time between the user's input and change to the visual display, less lag means more interactivity, real-time change is called "dynamic"
-- **Change propagation**: one plot changes something in other plots (e.g. linked brushing), requires an underlying data structure and communication between the plots
-- (**Cognitive**: the process of the user engaging with visual information and the effect it has on the user's perception, cognition, the generation of insights, etc...)
+```{r}
+#| echo: false
+#| label: tbl-definitions
+#| tbl-cap: "Definitions of interactivity"
 
+library(kableExtra)
 
-Under the many different definitions of interactivity, it is not clear how to classify most visualizations. For example, under the essential definition, where a plot is interactive if the user is able to change it in any way, even the process of writing code to produce a new or altered plot could be considered interactive visualization. In contrast, by the change propagation definition, where the user's interaction has to propagate between plots, the bulk of what are nowadays considered "interactive" visualizations would not meet the definition, since many confine the interactivity within a single plot.       
+tab1 <- read.csv('tables/definitions.csv')
+colnames(tab1) <- c("Type", "Short definition", "Details")
+ktab1 <- knitr::kable(tab1)
+ktab1 <- column_spec(ktab1, 1, width = "4cm", bold = TRUE)
+ktab1 <- column_spec(ktab1, 2, width = "8cm")
 
-The conceptual ambiguity about what is interactivity propagates to the software implementations. For example, the [R Graph Gallery of Interactive charts](https://r-graph-gallery.com/interactive-charts.html) features several example plots which allow for user interactions such zooming, panning, hovering, 3D rotation, and node repositioning within a network graph. Importantly, in all of the examples, the interaction and its results take place within a single plot and do not propagate anywhere, and so do not meet the change propagation definition of interactivity. 
+kable_styling(ktab1, bootstrap_options = c("striped"))
 
-In contrast, the plotly Dash documentation page on Interactive Visualizations (https://dash.plotly.com/interactive-graphing) features examples of linked hovering and cross-filtering, where the user's interaction within one plot propagates into another plot (e.g. selecting few points within a scatterplot highlights the same data rows in another). These two sets of examples represent fundamentally different types of interactivity. The first -- interaction within a single isolated plot -- requires only access to the data and manipulation of either the graphical attributes of the plot or the scales/coordinate system. The second -- interaction which propagates between plots -- requires an additional data structure that keeps track of which rows are currently selected. Furthemore, when there isn't a one-to-one relationship between the rows of the data and their graphical representation shown on screen -- when, for example, the height of a bar in a barplot represents a number of cases with the identical x-value -- then whatever statistical transformation underlies the graphical representation also needs to be recomputed every time new rows of data are selected.
+```
 
-::: column-page-inset
-+----------------------------------+-------------------------+---------------------+--------------------+---------------------------------+--------------+
-| Type                             | Representation          | Typical tasks       | Compute statistics | Requires                        | Complexity   |
-+==================================+=========================+=====================+====================+=================================+==============+
-| Truly interactive/ Communicating | -   One-to-one          | -   Brushing        | Often              | -   Data                        | High         |
-|                                  | -   Many-to-one         | -   Linking         |                    | -   Graphical attributes        |              |
-|                                  |                         | -   Cross-filtering |                    | -   Selected cases              |              |
-|                                  |                         |                     |                    | -   Statistical transformations |              |
-+----------------------------------+-------------------------+---------------------+--------------------+---------------------------------+--------------+
-| Embarassingly interactive        | -   Strictly one-to-one | -   Brushing        | Never              | -   Data                        | Intermediate |
-|                                  |                         | -   Linking         |                    | -   Graphical attributes        |              |
-|                                  |                         | -   Cross-filtering |                    | -   Selected cases              |              |
-+----------------------------------+-------------------------+---------------------+--------------------+---------------------------------+--------------+
-| Dynamic                          | -   One-to-one          | -   Zooming         | Once               | -   Data                        | Low          |
-|                                  | -   Many-to-one         | -   Panning         |                    | -   Graphical attributes        |              |
-|                                  |                         | -   Hovering        |                    |                                 |              |
-+----------------------------------+-------------------------+---------------------+--------------------+---------------------------------+--------------+
+Using the term "interactive" to cover such a wide range of diverse concepts makes it difficult to clearly classify visualizations. For example, should a single scatterplot in which the user can drag a brush to highlight some points be considered "interactive"? Under the most basic definition, yes, since the user *can* affect the visual display through interaction. However, under such an expansive definition, even the process of writing-and-running code to produce a new or altered plot could be considered an exercise in interactive visualization. In contrast, the scatterplot would clearly fail to meet the linked and parametric definitions of interactivity, since with a single plot there's nowhere for the changes to propagate to, and changing the color of individual points can hardly be considered a change to a mathematical model. This highlights the fact that the linked and parametric definitions are quite restrictive, and many visualizations that are currently being called "interactive" would fail to meet them. As for the temporal definition, this is met if we assume the user interaction happens smoothly enough. However, what if the volume of the displayed data is very high and the user has to wait several second before the result of the brushing is rendered? Does the plot stop being interactive (or dynamic) as the result of limited computational resources? Finally, is the plot interactive in the cognitive sense? Perhaps so, if it can help the user generate new insights, however that debatable in light of the limited functionality it has over a static plot. Thus, even with such a simple example, it becomes difficult to determine whether we should label such a plot "interactive" or not. 
 
-: Table 1: Interactive visualization types and their features
-:::
+The conceptual ambiguity about what "interactivity" is propagates to the software implementations. For example, the [R Graph Gallery entry on Interactive Charts](https://r-graph-gallery.com/interactive-charts.html) [@holtz2022interactive] features several example plots which allow for surface-level user interactions such zooming, panning, hovering, 3D rotation, and node repositioning within a network graph. Crucially, in all of the examples, the user interacts with a single plot and can affect graphical attributes of the plot only, and so these visualizations would not meet the communicating and parametric definitions of interactivity. In contrast, the [Plotly Dash documentation page on Interactive Visualizations](https://dash.plotly.com/interactive-graphing) [@bibentry2022plotly] features examples of linked hovering and cross-filtering, i.e. examples of communicating and parametric interactivity. Somewhat differently again, [VegaLite Gallery pages on Interactive Charts](https://vega.github.io/vega-lite/examples/#interactive-charts) and [Interactive Multiview Displays](https://vega.github.io/vega-lite/examples/#interactive-multi-view-displays)  [@bibentry2022vegalite] feature many examples, only few of which meet the communicating and parametric definitions.
 
 The term "interactive" is very loaded. Clearly, it would not be possible to disambiguate the many different definitions. However, to clear up at least some of the confusion, I propose to use the term *communicating* to refer to visualizations that meet the change propagation definition outlined above. A *communicating visualization* is one whose plots share an underlying representation of the data and communicate together in response to the user's interaction (here used in the essential sense).
 
@@ -64,8 +69,34 @@ Tufte [-@tufte2001visual] introduced the term *chartjunk* to refer to redundant 
 
 There is even greater potential for ducks and chartjunk to appear in interactive visualizations. First of all, user's interaction can produce abrupt changes to the visual scene and these can be even more attention-grabbing and distracting than any element of a static plot. In cognitive research, it is well-known that visual stimuli are initially perceived pre-attentively and compete for attention [see e.g. @carrasco2011visual; @treue2003visual]. Whichever stimulus is found to be the most salient is then perceived consciously. As such, rapid changes to the visual stimulus can compete for the user's attention and become distracting, especially if they were not committed intentionally.
 
-A specific example of an interactive chartjunk or *interactjunk* may be the overuse of a pop-up tooltips that appears whenever user hovers over a points on a scatterplot. Dragging a cursor over a part of the plot where many such points are located close together will make many tooltips pop in and out of existence and produce a distracting visual clutter. The value of this feature for graphical inference is questionable. Querying individual points *can* be valuable, such as when learning about outliers and otherwise unusual datapoints, however, these are, by definition, few and far apart. Most datapoints do not need to be queried, since they reveal information jointly, as part of a larger pattern. Put simply, we seldom need information about a specific Joe who is average, but information about the Average Joe may be interesting. Conversely, information about a specific Exceptional Steve may be interesting too, but there are few Exceptional Steves, otherwise they would not be exceptional. For these reasons, having a tooltip appear on hover by default seems like a bad feature design. Instead, the appearance of the tooltip should result from an intentional action by the user, such as by clicking the queried point while simultaneously holding down a specific key.  
+A specific example of an interactive chartjunk or *interactjunk* may be the overuse of a pop-up tooltips that appears whenever user hovers over a points on a scatterplot. Dragging a cursor over a part of the plot where many such points are located close together will make many tooltips pop in and out of existence and produce a distracting visual clutter. The value of this feature for graphical inference is questionable. Querying individual points *can* be valuable, such as when learning about outliers and otherwise unusual datapoints, however, these are, by definition, few and far apart. Most datapoints do not need to be queried, since they reveal information jointly, as part of a larger pattern. Put simply, we seldom need information about a specific Joe who is average, but information about the Average Joe may be interesting. Conversely, information about a specific Exceptional Steve may be interesting too, but there are few Exceptional Steves, otherwise they would not be exceptional. For these reasons, having a tooltip appear on hover by default seems like a bad feature design. Instead, the appearance of the tooltip should result from an intentional action by the user, such as by clicking the queried point while simultaneously holding down a specific key.
 
-Moreover, tooltip-on-hover also has the hallmarks of an interactive duck: it is immediate, attention-grabbing, and unavoidable. It signals to the user "this is an interactive plot alright". 
+Moreover, tooltip-on-hover also has the hallmarks of an interactive duck: it is immediate, attention-grabbing, and unavoidable. It signals to the user "this is an interactive plot alright".
 
 Finally, a question immediately presents itself: *"does interaction allow the user to see some patterns in the data clearer or faster?"* If not, there is no advantage over static visualization.
+
+```{r}
+#| echo: false
+#| label: tbl-principles
+#| tbl-cap: "Core principles"
+
+library(kableExtra)
+
+tab2 <- read.csv('tables/principles.csv')
+ktab2 <- knitr::kable(tab2)
+ktab2 <- column_spec(ktab2, 1, width = "12cm", bold = TRUE)
+
+kable_styling(ktab2, bootstrap_options = c("striped"))
+
+```
+
+:::{layout-ncol=2}
+```{r}
+plot(mtcars$wt, mtcars$mpg)
+```
+
+```{r}
+plot(mtcars$gear)
+```
+:::
+  

@@ -73,6 +73,8 @@ export class GraphicLayer {
     const context = this.context;
     context.save();
     context.fillStyle = this.toAlpha(col, alpha);
+    context.strokeStyle = strokeCol;
+    context.lineWidth = strokeWidth;
     xs.forEach((e, i) => {
       col ? context.fillRect(e - width / 2, ys[i], width, y0 - ys[i]) : null;
       strokeCol
@@ -102,6 +104,7 @@ export class GraphicLayer {
     context.save();
     context.fillStyle = this.toAlpha(col, alpha);
     context.strokeStyle = strokeCol;
+    context.lineWidth = strokeWidth;
     x.forEach((e, i) => {
       context.beginPath();
       context.arc(e, y[i], rs[i], 0, Math.PI * 2);
@@ -128,6 +131,7 @@ export class GraphicLayer {
     context.save();
     context.fillStyle = this.toAlpha(col, alpha);
     context.strokeStyle = strokeCol;
+    context.lineWidth = strokeWidth;
     x.forEach((e, i) => {
       col ? context.fillRect(e - w[i] / 2, y[i] - h[i] / 2, h[i], w[i]) : null;
       strokeCol

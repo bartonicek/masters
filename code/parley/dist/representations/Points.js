@@ -1,4 +1,4 @@
-import * as funs from "../functions.js";
+import * as dtstr from "../datastructures.js";
 import { Representation } from "./Representation.js";
 export class Points extends Representation {
     constructor(wrangler) {
@@ -7,15 +7,16 @@ export class Points extends Representation {
     getMappings = (membership = 0) => {
         const mappings = ["x", "y", "size"];
         let [x, y, size] = mappings.map((e) => this.getMapping(e, membership));
-        const radius = this.pars.radius[membership];
-        size = size
-            ? size.map((e) => radius * e * this.sizeMultiplier)
-            : Array.from(Array(x.length), (e) => radius).map((e) => e * this.sizeMultiplier);
+        const radius = this.pars[membership].radius;
+        size =
+            size.length > 0
+                ? size.map((e) => radius * e * this.sizeMultiplier)
+                : Array.from(Array(x.length), (e) => radius).map((e) => e * this.sizeMultiplier);
         return [x, y, size];
     };
     drawBase = (context) => {
-        const [x, y, size] = this.getMappings();
-        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 0);
+        const [x, y, size] = this.getMappings(0);
+        const { col, strokeCol, strokeWidth } = this.pars[0];
         const pars = {
             col,
             radius: size,
@@ -23,22 +24,23 @@ export class Points extends Representation {
             strokeWidth,
             alpha: this.alphaMultiplier,
         };
-        context.drawClear();
-        context.drawBackground();
         context.drawPoints(x, y, pars);
     };
     drawHighlight = (context) => {
-        const [x, y, size] = this.getMappings(1);
-        const { col, strokeCol, strokeWidth } = funs.accessIndexed(this.pars, 1);
-        const pars = {
-            col,
-            radius: size,
-            strokeCol,
-            strokeWidth,
-            alpha: 1,
-        };
-        context.drawClear();
-        x ? context.drawPoints(x, y, pars) : null;
+        dtstr.highlightMembershipArray.forEach((e) => {
+            const [x, y, size] = this.getMappings(e);
+            if (!(x.length > 0))
+                return;
+            const { col, strokeCol, strokeWidth } = this.pars[e];
+            const pars = {
+                col,
+                radius: size,
+                strokeCol,
+                strokeWidth,
+                alpha: 1,
+            };
+            context.drawPoints(x, y, pars);
+        });
     };
     get boundingRects() {
         const [x, y, size] = this.getMappings();

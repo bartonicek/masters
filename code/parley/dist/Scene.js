@@ -22,6 +22,13 @@ export class Scene {
             state: new hndl.StateHandler(),
         };
         this.handlers.state.keypressHandler = this.handlers.keypress;
+        document
+            .querySelector(".buttonHelp")
+            .addEventListener("click", (event) => {
+            document
+                .querySelector(".sidePanelHelp")
+                .classList.toggle("sidePanelHelpActive");
+        });
     }
     addPlotWrapper = (plotType, mapping) => {
         const { data, handlers, plotIds } = this;

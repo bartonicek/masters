@@ -50,12 +50,10 @@ export class Cast {
   getSplitOf = (membership?: dtstr.ValidMemberships) => {
     const { acrossVec, indices, uniqueIndices, marker } = this;
     const res = uniqueIndices.map((uniqueIndex) =>
-      indices.flatMap((index, i) =>
-        index === uniqueIndex &&
-        (!membership ||
-          marker.transientMembership[i] === membership ||
-          marker.persistentMembership[i] === membership)
-          ? acrossVec[i]
+      acrossVec.flatMap((e, i) =>
+        indices[i] === uniqueIndex &&
+        (!membership || marker.isOfLowerOrEqualMembership(i, membership))
+          ? e
           : []
       )
     );
@@ -69,10 +67,8 @@ export class Cast {
     if (membership) {
       // Members + no split + across trans.
       if (allUnique) {
-        return acrossVec.filter(
-          (_, i) =>
-            marker.transientMembership[i] === membership ||
-            marker.persistentMembership[i] === membership
+        return acrossVec.flatMap((e, i) =>
+          marker.isOfLowerOrEqualMembership(i, membership) ? e : []
         );
       }
       // Members + split + across trans. + within trans.

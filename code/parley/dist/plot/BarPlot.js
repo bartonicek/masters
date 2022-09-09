@@ -13,7 +13,7 @@ export class BarPlot extends Plot {
                 .splitBy("x")
                 .splitWhat("y")
                 .doWithin("by", funs.unique)
-                .doWithin("what", funs.length)
+                .doWithin("what", funs.sum)
                 .assignIndices(),
         };
         this.scales = {

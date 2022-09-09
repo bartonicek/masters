@@ -8,6 +8,7 @@ const getData = async (path: string) => {
 };
 
 const dataMtcars = await DataFrame.getData("mtcars.json");
+const dataMpg = await DataFrame.getData("mpg.json");
 const dataGapminder = await DataFrame.getData("gapminder.json");
 const dataDiamonds = await DataFrame.getData("diamonds.json");
 
@@ -23,13 +24,27 @@ function mtcars() {
   return scene;
 }
 
+function mpg() {
+  const scene = new Scene(dataMpg)
+    // .addPlotWrapper(
+    //   "bar",
+    //   new Mapping(["x", "manufacturer"], ["y", "_indicator"])
+    // )
+    .addPlotWrapper("histo", new Mapping(["x", "cty"], ["y", "_indicator"]))
+    .addPlotWrapper("scatter", new Mapping(["x", "displ"], ["y", "hwy"]));
+  return scene;
+}
+
 const gapminder = () => {
   const scene = new Scene(dataGapminder)
     .addPlotWrapper("scatter", new Mapping(["x", "pop"], ["y", "lifeExp"]))
-    .addPlotWrapper("bar", new Mapping(["x", "continent"], ["y", "_indicator"]))
     .addPlotWrapper(
       "histo",
       new Mapping(["x", "gdpPercap"], ["y", "_indicator"])
+    )
+    .addPlotWrapper(
+      "bar",
+      new Mapping(["x", "continent"], ["y", "_indicator"])
     );
   return scene;
 };
@@ -37,9 +52,8 @@ const gapminder = () => {
 const diamonds = () => {
   const scene = new Scene(dataDiamonds)
     .addPlotWrapper("scatter", new Mapping(["x", "carat"], ["y", "price"]))
-    .addPlotWrapper("bar", new Mapping(["x", "cut"], ["y", "price"]));
+    .addPlotWrapper("histo", new Mapping(["x", "price"], ["y", "_indicator"]));
   return scene;
-
   // .addPlotWrapper(
   //   "bubble",
   //   new Mapping(["x", "color"], ["y", "cut"], ["size", "price"])
@@ -69,4 +83,4 @@ const diamonds = () => {
 //   const plot3 = new BubblePlot(dataDiamonds, mapping3, marker1);
 // };
 
-export { mtcars, gapminder, diamonds };
+export { mtcars, mpg, gapminder, diamonds };

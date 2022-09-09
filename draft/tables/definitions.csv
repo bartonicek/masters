@@ -1,0 +1,6 @@
+Type,Short definition,Details
+Basic,Change happens at all,The user has the ability to manipulate some graphical attributes of the visual display.
+Temporal,Change happens “in real-time”,"The user’s input produces changes to the visual display fluidly, with little lag, real-time change is sometimes called dynamic."
+Linked,Change propagates,"Parts of the visual display are linked together and ""communicate"", i.e. the user's interaction with one plot produces a change in another plot (e.g. linked brushing)"
+Parametric,Change affects underlying models,"The user can manipulate the underlying mathematical structure behind the visual display, not just its surface-level graphical attributes"
+(Cognitive),Change is perceived by a human,"There is a back-and-forth between the visual information displayed and the user's perception, cognition, insights, etc..."

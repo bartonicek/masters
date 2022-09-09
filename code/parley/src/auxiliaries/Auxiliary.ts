@@ -1,4 +1,4 @@
-//import { Scale } from "../scales/Scale.js";
+import { GraphicLayer } from "../plot/GraphicLayer.js";
 
 export class Auxiliary {
   scales: { [key: string]: any };
@@ -10,7 +10,7 @@ export class Auxiliary {
     return this;
   };
 
-  draw = (context: any, ...args: any[]) => {};
-  drawBase = (context: any, ...args: any[]) => {};
-  drawUser = (context: any, handler: any, ...args: any[]) => {};
+  draw = (context: GraphicLayer, ...args: any[]) => {};
+  drawBase = (context: GraphicLayer, ...args: any[]) => {};
+  drawUser = (context: GraphicLayer, handler: any, ...args: any[]) => {};
 }

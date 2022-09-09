@@ -11,4 +11,7 @@ export class AxisBox extends Auxiliary {
     drawBase = (context) => {
         this.draw(context);
     };
+    drawHighlight = (context) => {
+        this.draw(context);
+    };
 }

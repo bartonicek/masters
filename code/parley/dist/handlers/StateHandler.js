@@ -1,18 +1,31 @@
+import * as dtstr from "../datastructures.js";
 import { Handler } from "./Handler.js";
 export class StateHandler extends Handler {
     keypressHandler;
     plotIds;
     plotsActive;
     plotContainers;
-    validModes;
-    modeKeys;
+    validStates;
+    stateKeys;
+    membershipArray;
     constructor() {
         super();
         this.plotIds = [];
         this.plotsActive = [];
         this.plotContainers = [];
-        this.validModes = ["or", "group1", "group2"];
-        this.modeKeys = ["ShiftLeft", "Digit1", "Digit2"];
+        this.validStates = ["not", "or", "group1", "group2"];
+        this.stateKeys = ["ControlLeft", "ShiftLeft", "Digit1", "Digit2"];
+        this.membershipArray = dtstr.validMembershipArray;
+    }
+    get currentId() {
+        const { stateKeys, keypressHandler } = this;
+        return (stateKeys.flatMap((e, i) => keypressHandler.currentlyPressedKeys.includes(e) ? i : [])[0] ?? -1);
+    }
+    get current() {
+        return this.validStates[this.currentId];
+    }
+    get membership() {
+        return this.membershipArray[this.currentId] ?? 1;
     }
     activate = (id) => {
         this.plotsActive[this.plotIds.indexOf(id)] = true;
@@ -29,8 +42,10 @@ export class StateHandler extends Handler {
     isActive = (id) => {
         return this.plotsActive[this.plotIds.indexOf(id)];
     };
-    inMode = (mode) => {
-        const { keypressHandler, validModes, modeKeys } = this;
-        return keypressHandler.isPressed(modeKeys[validModes.indexOf(mode)]);
+    inState = (state) => {
+        const { keypressHandler, validStates, stateKeys } = this;
+        if (state === "none" && !keypressHandler.currentlyPressed.some((e) => e))
+            return true;
+        return keypressHandler.isPressed(stateKeys[validStates.indexOf(state)]);
     };
 }

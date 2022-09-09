@@ -1,5 +1,6 @@
 import { Auxiliary } from "./Auxiliary.js";
 import * as funs from "../functions.js";
+import { GraphicLayer } from "../plot/GraphicLayer.js";
 
 export class AxisText extends Auxiliary {
   along: string;
@@ -30,11 +31,11 @@ export class AxisText extends Auxiliary {
       : this.dataBreaks.map((e) => e.toString());
   }
 
-  getLabelMetrics = (context: any) => {
+  getLabelMetrics = (context: GraphicLayer) => {
     return this.labels.map((label) => context.context.measureText(label));
   };
 
-  draw = (context: any) => {
+  draw = (context: GraphicLayer) => {
     const labelWidths = this.getLabelMetrics(context).map((e) => e.width);
     const labelHeights = this.getLabelMetrics(context).map(
       (e) => e.actualBoundingBoxAscent
@@ -57,7 +58,7 @@ export class AxisText extends Auxiliary {
     context.drawText(x, y, this.labels);
   };
 
-  drawBase = (context: any) => {
+  drawBase = (context: GraphicLayer) => {
     this.draw(context);
   };
 }

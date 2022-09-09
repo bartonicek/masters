@@ -1,6 +1,7 @@
 import * as dtstr from "../datastructures.js";
 import * as funs from "../functions.js";
 import { globalParameters } from "../globalparameters.js";
+import { GraphicLayer } from "../plot/GraphicLayer.js";
 import { Wrangler } from "../wrangler/Wrangler.js";
 
 export class Representation {
@@ -8,11 +9,12 @@ export class Representation {
   plotDims: { width: number; height: number };
   scales: { [key: string]: any };
   pars: {
-    col: string[];
-    strokeCol: string[];
-    strokeWidth: number[];
-    radius: number[];
-  };
+    col: string;
+    strokeCol: string;
+    strokeWidth: number;
+    radius: number;
+  }[];
+
   sizeMultiplier: number;
   sizeLimits: { min: number; max: number };
   alphaMultiplier: number;
@@ -20,7 +22,9 @@ export class Representation {
 
   constructor(wrangler: Wrangler) {
     this.wrangler = wrangler;
-    this.pars = globalParameters.reps;
+    this.pars = dtstr.validMembershipArray.map((e) =>
+      funs.accessIndexed(globalParameters.reps, e)
+    );
     this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
     this.sizeLimits = {
@@ -39,15 +43,15 @@ export class Representation {
   ) => {
     let res = this.wrangler[mapping]?.extract(membership);
     res = this.scales[mapping]?.dataToPlot(res);
-    return res;
+    return res ?? [];
   };
 
   get boundingRects() {
     return [];
   }
 
-  drawBase = (context: any) => {};
-  drawHighlight = (context: any, selectedPoints: number[]) => {};
+  drawBase = (context: GraphicLayer) => {};
+  drawHighlight = (context: GraphicLayer, selectedPoints: number[]) => {};
 
   registerScales = (scales: any) => {
     this.scales = scales;

@@ -19,7 +19,6 @@ export class Scene {
   };
 
   constructor(data: DataFrame) {
-    
     this.data = data;
     this.nObs = data[Object.keys(data)[0]].length;
     this.nPlots = 0;
@@ -32,6 +31,14 @@ export class Scene {
       state: new hndl.StateHandler(),
     };
     this.handlers.state.keypressHandler = this.handlers.keypress;
+
+    document
+      .querySelector<HTMLElement>(".buttonHelp")
+      .addEventListener("click", (event) => {
+        document
+          .querySelector<HTMLElement>(".sidePanelHelp")
+          .classList.toggle("sidePanelHelpActive");
+      });
   }
 
   addPlotWrapper = (plotType: dtstr.PlotTypes, mapping: Mapping) => {
