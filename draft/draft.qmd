@@ -7,6 +7,8 @@ mainfont: "Liberation Serif"
 fontcolor: "#1F271B"
 backgroundcolor: "floralwhite"
 bibliography: "references.bib"
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -90,13 +92,40 @@ kable_styling(ktab2, bootstrap_options = c("striped"))
 
 ```
 
-:::{layout-ncol=2}
-```{r}
-plot(mtcars$wt, mtcars$mpg)
-```
+
+### The Zebra Problem
+
+One issue with visualizing transient as well as persistent (group) selection is how to display the product of the two types of selection. For example, if we have two persistent groups and a transient selection operator, we end up with six ($= 2 \cdot (2 + 1)$) different visual memberships: base no group, transiently selected no group, base group 1, transiently selected group 1, base group 2, transiently selected group 2. Displaying this many group memberships is tricky. The worst possible solution would be to encode each of these different memberships via a different color (on, for example, a stacked bar chart). Then we would end up with a distracting "zebra" pattern. Also, it may not be immediately clear which colors belong to transient selection and which to persistent selection. We can ameliorate the problem by drawing groups first and then overlaying a semi-transparent color to mark transient selection (i.e. "darkening" or "lightening" the group color if we use black or white overlay).    
 
 ```{r}
-plot(mtcars$gear)
+#| echo: false
+#| label: fig-zebra
+#| layout-ncol: 3
+#| fig-cap: "Zebra Problem"
+#| fig-subcap: 
+#| - Each color different
+#| - Color (group) & \n brightness (transience)
+#| - Color (group) & brightness (transience), stacked transience-first
+
+set.seed(123456)
+a <- sample(c("A", "B"), 50, replace = TRUE)
+b <- sample(1:6, 50, replace = TRUE)
+
+cols1 <- RColorBrewer::brewer.pal(6, "Set1")
+cols3 <- c(colorspace::lighten(cols1[1:3], 0.85), cols1[1:3])
+cols2 <- cols3[c(1, 4, 2, 5, 3, 6)]
+
+barplot_fun <- function(cols) {
+  barplot(table(b, a), col = cols, border = NA, axes = FALSE, 
+        xlim = c(0.7 - 0.75, 1.9 + 0.75), ylim = c(0, 35),
+        names.arg = c("",""))
+  box(col = "grey80")
+}
+
+par(mar = c(3, 1, 3, 1))
+barplot_fun(cols1)
+barplot_fun(cols2)
+barplot_fun(cols3)
+
 ```
-:::
   

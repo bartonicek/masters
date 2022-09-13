@@ -14,18 +14,23 @@ export class MarkerHandler extends Handler {
     constructor(n) {
         super();
         this.n = n;
-        this.currentTransient = new MembershipArray(n).fill(255);
-        this.currentPersistent = new MembershipArray(n).fill(255);
-        this.pastTransient = new MembershipArray(n).fill(255);
-        this.pastPersistent = new MembershipArray(n).fill(255);
+        this.currentTransient = new MembershipArray(n);
+        this.currentPersistent = new MembershipArray(n);
+        this.pastTransient = new MembershipArray(n);
+        this.pastPersistent = new MembershipArray(n);
         this.callbacks = [];
         this.when = [];
     }
     isOfLowerOrEqualMembership = (index, membership) => {
-        return membership > 1
-            ? this.currentPersistent[index] <= membership ||
-                this.pastPersistent[index] <= membership
-            : this.currentTransient[index] === 1 || this.pastTransient[index] === 1;
+        if (membership > 1 && this.currentPersistent[index] < 255) {
+            return this.currentPersistent[index] <= membership;
+        }
+        else if (membership > 1) {
+            return this.pastPersistent[index] <= membership;
+        }
+        else {
+            return (this.currentTransient[index] === 1 || this.pastTransient[index] === 1);
+        }
     };
     getArray = (type, membership) => {
         return this[type + ["Transient", "Persistent"][membership > 1 ? 1 : 0]];
@@ -53,6 +58,7 @@ export class MarkerHandler extends Handler {
 export class MembershipArray extends Uint8Array {
     constructor(n) {
         super(n);
+        this.fill(255);
     }
     clear = () => {
         this.fill(255);

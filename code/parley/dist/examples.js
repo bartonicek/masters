@@ -14,7 +14,7 @@ function mtcars() {
         .addPlotWrapper("histo", new Mapping(["x", "mpg"], ["y", "_indicator"]))
         .addPlotWrapper("scatter", new Mapping(["x", "wt"], ["y", "mpg"]))
         .addPlotWrapper("square", new Mapping(["x", "cyl"], ["y", "am"], ["size", "_indicator"]))
-        .addPlotWrapper("scatter", new Mapping(["x", "hp"], ["y", "drat"]));
+        .addPlotWrapper("bar", new Mapping(["x", "carb"], ["y", "_indicator"]));
     return scene;
 }
 function mpg() {

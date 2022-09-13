@@ -150,7 +150,9 @@ export class Plot extends GraphicStack {
         callChildren("auxiliaries", what, this[where], ...args);
     };
     drawBase = () => this.draw("base");
-    drawHighlight = () => this.draw("highlight");
+    drawHighlight = () => {
+        this.draw("highlight");
+    };
     drawUser = () => {
         if (this.active || this.handlers.state.inState("none"))
             this.draw("user");

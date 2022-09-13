@@ -20,7 +20,7 @@ function mtcars() {
       "square",
       new Mapping(["x", "cyl"], ["y", "am"], ["size", "_indicator"])
     )
-    .addPlotWrapper("scatter", new Mapping(["x", "hp"], ["y", "drat"]));
+    .addPlotWrapper("bar", new Mapping(["x", "carb"], ["y", "_indicator"]));
   return scene;
 }
 

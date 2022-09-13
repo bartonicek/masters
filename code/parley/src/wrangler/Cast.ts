@@ -49,14 +49,16 @@ export class Cast {
   // No argument: default split, across all memberships
   getSplitOf = (membership?: dtstr.ValidMemberships) => {
     const { acrossVec, indices, uniqueIndices, marker } = this;
-    const res = uniqueIndices.map((uniqueIndex) =>
-      acrossVec.flatMap((e, i) =>
-        indices[i] === uniqueIndex &&
-        (!membership || marker.isOfLowerOrEqualMembership(i, membership))
-          ? e
-          : []
-      )
-    );
+
+    const res = Array.from(Array(uniqueIndices.length), (e) => []);
+    let i = indices.length;
+
+    while (i--) {
+      if (!membership || marker.isOfLowerOrEqualMembership(i, membership)) {
+        res[indices[i]].push(acrossVec[i]);
+      }
+    }
+
     return res;
   };
 
