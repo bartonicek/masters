@@ -54,17 +54,6 @@ export class ScaleContinuous extends Scale {
     return typeof data === "number"
       ? offset + (direction * length * (data - dataMin)) / range
       : data.map((e) => offset + direction * length * ((e - dataMin) / range));
-    // if (typeof data === "number") {
-    //   return this.inRange(data)
-    //     ? offset + (direction * length * (data - dataMin)) / range
-    //     : null;
-    // }
-
-    // return data.map((e) =>
-    //   this.inRange(e)
-    //     ? offset + direction * length * ((e - dataMin) / range)
-    //     : null
-    // );
   };
 
   unitsToData = (units: number | number[]) => {
