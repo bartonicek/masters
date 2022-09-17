@@ -18,7 +18,7 @@ export class StateHandler extends Handler {
     this.plotContainers = [];
     this.validStates = ["not", "or", "group1", "group2"];
     this.stateKeys = ["ControlLeft", "ShiftLeft", "Digit1", "Digit2"];
-    this.membershipArray = dtstr.validMembershipArray;
+    this.membershipArray = [1, 128, 2, 3];
   }
 
   get currentId() {
@@ -35,7 +35,7 @@ export class StateHandler extends Handler {
   }
 
   get membership() {
-    return this.membershipArray[this.currentId] ?? 1;
+    return this.membershipArray[this.currentId] ?? 128;
   }
 
   activate = (id: string) => {

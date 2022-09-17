@@ -1,76 +1,81 @@
 import { Handler } from "./Handler.js";
 export class MarkerHandler extends Handler {
     n;
-    selected;
-    currentTransient;
-    currentPersistent;
-    pastTransient;
-    pastPersistent;
-    // Membership values:
-    //  255: No membership, unchanged
-    //  0: No membership, changed (i.e. membership removed)
-    //  1: Basic highlighting
-    //  2-6: Group highlighting
+    current;
+    past;
     constructor(n) {
         super();
         this.n = n;
-        this.currentTransient = new MembershipArray(n);
-        this.currentPersistent = new MembershipArray(n);
-        this.pastTransient = new MembershipArray(n);
-        this.pastPersistent = new MembershipArray(n);
+        this.current = new MembershipArray(n);
+        this.past = new MembershipArray(n);
         this.callbacks = [];
         this.when = [];
     }
-    isOfLowerOrEqualMembership = (index, membership) => {
-        if (membership > 1 && this.currentPersistent[index] < 255) {
-            return this.currentPersistent[index] <= membership;
+    isOfMembership = (index, membership) => {
+        if (membership === 1)
+            return true;
+        const { current: curr, past } = this;
+        if (membership === 128) {
+            return curr[index] > 1 ? !!(curr[index] & 128) : !!(past[index] & 128);
         }
-        else if (membership > 1) {
-            return this.pastPersistent[index] <= membership;
-        }
-        else {
-            return (this.currentTransient[index] === 1 || this.pastTransient[index] === 1);
-        }
+        return curr[index] > 1
+            ? curr[index] >= membership
+            : past[index] >= membership;
     };
-    getArray = (type, membership) => {
-        return this[type + ["Transient", "Persistent"][membership > 1 ? 1 : 0]];
+    updateCurrent = (at, membership) => {
+        this.clearCurrent();
+        this.current.update(at, membership);
+        this.notifyAll("updateCurrent");
     };
-    replaceTemporary = (at, membership) => {
-        this.getArray("current", membership).receiveClearReplace(at, membership);
-        this.notifyAll("replaceTemporary");
+    mergeCurrent = () => {
+        this.past.merge(this.current.asPersistent());
+        this.notifyAll("mergeCurrent");
     };
-    mergeTemporary = () => {
-        this.pastTransient.merge(this.currentTransient);
-        this.pastPersistent.merge(this.currentPersistent);
-        this.notifyAll("mergeTemporary");
-    };
-    clearTransient = () => {
-        this.currentTransient.clear();
-        this.pastTransient.clear();
+    clearCurrent = () => {
+        this.current = new MembershipArray([...this.past.asPersistent()]);
     };
     clearAll = () => {
-        this.currentTransient.clear();
-        this.currentPersistent.clear();
-        this.pastTransient.clear();
-        this.pastPersistent.clear();
+        this.current.clear();
+        this.past.clear();
     };
 }
-export class MembershipArray extends Uint8Array {
-    constructor(n) {
-        super(n);
-        this.fill(255);
+class MembershipArray extends Uint8Array {
+    constructor(arg) {
+        super(arg);
+        if (typeof arg === "number")
+            this.fill(1);
     }
-    clear = () => {
-        this.fill(255);
+    clear = () => this.fill(1);
+    asPersistent = () => {
+        const res = new MembershipArray(this.length);
+        let i = this.length;
+        while (i--)
+            res[i] = this[i] & ~128;
+        return res;
+    };
+    asTransient = () => {
+        const res = new MembershipArray(this.length);
+        let i = this.length;
+        while (i--)
+            res[i] = this[i] & ~128;
+        return res;
     };
     merge = (arr) => {
-        arr.forEach((e, i) => (e !== 255 ? (this[i] = e) : null));
+        let i = this.length;
+        while (i--) {
+            if (arr[i] === 1)
+                continue;
+            this[i] = arr[i];
+        }
     };
-    recieveReplace = (at, membership) => {
-        at.forEach((e) => (this[e] = membership));
-    };
-    receiveClearReplace = (at, membership) => {
-        this.clear();
-        at.forEach((e) => (this[e] = membership));
+    update = (at, membership) => {
+        let i = at.length;
+        if (membership === 128) {
+            while (i--)
+                this[at[i]] = this[at[i]] | 128;
+            return;
+        }
+        while (i--)
+            this[at[i]] = membership;
     };
 }

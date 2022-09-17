@@ -22,9 +22,11 @@ export class Representation {
 
   constructor(wrangler: Wrangler) {
     this.wrangler = wrangler;
-    this.pars = dtstr.validMembershipArray.map((e) =>
-      funs.accessIndexed(globalParameters.reps, e)
-    );
+    this.pars = dtstr.validMembershipArray.map((e) => {
+      const p = globalParameters.reps;
+      if (e === 128) return funs.accessIndexed(p, p.col.length - 1);
+      return funs.accessIndexed(p, (e & ~128) - 1);
+    });
     this.sizeMultiplier = 1;
     this.alphaMultiplier = 1;
     this.sizeLimits = {
@@ -39,7 +41,7 @@ export class Representation {
 
   getMapping = (
     mapping: dtstr.ValidMappings,
-    membership: dtstr.ValidMemberships = 0
+    membership: dtstr.ValidMemberships = 1
   ) => {
     let res = this.wrangler[mapping]?.extract(membership);
     res = this.scales[mapping]?.dataToPlot(res);
@@ -49,6 +51,11 @@ export class Representation {
   get boundingRects() {
     return [];
   }
+
+  getPars = (membership: dtstr.ValidMemberships) => {
+    if (membership === 128) return this.pars[this.pars.length - 1];
+    return this.pars[(membership & ~128) - 1];
+  };
 
   drawBase = (context: GraphicLayer) => {};
   drawHighlight = (context: GraphicLayer, selectedPoints: number[]) => {};

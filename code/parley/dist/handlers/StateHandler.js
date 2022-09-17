@@ -1,4 +1,3 @@
-import * as dtstr from "../datastructures.js";
 import { Handler } from "./Handler.js";
 export class StateHandler extends Handler {
     keypressHandler;
@@ -15,7 +14,7 @@ export class StateHandler extends Handler {
         this.plotContainers = [];
         this.validStates = ["not", "or", "group1", "group2"];
         this.stateKeys = ["ControlLeft", "ShiftLeft", "Digit1", "Digit2"];
-        this.membershipArray = dtstr.validMembershipArray;
+        this.membershipArray = [1, 128, 2, 3];
     }
     get currentId() {
         const { stateKeys, keypressHandler } = this;
@@ -25,7 +24,7 @@ export class StateHandler extends Handler {
         return this.validStates[this.currentId];
     }
     get membership() {
-        return this.membershipArray[this.currentId] ?? 1;
+        return this.membershipArray[this.currentId] ?? 128;
     }
     activate = (id) => {
         this.plotsActive[this.plotIds.indexOf(id)] = true;

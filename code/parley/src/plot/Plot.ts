@@ -124,7 +124,7 @@ export class Plot extends GraphicStack {
     highlightrects.updateCurrentEndpoint(drag.end);
     highlightrects.updateLast();
     this.drawUser();
-    marker.replaceTemporary(
+    marker.updateCurrent(
       this.inSelection([drag.start, drag.end]),
       state.membership
     );
@@ -133,7 +133,7 @@ export class Plot extends GraphicStack {
   endDrag = () => {
     const { marker, state } = this.handlers;
     const { highlightrects } = this.auxiliaries;
-    marker.mergeTemporary();
+    marker.mergeCurrent();
     if (!state.inState("none") && highlightrects.lastComplete) {
       highlightrects.pushLastToPast();
     }
@@ -173,12 +173,12 @@ export class Plot extends GraphicStack {
     const { marker, click, drag, state } = this.handlers;
     const { highlightrects } = this.auxiliaries;
     if (state.inState("none")) {
-      marker.clearTransient();
+      marker.clearCurrent();
       this.auxiliaries.highlightrects.clear();
     }
     state.deactivateAll();
     this.activate();
-    marker.replaceTemporary(
+    marker.updateCurrent(
       this.inClickPosition(click.clickLast),
       state.membership
     );
@@ -206,6 +206,8 @@ export class Plot extends GraphicStack {
 
   drawBase = () => this.draw("base");
   drawHighlight = () => {
+    console.log([...this.handlers.marker.current]);
+    console.log([...this.handlers.marker.past]);
     this.draw("highlight");
   };
   drawUser = () => {
@@ -247,7 +249,7 @@ export class Plot extends GraphicStack {
 
     handlers.marker.registerCallbacks(
       [drawHighlight, drawHighlight],
-      ["replaceTemporary", "clearAll"]
+      ["updateCurrent", "clearAll"]
     );
     handlers.state.registerCallbacks([drawUser], ["deactivateAll"]);
 

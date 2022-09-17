@@ -7,7 +7,6 @@ export class Cast {
   marker: MarkerHandler;
   indices: number[];
   allUnique: boolean;
-  selected: number[];
   fun: Function;
   args: any[];
   withinFun: Function;
@@ -54,7 +53,7 @@ export class Cast {
     let i = indices.length;
 
     while (i--) {
-      if (!membership || marker.isOfLowerOrEqualMembership(i, membership)) {
+      if (!membership || marker.isOfMembership(i, membership)) {
         res[indices[i]].push(acrossVec[i]);
       }
     }
@@ -62,7 +61,7 @@ export class Cast {
     return res;
   };
 
-  extract = (membership: dtstr.ValidMemberships = 0) => {
+  extract = (membership: dtstr.ValidMemberships = 1) => {
     const { marker, allUnique, withinFun, withinArgs, acrossVec, getSplitOf } =
       this;
 
@@ -70,7 +69,7 @@ export class Cast {
       // Members + no split + across trans.
       if (allUnique) {
         return acrossVec.flatMap((e, i) =>
-          marker.isOfLowerOrEqualMembership(i, membership) ? e : []
+          marker.isOfMembership(i, membership) ? e : []
         );
       }
       // Members + split + across trans. + within trans.

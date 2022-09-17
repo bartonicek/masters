@@ -1,9 +1,9 @@
 export const globalParameters = {
-    bgCol: `ivory`,
+    bgCol: `#f2efde`,
     reps: {
-        col: [`#cccccc`, `#ffffffc0`, `#1b9e77`, `#d95f02`],
-        strokeCol: [null, `#333333`, null, null],
-        strokeWidth: [null, 2, null, null],
+        col: [`#cccccc`, `#1b9e77`, `#d95f02`, `#ffffff80`],
+        strokeCol: [null, null, null, `#000000`],
+        strokeWidth: [null, null, null, 2],
         radius: [5, 5, 5, 5],
     },
 };

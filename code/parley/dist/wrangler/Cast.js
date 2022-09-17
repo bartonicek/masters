@@ -4,7 +4,6 @@ export class Cast {
     marker;
     indices;
     allUnique;
-    selected;
     fun;
     args;
     withinFun;
@@ -39,18 +38,18 @@ export class Cast {
         const res = Array.from(Array(uniqueIndices.length), (e) => []);
         let i = indices.length;
         while (i--) {
-            if (!membership || marker.isOfLowerOrEqualMembership(i, membership)) {
+            if (!membership || marker.isOfMembership(i, membership)) {
                 res[indices[i]].push(acrossVec[i]);
             }
         }
         return res;
     };
-    extract = (membership = 0) => {
+    extract = (membership = 1) => {
         const { marker, allUnique, withinFun, withinArgs, acrossVec, getSplitOf } = this;
         if (membership) {
             // Members + no split + across trans.
             if (allUnique) {
-                return acrossVec.flatMap((e, i) => marker.isOfLowerOrEqualMembership(i, membership) ? e : []);
+                return acrossVec.flatMap((e, i) => marker.isOfMembership(i, membership) ? e : []);
             }
             // Members + split + across trans. + within trans.
             return getSplitOf(membership)

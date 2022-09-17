@@ -44,12 +44,13 @@ export class Bars extends Representation {
   };
 
   drawHighlight = (context: GraphicLayer) => {
-    dtstr.highlightMembershipArray.forEach((e) => {
+    dtstr.validMembershipArray.forEach((e) => {
       const [x, y] = this.getMappings(e);
-      //console.log(x);
+      // console.log(e);
+      // console.log(y);
       if (!(x.length > 0)) return;
       const { y0, width } = this;
-      const { col, strokeCol, strokeWidth } = this.pars[e];
+      const { col, strokeCol, strokeWidth } = this.getPars(e);
       const pars = { col, strokeCol, strokeWidth, alpha: 1, width };
       context.drawBarsV(x, y, y0, pars);
     });

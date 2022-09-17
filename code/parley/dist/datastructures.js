@@ -1,4 +1,8 @@
-const validMembershipArray = [0, 1, 2, 3];
-const highlightMembershipArray = [3, 2, 1];
+const baseMembershipArray = [1, 2, 3];
+const validMembershipArray = [
+    ...baseMembershipArray,
+    ...baseMembershipArray.map((e) => e + 128),
+    128,
+];
 const plotTypeArray = ["scatter", "bubble", "bar", "histo", "square"];
-export { validMembershipArray, highlightMembershipArray, plotTypeArray, };
+export { baseMembershipArray, validMembershipArray, plotTypeArray, };

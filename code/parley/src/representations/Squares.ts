@@ -11,10 +11,10 @@ export class Squares extends Representation {
     super(wrangler);
   }
 
-  getMappings = (membership: dtstr.ValidMemberships = 0) => {
+  getMappings = (membership: dtstr.ValidMemberships = 1) => {
     const mappings: dtstr.ValidMappings[] = ["x", "y", "size"];
     let [x, y, size] = mappings.map((e) => this.getMapping(e, membership));
-    const radius = gpars.reps.radius[membership];
+    const radius = this.getPars(membership).radius;
 
     size = size
       ? size.map((e) => radius * e * this.sizeMultiplier)
@@ -25,17 +25,17 @@ export class Squares extends Representation {
   };
 
   drawBase = (context: GraphicLayer) => {
-    const [x, y, size] = this.getMappings(0);
+    const [x, y, size] = this.getMappings(1);
     const { col, strokeCol, strokeWidth } = this.pars[0];
     const pars = { col, strokeCol, strokeWidth, alpha: this.alphaMultiplier };
     context.drawRectsHW(x, y, size, size, pars);
   };
 
   drawHighlight = (context: GraphicLayer) => {
-    dtstr.highlightMembershipArray.forEach((e) => {
+    dtstr.validMembershipArray.forEach((e) => {
       const [x, y, size] = this.getMappings(e);
       if (!x) return;
-      const { col, strokeCol, strokeWidth } = this.pars[e];
+      const { col, strokeCol, strokeWidth } = this.getPars(e);
       const pars = { col, strokeCol, strokeWidth, alpha: 1 };
       context.drawRectsHW(x, y, size, size, pars);
     });
